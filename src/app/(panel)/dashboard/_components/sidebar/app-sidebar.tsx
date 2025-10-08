@@ -29,10 +29,9 @@ import {
   Trash
 } from "lucide-react"
 import Link from "next/link"
-import { DesktopForm } from "./desktop-form"
 import { Button } from "@/components/ui/button"
-import { deleteDesktop } from "../../_actions/delete-desktop"
-import { toast } from "react-toastify"
+import { deleteWorkspace } from "../../_actions/delete-workspace"
+import { toast } from "sonner"
 import { useState, useCallback } from "react"
 import { Menu } from "./menu"
 import { Session } from "next-auth"
@@ -40,6 +39,9 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { FaTasks } from "react-icons/fa"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DialogCreateWorkspace } from "../../workspace/[id]/_components/dialog-create-workspace"
+import { WorkspaceForm } from "./workspace-form"
+
 
 type NavigationLink =
   | {
@@ -79,80 +81,83 @@ const navigationLinks: NavigationLink[] = [
 ];
 
 interface AppSidebarProps {
-  desktops: Desktop[];
+  Workspaces: Workspace[];
   userData: Session;
 }
 
-type Desktop = {
+type Workspace = {
   id: string;
   title: string;
 };
 
 interface EditingState {
   isEditing: boolean;
-  desktop: Desktop | null;
+  Workspace: Workspace | null;
 }
 
-export function AppSidebar({ desktops, userData }: AppSidebarProps) {
+export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
   const pathname = usePathname();
-  const [isAddingDesktop, setIsAddingDesktop] = useState(false);
+  const [isAddingWorkspace, setIsAddingWorkspace] = useState(false);
   const [editingState, setEditingState] = useState<EditingState>({
     isEditing: false,
-    desktop: null
+    Workspace: null
   });
-  const [deletingDesktopId, setDeletingDesktopId] = useState<string | null>(null);
+  const [deletingWorkspaceId, setDeletingWorkspaceId] = useState<string | null>(null);
 
-  const handleStartAddingDesktop = useCallback(() => {
-    setIsAddingDesktop(true);
+  const handleStartAddingWorkspace = useCallback(() => {
+    setIsAddingWorkspace(true);
   }, []);
 
-  const handleFinishAddingDesktop = useCallback((value: boolean) => {
-    setIsAddingDesktop(value);
+  const handleFinishAddingWorkspace = useCallback((value: boolean) => {
+    setIsAddingWorkspace(value);
     return value;
   }, []);
 
-  const handleStartEditingDesktop = useCallback((desktop: Desktop) => {
+  const handleStartEditingWorkspace = useCallback((Workspace: Workspace) => {
     setEditingState({
       isEditing: true,
-      desktop
+      Workspace
     });
   }, []);
 
-  const handleFinishEditingDesktop = useCallback((value: boolean) => {
+  const handleFinishEditingWorkspace = useCallback((value: boolean) => {
     setEditingState({
       isEditing: value,
-      desktop: value ? editingState.desktop : null
+      Workspace: value ? editingState.Workspace : null
     });
     return value;
-  }, [editingState.desktop]);
+  }, [editingState.Workspace]);
 
-  const handleDeleteDesktop = useCallback(async (desktopId: string) => {
-    if (deletingDesktopId) return; // Prevent double deletion
+  const handleDeleteWorkspace = useCallback(async (WorkspaceId: string) => {
+    if (!confirm('Deseja realmente a área de trabalho?, todos os grupos e items serão deletados justos')) {
+      return;
+    }
+    if (deletingWorkspaceId) return; // Prevent double deletion
 
-    setDeletingDesktopId(desktopId);
+    setDeletingWorkspaceId(WorkspaceId);
 
     try {
-      const response = await deleteDesktop(desktopId);
+      const response = await deleteWorkspace(WorkspaceId);
 
       if (response.error) {
         toast.error(response.error);
         return;
       }
 
-      toast.success(response.data || "Desktop deletado com sucesso!");
+      toast.success(response.data || "Workspace deletado com sucesso!");
     } catch (error) {
-      toast.error("Erro inesperado ao deletar desktop");
+      toast.error("Erro inesperado ao deletar Workspace");
     } finally {
-      setDeletingDesktopId(null);
+      setDeletingWorkspaceId(null);
     }
-  }, [deletingDesktopId]);
+  }, [deletingWorkspaceId]);
 
-  const isDesktopBeingEdited = (desktopId: string) => {
-    return editingState.isEditing && editingState.desktop?.id === desktopId;
+  const isWorkspaceBeingEdited = (WorkspaceId: string) => {
+    return editingState.isEditing && editingState.Workspace?.id === WorkspaceId;
   };
 
-  const isDesktopBeingDeleted = (desktopId: string) => {
-    return deletingDesktopId === desktopId;
+  const isWorkspaceBeingDeleted = (WorkspaceId: string) => {
+    return deletingWorkspaceId === WorkspaceId;
   };
 
   return (
@@ -219,46 +224,34 @@ export function AppSidebar({ desktops, userData }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel>Áreas de Trabalho</SidebarGroupLabel>
           <SidebarGroupContent>
-            {/* Add Desktop Section */}
-            <div className="px-2 mb-2">
-              {!isAddingDesktop ? (
-                <Button
-                  variant="outline"
-                  onClick={handleStartAddingDesktop}
-                  className="w-full border-dashed bg-transparent hover:bg-muted/50 justify-start"
-                  size="sm"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Desktop
-                </Button>
-              ) : (
-                <DesktopForm setAddDesktop={handleFinishAddingDesktop} />
-              )}
+            {/* Add Workspace Section */}
+            <div className="w-full mb-2">
+              <DialogCreateWorkspace sidebar />
             </div>
 
-            {/* Desktop List */}
+            {/* Workspace List */}
             <SidebarMenu>
-              {desktops.map((desktop) => (
-                <div key={desktop.id}>
-                  {isDesktopBeingEdited(desktop.id) ? (
+              {Workspaces.map((Workspace) => (
+                <div key={Workspace.id}>
+                  {isWorkspaceBeingEdited(Workspace.id) ? (
                     <div className="px-2">
-                      <DesktopForm
-                        desktopId={editingState.desktop?.id}
+                      <WorkspaceForm
+                        WorkspaceId={editingState.Workspace?.id}
                         initialValues={{
-                          title: editingState.desktop?.title || ""
+                          title: editingState.Workspace?.title || ""
                         }}
-                        setAddDesktop={handleFinishEditingDesktop}
+                        setAddWorkspace={handleFinishEditingWorkspace}
                       />
                     </div>
                   ) : (
                     <SidebarMenuItem>
                       <div className={cn("flex items-center w-full",
-                        pathname === `/dashboard/desktop/${desktop.id}` && "border border-primary rounded-md")
+                        pathname === `/dashboard/workspace/${Workspace.id}` && "border border-primary rounded-md")
                       }>
                         <SidebarMenuButton asChild className="flex-1">
-                          <Link href={`/dashboard/desktop/${desktop.id}`}>
+                          <Link href={`/dashboard/workspace/${Workspace.id}`}>
                             <Dock className="h-4 w-4" />
-                            <span className="truncate">{desktop.title}</span>
+                            <span className="truncate">{Workspace.title}</span>
                           </Link>
                         </SidebarMenuButton>
 
@@ -268,10 +261,10 @@ export function AppSidebar({ desktops, userData }: AppSidebarProps) {
                               variant="ghost"
                               size="sm"
                               className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                              disabled={isDesktopBeingDeleted(desktop.id)}
+                              disabled={isWorkspaceBeingDeleted(Workspace.id)}
                             >
                               <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Opções para {desktop.title}</span>
+                              <span className="sr-only">Opções para {Workspace.title}</span>
                             </Button>
                           </DropdownMenuTrigger>
 
@@ -280,7 +273,7 @@ export function AppSidebar({ desktops, userData }: AppSidebarProps) {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                              onClick={() => handleStartEditingDesktop(desktop)}
+                              onClick={() => handleStartEditingWorkspace(Workspace)}
                               className="cursor-pointer"
                             >
                               <Edit2 className="mr-2 h-4 w-4" />
@@ -288,13 +281,13 @@ export function AppSidebar({ desktops, userData }: AppSidebarProps) {
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                              onClick={() => handleDeleteDesktop(desktop.id)}
-                              disabled={isDesktopBeingDeleted(desktop.id)}
+                              onClick={() => handleDeleteWorkspace(Workspace.id)}
+                              disabled={isWorkspaceBeingDeleted(Workspace.id)}
                               className="cursor-pointer"
                               variant="destructive"
                             >
                               <Trash className="mr-2 h-4 w-4" />
-                              {isDesktopBeingDeleted(desktop.id) ? "Deletando..." : "Deletar"}
+                              {isWorkspaceBeingDeleted(Workspace.id) ? "Deletando..." : "Deletar"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -305,9 +298,9 @@ export function AppSidebar({ desktops, userData }: AppSidebarProps) {
               ))}
             </SidebarMenu>
 
-            {desktops.length === 0 && !isAddingDesktop && (
+            {Workspaces.length === 0 && !isAddingWorkspace && (
               <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                Nenhuma Desktop criada
+                Nenhuma Workspace criada
               </div>
             )}
           </SidebarGroupContent>

@@ -60,7 +60,7 @@ describe("goalCompletion Action", () => {
     expect(mockPrismaGoalCompletionsCreate).toHaveBeenCalledWith({
       data: { goalId: existingGoal.id },
     });
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/desktop");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/Workspace");
     expect(result).toEqual({ data: `Parabêns você completou a meta ${existingGoal.title}.` });
   });
 

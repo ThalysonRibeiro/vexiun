@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react";
-import { getPriorities, PrioritiesCount } from "../../desktop/[id]/_data-access/get-priorities";
+import { render } from "@testing-library/react";
 import { Priorities } from "../priorities";
-import { PrioritiesBar } from "../../desktop/[id]/_components/priorities-bar";
+import { getPriorities, PrioritiesCount } from "../../workspace/[id]/_data-access/get-priorities";
+import { PrioritiesBar } from "../../workspace/[id]/_components/priorities-bar";
 
-jest.mock("../../desktop/[id]/_data-access/get-priorities");
 
-jest.mock("../../desktop/[id]/_components/priorities-bar", () => ({
+jest.mock("../../workspace/[id]/_data-access/get-priorities");
+
+jest.mock("../../workspace/[id]/_components/priorities-bar", () => ({
   PrioritiesBar: jest.fn(() => <div data-testid="priorities-bar" />),
 }));
 
@@ -26,19 +27,19 @@ describe("Priorities component", () => {
 
   it("should render priorities with correct props when data is fetched successfully", async () => {
     mockGetPriorities.mockResolvedValue(mockPriorities);
-    const Component = await Priorities({ desktopId: "desktop-01" });
+    const Component = await Priorities({ workspaceId: "workspace-01" });
     render(Component as React.ReactElement);
 
-    expect(mockGetPriorities).toHaveBeenCalledWith("desktop-01");
+    expect(mockGetPriorities).toHaveBeenCalledWith("workspace-01");
     expect(mockPrioritiesBar).toHaveBeenCalledWith(expect.objectContaining({ priorities: mockPriorities, label: false }), undefined);
   });
 
   it("should render with an empty array when no priorities are found", async () => {
     mockGetPriorities.mockResolvedValue([]);
-    const Component = await Priorities({ desktopId: "desktop-01" });
+    const Component = await Priorities({ workspaceId: "workspace-01" });
     render(Component);
 
-    expect(mockGetPriorities).toHaveBeenCalledWith("desktop-01");
+    expect(mockGetPriorities).toHaveBeenCalledWith("workspace-01");
     expect(mockPrioritiesBar).toHaveBeenCalledWith(expect.objectContaining({ priorities: [], label: false }), undefined);
 
   });

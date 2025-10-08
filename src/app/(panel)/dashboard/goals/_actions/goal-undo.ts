@@ -32,7 +32,7 @@ export async function goalUndo(formData: FormSchema) {
         id: existingGoalCompletion.id
       }
     });
-    revalidatePath("/dashboard/desktop");
+    revalidatePath("/dashboard/Workspace");
     return {
       data: "Desfeita"
     }

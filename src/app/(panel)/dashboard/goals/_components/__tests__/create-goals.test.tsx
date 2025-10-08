@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CreateGoals } from "../create-goals";
 import { createGoal } from "../../_actions/create-goal";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useMobile } from "@/hooks/use-mobile";
 import { Sheet } from "@/components/ui/sheet";
 
 // Mock dependencies
 jest.mock("../../_actions/create-goal");
-jest.mock("react-toastify");
+jest.mock("sonner");
 jest.mock("@/hooks/use-mobile");
 
 const mockCreateGoal = createGoal as jest.Mock;
@@ -23,7 +23,7 @@ const renderInSheet = (ui: React.ReactElement) => {
 describe("CreateGoals Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseMobile.mockReturnValue(false); // Default to desktop
+    mockUseMobile.mockReturnValue(false); // Default to Workspace
   });
 
   it("should render the form correctly", () => {

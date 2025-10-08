@@ -37,7 +37,7 @@ export function getDeviceInfo() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Detectar dispositivo
-  let deviceType = 'Desktop';
+  let deviceType = 'Workspace';
   if (/iPad/i.test(userAgent)) {
     deviceType = 'Tablet';
   } else if (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent)) {

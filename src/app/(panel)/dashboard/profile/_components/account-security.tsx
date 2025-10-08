@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AlertCircle, CheckCircle, Mail, Shield } from "lucide-react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { SettingsFormData, UseSettingsForm } from "./use-settings-form";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
@@ -56,9 +56,9 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
       });
 
       await toast.promise(responsePromise, {
-        pending: 'Enviando e-mail de verificação...',
-        success: 'E-mail de verificação enviado com sucesso!',
-        error: 'Falha ao enviar o e-mail de verificação.',
+        loading: 'Enviando e-mail de verificação...',
+        success: 'E-mail de verificação enviado com sucesso!', // This will be called if response.ok is true
+        error: 'Falha ao enviar o e-mail de verificação.', // This will be called if response.ok is false or an error occurs
       });
 
       // Opcional: verificar se a resposta foi ok
@@ -104,12 +104,12 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
             {isVerified ? (
               <>
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="font-semibold text-green-700">Email Verified</span>
+                <span className="font-semibold text-green-700">Email verificado</span>
               </>
             ) : (
               <>
                 <AlertCircle className="w-5 h-5 text-orange-700" />
-                <span className="font-semibold text-orange-700">Email Not Verified</span>
+                <span className="font-semibold text-orange-700">E-mail não verificado</span>
               </>
             )}
           </div>
@@ -133,7 +133,7 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4 p-4 rounded-xl border"
           >
-            <h3 className="font-semibold text-lg">Security Settings</h3>
+            <h3 className="font-semibold text-lg">Configurações de segurança</h3>
 
             <div className="opacity-50 cursor-not-allowed border flex items-center justify-between py-3 px-4 rounded-lg">
               <div className="flex items-center gap-3">

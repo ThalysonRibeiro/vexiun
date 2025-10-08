@@ -45,7 +45,7 @@ const mockDetailUserWithSettings = {
   id: "user-1",
   name: "Test User",
   email: "test@test.com",
-  UserSettings: {
+  userSettings: {
     id: "settings-1",
     userId: "user-1",
     timezone: "Europe/London",

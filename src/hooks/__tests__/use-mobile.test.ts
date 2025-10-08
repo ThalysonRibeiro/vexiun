@@ -176,7 +176,7 @@ describe("getDeviceInfo", () => {
       configurable: true,
     })
 
-    // Mock do screen para desktop
+    // Mock do screen para Workspace
     Object.defineProperty(global, "screen", {
       value: {
         width: 1920,
@@ -187,13 +187,13 @@ describe("getDeviceInfo", () => {
     })
 
     const deviceInfo = getDeviceInfo()
-    expect(deviceInfo.userAgent).toBe("Opera em Desktop")
+    expect(deviceInfo.userAgent).toBe("Opera em Workspace")
     expect(deviceInfo.platform).toBe("Win32")
     expect(deviceInfo.language).toBe("en-US")
   })
 
-  it("should correctly identify Chrome browser on desktop", () => {
-    // Mock do navigator para Chrome Desktop
+  it("should correctly identify Chrome browser on Workspace", () => {
+    // Mock do navigator para Chrome Workspace
     Object.defineProperty(global, "navigator", {
       value: {
         userAgent:
@@ -215,7 +215,7 @@ describe("getDeviceInfo", () => {
     })
 
     const deviceInfo = getDeviceInfo()
-    expect(deviceInfo.userAgent).toBe("Chrome em Desktop")
+    expect(deviceInfo.userAgent).toBe("Chrome em Workspace")
     expect(deviceInfo.platform).toBe("Win32")
     expect(deviceInfo.language).toBe("pt-BR")
   })
@@ -242,6 +242,6 @@ describe("getDeviceInfo", () => {
     })
 
     const deviceInfo = getDeviceInfo()
-    expect(deviceInfo.userAgent).toBe("Firefox em Desktop")
+    expect(deviceInfo.userAgent).toBe("Firefox em Workspace")
   })
 })

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Plus, Trash } from "lucide-react"
 import { goalCompletion } from "../_actions/goal-completion"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 import { deleteGoal } from "../_actions/delete-goal"
 import { PendingGoal } from "../_types"
 import { cn } from "@/lib/utils"

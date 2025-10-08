@@ -1,20 +1,20 @@
 import React from "react";
-import { Status, Priority, Desktop, Group, Item, User, UserSettings } from "@/generated/prisma";
+import { Status, Priority, Workspace, Group, Item, User, UserSettings } from "@/generated/prisma";
 import { render, screen } from "@testing-library/react";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/getSession";
 import { GetWeekSummary } from "../goals/_data-access/get-week-summary";
 import { getDetailUser } from "../_data-access/get-detail-user";
-import { getDesktops } from "../_data-access/get-desktops";
-import { getPriorities } from "../desktop/[id]/_data-access/get-priorities";
+import { getPriorities } from "../workspace/[id]/_data-access/get-priorities";
 import type { WeekSummaryResponse } from "../goals/_types";
+import { getWorkspaces } from "../_data-access/get-workspace";
 
 jest.mock("next/navigation");
 jest.mock("@/lib/getSession");
 jest.mock("../goals/_data-access/get-week-summary");
 jest.mock("../_data-access/get-detail-user");
-jest.mock("../_data-access/get-desktops");
-jest.mock("../desktop/[id]/_data-access/get-priorities");
+jest.mock("../_data-access/get-Workspaces");
+jest.mock("../workspace/[id]/_data-access/get-priorities");
 
 jest.mock("@/components/login-alert", () => ({
   LoginAlert: ({ emailNotifications }: { emailNotifications?: boolean }) => (
@@ -28,7 +28,7 @@ jest.mock("../goals/_components/summary", () => ({
   ),
 }));
 
-jest.mock("../desktop/[id]/_components/priorities-bar", () => ({
+jest.mock("../workspace/[id]/_components/priorities-bar", () => ({
   PrioritiesBar: ({ priorities, label }: { priorities: Item[]; label: boolean }) => (
     <div data-testid="priorities-bar" />
   ),
@@ -37,7 +37,7 @@ jest.mock("../desktop/[id]/_components/priorities-bar", () => ({
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href} data-testid="desktop-link">{children}</a>
+    <a href={href} data-testid="Workspace-link">{children}</a>
   ),
 }));
 
@@ -63,7 +63,7 @@ jest.mock("@/components/ui/separator", () => ({
   Separator: () => <hr data-testid="separator" />,
 }));
 
-type DesktopWithGroups = Desktop & {
+type WorkspaceWithGroups = Workspace & {
   groupe: Array<Group & { item: Item[] }>;
 };
 
@@ -99,14 +99,14 @@ const createMockWeekSummary = (total = 1, completed = 1): WeekSummaryResponse =>
   summary: { total, completed, goalsPerDay: [] },
 });
 
-const createMockDesktop = (id: string, title: string, groups: Array<Group & { item: Item[] }> = []): DesktopWithGroups => {
+const createMockWorkspace = (id: string, title: string, groups: Array<Group & { item: Item[] }> = []): WorkspaceWithGroups => {
   const now = new Date();
   return { id, title, userId: "user-1", createdAt: now, updatedAt: now, groupe: groups };
 };
 
 const createMockGroup = (id: string, title: string, items: Item[] = []): Group & { item: Item[] } => {
   const now = new Date();
-  return { id, title, textColor: "#000000", desktopId: "desktop-1", createdAt: now, updatedAt: now, item: items };
+  return { id, title, textColor: "#000000", workspaceId: "Workspace-1", createdAt: now, updatedAt: now, item: items };
 };
 
 const createMockItem = (id: string, title: string, groupId = "group-1"): Item => {
@@ -115,8 +115,8 @@ const createMockItem = (id: string, title: string, groupId = "group-1"): Item =>
 };
 
 const mockDashboardModule = {
-  Priorities: ({ desktopId }: { desktopId: string }) => (
-    <div data-testid="priorities-component" data-desktop-id={desktopId}>
+  Priorities: ({ workspaceId }: { workspaceId: string }) => (
+    <div data-testid="priorities-component" data-Workspace-id={workspaceId}>
       <div data-testid="priorities-bar" />
     </div>
   ),
@@ -132,7 +132,7 @@ const mockGetDetailUser = getDetailUser as jest.MockedFunction<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockGetWeekSummary = GetWeekSummary as jest.MockedFunction<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockGetDesktops = getDesktops as jest.MockedFunction<any>;
+const mockGetWorkspaces = getWorkspaces as jest.MockedFunction<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockGetPriorities = getPriorities as jest.MockedFunction<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -144,7 +144,7 @@ const createTestDashboard = () => {
   return async function TestDashboard() {
     const session = await getSession();
     if (!session) { redirect("/"); return; }
-    const desktops = await getDesktops();
+    const Workspaces = await getWorkspaces();
     const weekSummaryDate = await GetWeekSummary();
     const detailUser = await getDetailUser();
     if (!detailUser) return null;
@@ -164,19 +164,19 @@ const createTestDashboard = () => {
               <h2>Aqui está seu resumo.</h2>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {desktops.map((desktop: DesktopWithGroups) => (
-                <a href={`/dashboard/desktop/${desktop.id}`} key={desktop.id} data-testid="desktop-link">
+              {Workspaces.map((Workspace: WorkspaceWithGroups) => (
+                <a href={`/dashboard/workspace/${Workspace.id}`} key={Workspace.id} data-testid="Workspace-link">
                   <div data-testid="card">
                     <div data-testid="card-header">
-                      <div data-testid="card-title">{desktop.title}</div>
+                      <div data-testid="card-title">{Workspace.title}</div>
                       <div data-testid="card-description">
-                        Total grupos: {desktop.groupe.length}
+                        Total grupos: {Workspace.groupe.length}
                         <br />
-                        Total tarefas: {totalItens(desktop.groupe)}
+                        Total tarefas: {totalItens(Workspace.groupe)}
                       </div>
                     </div>
                     <div data-testid="card-content">
-                      <Priorities desktopId={desktop.id} />
+                      <Priorities workspaceId={Workspace.id} />
                     </div>
                   </div>
                 </a>
@@ -205,7 +205,7 @@ describe("Dashboard Page", () => {
     mockGetSession.mockResolvedValue(createMockSession());
     mockGetDetailUser.mockResolvedValue(createMockDetailUser());
     mockGetWeekSummary.mockResolvedValue(createMockWeekSummary());
-    mockGetDesktops.mockResolvedValue([]);
+    mockGetWorkspaces.mockResolvedValue([]);
     mockGetPriorities.mockResolvedValue([]);
   };
 
@@ -214,11 +214,11 @@ describe("Dashboard Page", () => {
       createMockItem("task-1", "Task 1"),
       createMockItem("task-2", "Task 2"),
     ]);
-    const desktop = createMockDesktop("desktop-1", "Work Desktop", [group1]);
+    const Workspace = createMockWorkspace("Workspace-1", "Work Workspace", [group1]);
     mockGetSession.mockResolvedValue(createMockSession());
     mockGetDetailUser.mockResolvedValue(createMockDetailUser());
     mockGetWeekSummary.mockResolvedValue(createMockWeekSummary(10, 5));
-    mockGetDesktops.mockResolvedValue([desktop]);
+    mockGetWorkspaces.mockResolvedValue([Workspace]);
     mockGetPriorities.mockResolvedValue([]);
   };
 
@@ -267,21 +267,21 @@ describe("Dashboard Page", () => {
       expect(mockGetSession).toHaveBeenCalled();
       expect(mockGetDetailUser).toHaveBeenCalled();
       expect(mockGetWeekSummary).toHaveBeenCalled();
-      expect(mockGetDesktops).toHaveBeenCalled();
+      expect(mockGetWorkspaces).toHaveBeenCalled();
     });
 
-    it("should call getPriorities for each desktop", async () => {
-      const desktops = [
-        createMockDesktop("desktop-1", "Desktop 1"),
-        createMockDesktop("desktop-2", "Desktop 2"),
+    it("should call getPriorities for each Workspace", async () => {
+      const Workspaces = [
+        createMockWorkspace("Workspace-1", "Workspace 1"),
+        createMockWorkspace("Workspace-2", "Workspace 2"),
       ];
-      mockGetDesktops.mockResolvedValue(desktops);
+      mockGetWorkspaces.mockResolvedValue(Workspaces);
       const result = await TestDashboard();
       render(result);
       const prioritiesComponents = screen.getAllByTestId("priorities-component");
       expect(prioritiesComponents).toHaveLength(2);
-      expect(prioritiesComponents[0]).toHaveAttribute("data-desktop-id", "desktop-1");
-      expect(prioritiesComponents[1]).toHaveAttribute("data-desktop-id", "desktop-2");
+      expect(prioritiesComponents[0]).toHaveAttribute("data-Workspace-id", "Workspace-1");
+      expect(prioritiesComponents[1]).toHaveAttribute("data-Workspace-id", "Workspace-2");
     });
   });
 
@@ -296,12 +296,12 @@ describe("Dashboard Page", () => {
       expect(screen.getByTestId("separator")).toBeInTheDocument();
     });
 
-    it("should render desktop cards", async () => {
+    it("should render Workspace cards", async () => {
       setupSuccessfulRender();
       const component = await TestDashboard();
       render(component);
-      expect(screen.getByText("Work Desktop")).toBeInTheDocument();
-      expect(screen.getByTestId("desktop-link")).toBeInTheDocument();
+      expect(screen.getByText("Work Workspace")).toBeInTheDocument();
+      expect(screen.getByTestId("Workspace-link")).toBeInTheDocument();
       expect(screen.getByTestId("card")).toBeInTheDocument();
       expect(screen.getByTestId("priorities-component")).toBeInTheDocument();
     });
@@ -318,7 +318,7 @@ describe("Dashboard Page", () => {
       mockGetSession.mockResolvedValue(createMockSession());
       mockGetDetailUser.mockResolvedValue(createMockDetailUser());
       mockGetWeekSummary.mockResolvedValue(createMockWeekSummary(0, 0));
-      mockGetDesktops.mockResolvedValue([]);
+      mockGetWorkspaces.mockResolvedValue([]);
       const component = await TestDashboard();
       render(component);
       expect(screen.getByText("Cadastre metas e acompanhe sua evolução")).toBeInTheDocument();
@@ -326,18 +326,18 @@ describe("Dashboard Page", () => {
     });
   });
 
-  describe("Desktop Item Count Logic", () => {
+  describe("Workspace Item Count Logic", () => {
     it("should calculate correct item counts", async () => {
       const group1 = createMockGroup("group-1", "Group 1", [
         createMockItem("task-1", "Task 1"),
         createMockItem("task-2", "Task 2"),
       ]);
       const group2 = createMockGroup("group-2", "Group 2", []);
-      const desktop = createMockDesktop("desktop-1", "Desktop 1", [group1, group2]);
+      const Workspace = createMockWorkspace("Workspace-1", "Workspace 1", [group1, group2]);
       mockGetSession.mockResolvedValue(createMockSession());
       mockGetDetailUser.mockResolvedValue(createMockDetailUser());
       mockGetWeekSummary.mockResolvedValue(createMockWeekSummary());
-      mockGetDesktops.mockResolvedValue([desktop]);
+      mockGetWorkspaces.mockResolvedValue([Workspace]);
       const component = await TestDashboard();
       render(component);
       const cardDescription = screen.getByTestId("card-description");
@@ -351,11 +351,11 @@ describe("Dashboard Page", () => {
         createMockItem("task-2", "Task 2"),
       ]);
       const group2 = createMockGroup("group-2", "Group 2", []);
-      const desktop = createMockDesktop("desktop-1", "Desktop 1", [group1, group2]);
+      const Workspace = createMockWorkspace("Workspace-1", "Workspace 1", [group1, group2]);
       mockGetSession.mockResolvedValue(createMockSession());
       mockGetDetailUser.mockResolvedValue(createMockDetailUser());
       mockGetWeekSummary.mockResolvedValue(createMockWeekSummary());
-      mockGetDesktops.mockResolvedValue([desktop]);
+      mockGetWorkspaces.mockResolvedValue([Workspace]);
       const component = await TestDashboard();
       render(component);
       const cardDescription = screen.getByTestId("card-description");
@@ -365,11 +365,11 @@ describe("Dashboard Page", () => {
   });
 
   describe("Error Scenarios", () => {
-    it("should handle missing desktop data", async () => {
+    it("should handle missing Workspace data", async () => {
       setupBasicMocks();
       const component = await TestDashboard();
       render(component);
-      expect(screen.queryByTestId("desktop-link")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("Workspace-link")).not.toBeInTheDocument();
       expect(screen.queryByTestId("card")).not.toBeInTheDocument();
     });
 
@@ -379,7 +379,7 @@ describe("Dashboard Page", () => {
         UserSettings: { id: "1", userId: "1", pushNotifications: true, emailNotifications: true, language: "pt-BR", timezone: "America/Sao_Paulo", createdAt: new Date(), updatedAt: new Date() },
       }));
       mockGetWeekSummary.mockResolvedValue(createMockWeekSummary());
-      mockGetDesktops.mockRejectedValue(new Error("Database error"));
+      mockGetWorkspaces.mockRejectedValue(new Error("Database error"));
       await expect(TestDashboard()).rejects.toThrow("Database error");
     });
   });

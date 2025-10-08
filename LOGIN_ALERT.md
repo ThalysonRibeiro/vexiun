@@ -34,7 +34,7 @@ O sistema de alerta de login envia um email para o usuário sempre que ele faz l
 
 ### 4. Hook de Informações do Dispositivo (`src/hooks/use-mobile.ts`)
 - Função `getDeviceInfo` que captura informações do navegador
-- Detecta tipo de dispositivo (Desktop, Mobile, Tablet)
+- Detecta tipo de dispositivo (Workspace, Mobile, Tablet)
 - Identifica navegador usado
 - Obtém resolução da tela e timezone
 

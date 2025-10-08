@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AccountSecurity from "./account-security";
 import { updateSettings } from "../_actions/update-settings";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { UserWithCounts } from "../types/profile-types";
 
 // Mock Intl.supportedValuesOf for the test environment
@@ -17,7 +17,7 @@ Object.defineProperty(Intl, "supportedValuesOf", {
 
 // Mock dependencies
 jest.mock("../_actions/update-settings");
-jest.mock("react-toastify");
+jest.mock("sonner");
 
 // Mock fetch for sendVerificationEmail
 global.fetch = jest.fn();
@@ -48,13 +48,13 @@ describe("AccountSecurity Component", () => {
   describe("Email Verification", () => {
     it("should show 'Verified' status for a verified user", () => {
       render(<AccountSecurity detailUser={createMockUser(true)} />);
-      expect(screen.getByText("Email Verified")).toBeInTheDocument();
+      expect(screen.getByText("Email verificado")).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /reenviar/i })).not.toBeInTheDocument();
     });
 
     it("should show 'Not Verified' status and a button for an unverified user", () => {
       render(<AccountSecurity detailUser={createMockUser(false)} />);
-      expect(screen.getByText("Email Not Verified")).toBeInTheDocument();
+      expect(screen.getByText("E-mail não verificado")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /reenviar/i })).toBeInTheDocument();
     });
 

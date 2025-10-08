@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Summary, ProgressGoals } from "../summary";
 import { goalUndo } from "../../_actions/goal-undo";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { PendingGoal, WeekSummaryResponse } from "../../_types";
 
 // Mock dependencies
 jest.mock("../../_actions/goal-undo");
-jest.mock("react-toastify", () => ({
+jest.mock("sonner", () => ({
   toast: Object.assign(jest.fn(), {
     error: jest.fn(),
   }),

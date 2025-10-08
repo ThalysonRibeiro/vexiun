@@ -1,8 +1,7 @@
 'use client'
-import { ToastContainer, Bounce } from 'react-toastify';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'sonner';
 
 export function ToastProvider() {
   const { theme, systemTheme } = useTheme();
@@ -17,19 +16,11 @@ export function ToastProvider() {
   }
   const currentTheme = theme === 'system' ? systemTheme : theme;
 
+
   return (
-    <ToastContainer
+    <Toaster
       position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick={false}
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
       theme={currentTheme === 'dark' ? 'dark' : 'light'}
-      transition={Bounce}
     />
   );
 }

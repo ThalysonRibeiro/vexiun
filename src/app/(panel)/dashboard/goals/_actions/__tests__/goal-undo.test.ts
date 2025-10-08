@@ -43,7 +43,7 @@ describe("goalUndo Action", () => {
 
     expect(mockPrismaGoalCompletionsFindFirst).toHaveBeenCalledWith({ where: { id: formData.id } });
     expect(mockPrismaGoalCompletionsDelete).toHaveBeenCalledWith({ where: { id: existingCompletion.id } });
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/desktop");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/Workspace");
     expect(result).toEqual({ data: "Desfeita" });
   });
 

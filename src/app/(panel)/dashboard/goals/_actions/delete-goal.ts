@@ -28,7 +28,7 @@ export async function deleteGoal(formData: FormSchema) {
     await prisma.goals.delete({
       where: { id: existingGoal.id }
     });
-    revalidatePath("/dashboard/desktop");
+    revalidatePath("/dashboard/Workspace");
     return { data: "Meta deletada com sucesso!" }
   } catch (error) {
     return {

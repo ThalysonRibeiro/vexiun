@@ -75,7 +75,7 @@ describe("createGoal Action", () => {
         desiredWeeklyFrequency: formData.desiredWeeklyFrequency,
       },
     });
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/desktop");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/Workspace");
     expect(result).toEqual({ data: "Meta cadastrada com sucesso!" });
   });
 

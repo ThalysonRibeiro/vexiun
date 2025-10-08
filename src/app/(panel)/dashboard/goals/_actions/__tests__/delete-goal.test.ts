@@ -43,7 +43,7 @@ describe("deleteGoal Action", () => {
 
     expect(mockPrismaGoalFindFirst).toHaveBeenCalledWith({ where: { id: formData.goalId } });
     expect(mockPrismaGoalDelete).toHaveBeenCalledWith({ where: { id: existingGoal.id } });
-    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/desktop");
+    expect(mockRevalidatePath).toHaveBeenCalledWith("/dashboard/Workspace");
     expect(result).toEqual({ data: "Meta deletada com sucesso!" });
   });
 

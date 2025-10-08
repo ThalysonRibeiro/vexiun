@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { NameForme } from "./name-form";
 import { updateName } from "../_actions/update-name";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { User } from "next-auth";
 
 // Mock dependencies
 jest.mock("../_actions/update-name");
-jest.mock("react-toastify");
+jest.mock("sonner");
 
 const mockUpdateName = updateName as jest.Mock;
 const mockToastError = toast.error as jest.Mock;

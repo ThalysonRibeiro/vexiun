@@ -1,7 +1,7 @@
 "use client";
 import { Card, CardContent } from "./ui/card";
 import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from "./ui/kibo-ui/marquee";
-import { TESTIMONIALS } from "@/utils/constants";
+import { TESTIMONIALS } from "@/lib/constants";
 
 export function TestimonialsSectionMultipleRows({
   maxRows

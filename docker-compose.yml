@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:17
-    container_name: dev_tasks
+    container_name: catalyst
     restart: always
     environment:
       POSTGRES_USER: myuser
@@ -16,7 +16,7 @@ services:
 
   db-test:
     image: postgres:17
-    container_name: dev_tasks_test
+    container_name: catalyst_test
     restart: always
     environment:
       POSTGRES_USER: myuser

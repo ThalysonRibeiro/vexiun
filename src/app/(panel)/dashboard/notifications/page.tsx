@@ -1,12 +1,12 @@
 'use client'
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotifications } from '@/hooks/use-notifications';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CheckCheck, X, Sparkles, Check, Bell, Trash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { deleteNotification } from '../_actions/delete-notification';
 import { deleteMultipleNotifications } from '../_actions/delete-multiple-notification';
 import { deleteAllNotifications } from '../_actions/delete-all-notification';
@@ -132,7 +132,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl mt-6">
+    <main className="container mx-auto p-6 max-w-4xl mt-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Notificações</h1>
@@ -262,6 +262,6 @@ export default function NotificationsPage() {
           ))
         )}
       </div>
-    </div>
+    </main>
   );
 }

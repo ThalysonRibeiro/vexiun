@@ -5,15 +5,18 @@ import { auth } from "@/lib/auth";
 import { NotificationType } from "@/generated/prisma";
 
 const formSchema = z.object({
+  image: z.string().optional(),
+  nameReference: z.string().optional(),
   userId: z.string().min(1, "O id é obrigatório"),
   referenceId: z.string().min(1, "O id é obrigatório"),
-  title: z.string().min(1, "O titulo é obrigatório"),
   message: z.string().min(1, "A mensagem é obrigatória"),
   type: z.enum([
     NotificationType.FRIEND_REQUEST,
     NotificationType.FRIEND_ACCEPTED,
-    NotificationType.DESKTOP_INVITE,
+    NotificationType.WORKSPACE_INVITE,
+    NotificationType.WORKSPACE_ACCEPTED,
     NotificationType.ITEM_ASSIGNED,
+    NotificationType.ITEM_COMPLETED,
     NotificationType.CHAT_MESSAGE
   ]),
 });
@@ -36,7 +39,6 @@ export async function sendNotification(formData: FormSchema) {
   }
 
   try {
-    // Sempre valida se o usuário existe
     const userExists = await existingUser(formData.userId);
     if (!userExists) {
       return {
@@ -48,25 +50,32 @@ export async function sendNotification(formData: FormSchema) {
       case "CHAT_MESSAGE":
       case "FRIEND_REQUEST":
       case "FRIEND_ACCEPTED":
-        return await createNotification(formData);
-
-      case "DESKTOP_INVITE":
-        if (!formData.referenceId) {
-          return { error: "ID do desktop é obrigatório" }
+        const userReferenceExists = await existingUser(formData.referenceId);
+        if (!userReferenceExists) {
+          return {
+            error: "Usuário de referência não encontrado"
+          }
         }
-        const existingDesktop = await prisma.desktop.findFirst({
+        return await createNotification({
+          ...formData,
+          image: userReferenceExists.image ?? undefined,
+          nameReference: userReferenceExists.name ?? undefined,
+        });
+
+      case "WORKSPACE_INVITE":
+      case "WORKSPACE_ACCEPTED":
+        const existingWorkspace = await prisma.workspace.findUnique({
           where: { id: formData.referenceId }
         });
-        if (!existingDesktop) {
-          return { error: "Desktop não encontrado" }
+
+        if (!existingWorkspace) {
+          return { error: "Workspace não encontrado" }
         }
         return await createNotification(formData);
 
       case "ITEM_ASSIGNED":
-        if (!formData.referenceId) {
-          return { error: "ID do item é obrigatório" }
-        }
-        const existingItem = await prisma.item.findFirst({
+      case "ITEM_COMPLETED":
+        const existingItem = await prisma.item.findUnique({
           where: { id: formData.referenceId }
         });
         if (!existingItem) {
@@ -88,6 +97,8 @@ export async function sendNotification(formData: FormSchema) {
 async function createNotification(formData: FormSchema) {
   return await prisma.notification.create({
     data: {
+      image: formData.image,
+      nameReference: formData.nameReference,
       userId: formData.userId,
       type: formData.type,
       message: formData.message,
@@ -96,9 +107,9 @@ async function createNotification(formData: FormSchema) {
   });
 }
 
-async function existingUser(userId: string): Promise<boolean> {
-  const user = await prisma.user.findFirst({
-    where: { id: userId }
+async function existingUser(userId: string) {
+  return await prisma.user.findUnique({
+    where: { id: userId },
+    select: { image: true, name: true }
   });
-  return !!user;
 }

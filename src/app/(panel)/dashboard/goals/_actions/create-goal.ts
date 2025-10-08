@@ -39,7 +39,7 @@ export async function createGoal(formData: FormSchema) {
       }
     })
 
-    revalidatePath("/dashboard/desktop");
+    revalidatePath("/dashboard/Workspace");
     return { data: "Meta cadastrada com sucesso!" };
   } catch (error) {
     return {

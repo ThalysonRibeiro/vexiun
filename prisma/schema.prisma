@@ -33,7 +33,9 @@ enum SpatusInvitation {
 enum NotificationType {
   FRIEND_REQUEST // Solicitação de amizade
   FRIEND_ACCEPTED // Quando alguém aceitou
-  DESKTOP_INVITE // Convite para um projeto
+  WORKSPACE_INVITE // Convite para um projeto
+  WORKSPACE_ACCEPTED // Projeto aceito
+  ITEM_COMPLETED // Item completo
   ITEM_ASSIGNED // Item atribuído
   CHAT_MESSAGE // Nova mensagem no chat
   SISTEM_MESSAGE // Mensagem do sistema
@@ -49,6 +51,7 @@ enum Role {
 enum FriendStatus {
   PENDING
   ACCEPTED
+  REJECTED
   BLOCKED
 }
 
@@ -73,50 +76,50 @@ model GoalCompletions {
   goal Goals @relation(fields: [goalId], references: [id], onDelete: Cascade)
 }
 
-model Desktop {
-  id                String              @id @default(cuid())
-  title             String
-  userId            String
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  groups            Group[]
-  members           DesktopMember[]
-  desktopInvitation DesktopInvitation[]
-  chat              Chat[]
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+model Workspace {
+  id                  String                @id @default(cuid())
+  title               String
+  userId              String
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groups              Group[]
+  members             WorkspaceMember[]
+  workspaceInvitation WorkspaceInvitation[]
+  chat                Chat[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
 }
 
-model DesktopMember {
-  desktopId String
-  userId    String
+model WorkspaceMember {
+  workspaceId String
+  userId      String
 
-  desktop Desktop @relation(fields: [desktopId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([desktopId, userId])
+  @@id([workspaceId, userId])
 }
 
-model DesktopInvitation {
-  id        String           @id @default(cuid())
-  desktopId String
-  userId    String // usuário convidado
-  status    SpatusInvitation @default(PENDING)
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+model WorkspaceInvitation {
+  id          String           @id @default(cuid())
+  workspaceId String
+  userId      String // usuário convidado
+  status      SpatusInvitation @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
-  desktop Desktop @relation(fields: [desktopId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Group {
-  id        String   @id @default(cuid())
-  title     String
-  textColor String
-  desktopId String
-  desktop   Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
-  item      Item[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  title       String
+  textColor   String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  item        Item[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Item {
@@ -127,6 +130,7 @@ model Item {
   priority    Priority @default(STANDARD)
   notes       String
   description String
+  details     Json? // Conteúdo rico do editor (código, formatação, etc)
   groupId     String?
 
   createdBy  String? // ID do usuário que criou
@@ -141,12 +145,14 @@ model Item {
 }
 
 model Notification {
-  id          String           @id @default(cuid())
-  userId      String // usuário que recebe a notificação
-  type        NotificationType
-  message     String // texto da notificação
-  referenceId String? // id de referência (ex: DesktopInvitation.id ou Item.id)
-  isRead      Boolean          @default(false)
+  id            String           @id @default(cuid())
+  image         String?
+  nameReference String?
+  userId        String // usuário que recebe a notificação
+  type          NotificationType
+  message       String // texto da notificação
+  referenceId   String? // id de referência (ex: WorkspaceInvitation.id ou Item.id)
+  isRead        Boolean          @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -186,13 +192,13 @@ model Chat {
   isGroup Boolean @default(false)
 
   // Relações
-  messages Message[]
-  members  ChatMember[]
-  desktop  Desktop?     @relation(fields: [desktopId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  members   ChatMember[]
+  workspace Workspace?   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  desktopId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  workspaceId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model ChatMember {
@@ -231,20 +237,20 @@ model User {
   createdBy              String? // ID de quem criou este usuário
 
   // Relações existentes
-  desktop       Desktop[]
-  desktopMember DesktopMember[]
-  accounts      Account[]
-  sessions      Session[]
-  goals         Goals[]
-  Authenticator Authenticator[]
-  userSettings  UserSettings?
+  workspace       Workspace[]
+  workspaceMember WorkspaceMember[]
+  accounts        Account[]
+  sessions        Session[]
+  goals           Goals[]
+  Authenticator   Authenticator[]
+  userSettings    UserSettings?
 
   // Relações de atribuição
-  assignedItems     Item[]              @relation("AssignedItems")
-  createdItems      Item[]              @relation("CreatedItems")
-  DesktopInvitation DesktopInvitation[]
-  Notification      Notification[]
-  assessments       Assessments?
+  assignedItems       Item[]                @relation("AssignedItems")
+  createdItems        Item[]                @relation("CreatedItems")
+  workspaceInvitation WorkspaceInvitation[]
+  Notification        Notification[]
+  assessments         Assessments?
 
   requestedFriends UserFriend[] @relation("RequestedFriends")
   receivedFriends  UserFriend[] @relation("ReceivedFriends")

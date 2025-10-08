@@ -41,8 +41,8 @@
 
 ## 📸 Screenshots/Demo
 
-### Desktop
-<!-- Screenshot da funcionalidade no desktop -->
+### Workspace
+<!-- Screenshot da funcionalidade no Workspace -->
 
 ### Mobile
 <!-- Screenshot da funcionalidade no mobile -->

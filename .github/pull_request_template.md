@@ -25,7 +25,7 @@
 
 ### Funcionalidades
 - [ ] ✅ Funcionalidade testada localmente
-- [ ] ✅ Responsividade testada (mobile/desktop)
+- [ ] ✅ Responsividade testada (mobile/Workspace)
 - [ ] ✅ Acessibilidade verificada
 - [ ] ✅ Performance não degradada
 

@@ -1,17 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/getSession";
-import { getDesktops } from "../_data-access/get-desktops";
-import { Desktop, Group, Item } from "@/generated/prisma";
+import { Workspace, Group, Item } from "@/generated/prisma";
 import { Session } from "next-auth";
 import Layout from "../layout";
+import { getWorkspaces } from "../_data-access/get-workspace";
 
-jest.mock("../_data-access/get-desktops");
+jest.mock("../_data-access/get-Workspaces");
 
 jest.mock("../_components/sidebar/app-sidebar", () => ({
-  AppSidebar: ({ desktops, userData }: { desktops: Desktop[], userData: Session | null }) => (
+  AppSidebar: ({ Workspaces, userData }: { Workspaces: Workspace[], userData: Session | null }) => (
     <div data-testid="app-sidebar">
-      <span data-testid="desktops-count">{desktops?.length || 0}</span>
+      <span data-testid="Workspaces-count">{Workspaces?.length || 0}</span>
       <span data-testid="user-email">{userData?.user?.email || "no-email"}</span>
     </div>
   )
@@ -32,16 +32,16 @@ const mockSession = {
   user: { id: "1", email: "user@test.com" }
 } as Session;
 
-type MockedDesktop = Desktop & {
+type MockedWorkspace = Workspace & {
   groupe: (Group & { item: Item[] })[];
 };
 
-const mockDesktops: MockedDesktop[] = [
-  { id: "1", title: "Desktop 1", createdAt: new Date(), updatedAt: new Date(), userId: "1", groupe: [] },
-  { id: "2", title: "Desktop 2", createdAt: new Date(), updatedAt: new Date(), userId: "1", groupe: [] }
+const mockWorkspaces: MockedWorkspace[] = [
+  { id: "1", title: "Workspace 1", createdAt: new Date(), updatedAt: new Date(), userId: "1", groupe: [] },
+  { id: "2", title: "Workspace 2", createdAt: new Date(), updatedAt: new Date(), userId: "1", groupe: [] }
 ];
 
-const mockGetDesktops = getDesktops as jest.MockedFunction<typeof getDesktops>;
+const mockGetWorkspaces = getWorkspaces as jest.MockedFunction<typeof getWorkspaces>;
 const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
 const mockGetSession = getSession as unknown as jest.Mock<Promise<Session | null>>;
 
@@ -58,15 +58,15 @@ describe("Dashboard Layout", () => {
       });
       await expect(Layout({ children: <div>Test</div> })).rejects.toThrow("NEXT_REDIRECT");
       expect(mockRedirect).toHaveBeenCalledWith("/");
-      expect(mockGetDesktops).not.toHaveBeenCalled();
+      expect(mockGetWorkspaces).not.toHaveBeenCalled();
     });
 
     it("should not redirect when session exists", async () => {
       mockGetSession.mockResolvedValue(mockSession);
-      mockGetDesktops.mockResolvedValue([]);
+      mockGetWorkspaces.mockResolvedValue([]);
       const result = await Layout({ children: <div>Test</div> });
       expect(mockRedirect).not.toHaveBeenCalled();
-      expect(mockGetDesktops).toHaveBeenCalled();
+      expect(mockGetWorkspaces).toHaveBeenCalled();
     });
   });
 
@@ -75,27 +75,27 @@ describe("Dashboard Layout", () => {
       mockGetSession.mockResolvedValue(mockSession);
     });
 
-    it("should load desktops when authenticated", async () => {
-      mockGetDesktops.mockResolvedValue(mockDesktops);
+    it("should load Workspaces when authenticated", async () => {
+      mockGetWorkspaces.mockResolvedValue(mockWorkspaces);
       const result = await Layout({
         children: <div data-testid="children">Test Content</div>
       });
-      expect(mockGetDesktops).toHaveBeenCalled();
+      expect(mockGetWorkspaces).toHaveBeenCalled();
       render(result);
-      expect(screen.getByTestId("desktops-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("Workspaces-count")).toHaveTextContent("2");
     });
 
-    it("should handle empty desktops array", async () => {
-      mockGetDesktops.mockResolvedValue([]);
+    it("should handle empty Workspaces array", async () => {
+      mockGetWorkspaces.mockResolvedValue([]);
       const result = await Layout({
         children: <div data-testid="children">Test Content</div>
       });
       render(result);
-      expect(screen.getByTestId("desktops-count")).toHaveTextContent("0");
+      expect(screen.getByTestId("Workspaces-count")).toHaveTextContent("0");
     });
 
-    it("should handle getDesktops error gracefully", async () => {
-      mockGetDesktops.mockRejectedValue(new Error("Database error"));
+    it("should handle getWorkspaces error gracefully", async () => {
+      mockGetWorkspaces.mockRejectedValue(new Error("Database error"));
       await expect(
         Layout({ children: <div>Test</div> })
       ).rejects.toThrow("Database error");
@@ -104,10 +104,10 @@ describe("Dashboard Layout", () => {
   });
 
   describe("Component Rendering", () => {
-    const localMockDesktops: MockedDesktop[] = [{ id: "1", title: "Desktop 1", createdAt: new Date(), updatedAt: new Date(), userId: "1", groupe: [] }];
+    const localMockWorkspaces: MockedWorkspace[] = [{ id: "1", title: "Workspace 1", createdAt: new Date(), updatedAt: new Date(), userId: "1", groupe: [] }];
     beforeEach(() => {
       mockGetSession.mockResolvedValue(mockSession);
-      mockGetDesktops.mockResolvedValue(localMockDesktops);
+      mockGetWorkspaces.mockResolvedValue(localMockWorkspaces);
     });
 
     it("should render all components with correct props", async () => {
@@ -124,7 +124,7 @@ describe("Dashboard Layout", () => {
     it("should pass correct props to AppSidebar", async () => {
       const result = await Layout({ children: <div>Test</div> });
       render(result);
-      expect(screen.getByTestId("desktops-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("Workspaces-count")).toHaveTextContent("1");
       expect(screen.getByTestId("user-email")).toHaveTextContent("user@test.com");
     });
 

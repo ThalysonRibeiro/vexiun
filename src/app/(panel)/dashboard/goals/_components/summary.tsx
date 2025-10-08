@@ -8,7 +8,7 @@ import { Progress, ProgressIndicator } from "@/components/ui/progress-bar";
 import { Separator } from "@/components/ui/separator"
 import { PedingGoals } from "./peding-goals";
 import { goalUndo } from "../_actions/goal-undo";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { PendingGoal, WeekSummaryResponse } from "../_types";
 
 interface SummaryProps {

@@ -47,7 +47,7 @@ export async function goalCompletion(formData: FormSchema) {
         goalId: existingGoal.id,
       }
     });
-    revalidatePath("/dashboard/desktop");
+    revalidatePath("/dashboard/Workspace");
     return { data: `Parabêns você completou a meta ${existingGoal.title}.` };
   } catch (error) {
     return {

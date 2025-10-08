@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionAuthProvider } from "@/components/session-auth";
-import { Bounce, ToastContainer } from "react-toastify";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/modeToggle";
 import { Providers } from "@/components/providers";
@@ -19,11 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dev tasks",
-  description: "Uma aplicação moderna de gerenciamento de tarefas para desenvolvedores.",
-  keywords: ["dev", "tasks", "task", "tarefas", "produtividade", "metas", "lista de metas", "kanban", "calendario",],
+  title: "Catalyst - Accelerate Your Team",
+  description: "Collaborative task management platform that accelerates team productivity",
+  keywords: ["task management", "collaboration", "productivity", "team work", "dev", "tasks", "task", "tarefas", "produtividade", "metas", "lista de metas", "kanban", "calendario",],
+  authors: [{ name: "Thalyson Ribeiro" }],
   openGraph: {
-    title: "Dev tasks",
+    title: "Catalyst",
+    description: "Accelerate your team's productivity",
     images: [``],
     locale: "pt_BR",
     type: "website",
@@ -40,8 +41,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dev tasks",
-    description: "Uma aplicação moderna de gerenciamento de tarefas para desenvolvedores.",
+    title: "Catalyst - Accelerate Your Team",
+    description: "Collaborative task management platform that accelerates team productivity",
     images: [``],
   },
 };

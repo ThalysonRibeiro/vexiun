@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { CreateGoalForm, UseCreateGoalForm } from "./use-create-goal"
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useState } from "react";
 import { RadioGroup, RadioGroupIndicator, RadioGroupItem } from "@/components/ui/radio-group";
 import { createGoal } from "../_actions/create-goal";

@@ -5,6 +5,7 @@ import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TestimonialsSectionMultipleRows } from "@/components/testimonials";
+import { CatalystLogo } from "@/components/catalyst-logo";
 
 export default async function Home() {
   const session = await getSession();
@@ -15,6 +16,9 @@ export default async function Home() {
 
   return (
     <div className="relative overflow-x-hidden min-h-screen">
+      <div className="absolute top-4 left-4">
+        <CatalystLogo size="lg" />
+      </div>
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[44px_44px]" />
 
       {/* Hero Section */}
@@ -31,6 +35,8 @@ export default async function Home() {
           </div>
 
           <CardSignIn />
+
+
         </div>
       </section>
 

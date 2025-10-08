@@ -7,7 +7,7 @@ import { useState } from "react";
 import { UseNameForm } from "./use-settings-form";
 import { Button } from "@/components/ui/button";
 import { updateName } from "../_actions/update-name";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export function NameForme({ user }: { user: User }) {
   const [isAdding, setIsAdding] = useState<boolean>(false);
