@@ -11,7 +11,7 @@ export function PrioritiesBar({ priorities, label = true }: PrioritiesBarProps) 
 
   return (
     <div className="relative group">
-      {label && <h3 className="font-semibold text-sm">Prioridade geral</h3>}
+      {label && <h3 className="font-semibold text-sm text-center">Prioridade geral</h3>}
       <div data-testid="progress-bar-container" className=" flex w-full h-4 rounded-md overflow-hidden">
         {priorities.map((priority) => (
           <div

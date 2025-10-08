@@ -11,7 +11,7 @@ export function StatusBar({ status }: StatusBarProps) {
 
   return (
     <div className="relative group">
-      <h3 className="font-semibold text-sm">Status geral</h3>
+      <h3 className="font-semibold text-sm text-center">Status geral</h3>
       <div data-testid="progress-bar-container" className="flex w-full h-4 rounded-md overflow-hidden">
         {status.map((s) => (
           <div

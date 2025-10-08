@@ -22,11 +22,7 @@ import {
 import {
   Dock,
   MoreHorizontal,
-  Home,
-  Plus,
-  Edit2,
-  MonitorSpeaker,
-  Trash
+  Home, Edit2, Trash
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -38,9 +34,10 @@ import { Session } from "next-auth"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { FaTasks } from "react-icons/fa"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { DialogCreateWorkspace } from "../../workspace/[id]/_components/dialog-create-workspace"
 import { WorkspaceForm } from "./workspace-form"
+import { CatalystLogo } from "@/components/catalyst-logo"
 
 
 type NavigationLink =
@@ -97,21 +94,11 @@ interface EditingState {
 
 export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
   const pathname = usePathname();
-  const [isAddingWorkspace, setIsAddingWorkspace] = useState(false);
   const [editingState, setEditingState] = useState<EditingState>({
     isEditing: false,
     Workspace: null
   });
   const [deletingWorkspaceId, setDeletingWorkspaceId] = useState<string | null>(null);
-
-  const handleStartAddingWorkspace = useCallback(() => {
-    setIsAddingWorkspace(true);
-  }, []);
-
-  const handleFinishAddingWorkspace = useCallback((value: boolean) => {
-    setIsAddingWorkspace(value);
-    return value;
-  }, []);
 
   const handleStartEditingWorkspace = useCallback((Workspace: Workspace) => {
     setEditingState({
@@ -164,7 +151,7 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <MonitorSpeaker className="h-6 w-6" />
+          <CatalystLogo showText={false} />
           <span className="font-semibold text-lg">Espaço de trabalho</span>
         </div>
       </SidebarHeader>
@@ -298,7 +285,7 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
               ))}
             </SidebarMenu>
 
-            {Workspaces.length === 0 && !isAddingWorkspace && (
+            {Workspaces.length === 0 && (
               <div className="px-2 py-4 text-center text-sm text-muted-foreground">
                 Nenhuma Workspace criada
               </div>
