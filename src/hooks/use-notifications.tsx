@@ -1,4 +1,5 @@
 import { Notification } from "@/generated/prisma";
+import { ERROR_MESSAGES } from "@/utils/error-messages";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
@@ -12,51 +13,186 @@ export function useMarkAsRead() {
       const response = await fetch(`/api/notifications/${notificationId}/read`, {
         method: "PATCH",
       });
+
+      if (!response.ok) {
+        throw new Error(ERROR_MESSAGES.GENERIC);
+      }
+
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+
+    onMutate: async (notificationId) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+
+      const previousNotifications = queryClient.getQueryData<Notification[]>(["notifications"]);
+
+      queryClient.setQueryData<Notification[]>(["notifications"], (old = []) =>
+        old.filter(notification => notification.id !== notificationId)
+      );
+
+      return { previousNotifications };
+    },
+
+    onError: (err, notificationId, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(["notifications"], context.previousNotifications);
+      }
+      toast.error(ERROR_MESSAGES.GENERIC);
+    },
+
+    onSettled: (data, error) => {
+      if (error) {
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      }
     },
   });
 }
 
 export function useNotifications() {
   const previousNotifications = useRef<Notification[]>([]);
+  const isFirstFetch = useRef(true);
 
   const query = useQuery<Notification[]>({
     queryKey: ["notifications"],
     queryFn: async () => {
       const response = await fetch("/api/notifications");
       if (!response.ok) {
-        throw new Error("Erro ao buscar notificações");
+        throw new Error(ERROR_MESSAGES.NOT_FOUND.NOTIFICATION);
       }
       return response.json();
     },
+
+    refetchInterval: (query) => {
+      if (typeof document === 'undefined') return false;
+      if (document.visibilityState === 'hidden') return false;
+      return 30 * 1000; // 30 segundos
+    },
+
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 5,
   });
 
   useEffect(() => {
-    if (query.data && query.data.length > 0) {
-      const previousIds = previousNotifications.current.map(n => n.id);
-      const newNotifications = query.data.filter(
-        notification => !previousIds.includes(notification.id)
+    if (!query.data || query.data.length === 0) return;
+
+    if (isFirstFetch.current) {
+      previousNotifications.current = query.data;
+      isFirstFetch.current = false;
+      return;
+    }
+
+    const previousIds = previousNotifications.current.map(n => n.id);
+    const newNotifications = query.data.filter(
+      notification => !previousIds.includes(notification.id)
+    );
+
+    if (newNotifications.length > 0) {
+      const sortedNew = [...newNotifications].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
-      if (newNotifications.length > 0) {
-        const latest = newNotifications[0];
-        showNotificationToast(latest);
-      }
+      sortedNew.slice(0, 3).forEach((notification, index) => {
+        setTimeout(() => {
+          showNotificationToast(notification);
+        }, index * 300);
+      });
 
-      previousNotifications.current = query.data;
+      if (sortedNew.length > 3) {
+        setTimeout(() => {
+          toast.info(`+ ${sortedNew.length - 3} novas notificações`);
+        }, 900);
+      }
     }
+
+    previousNotifications.current = query.data;
   }, [query.data]);
 
   return query;
 }
 
+export function useUnreadNotificationsCount() {
+  const { data: notifications } = useNotifications();
+  return notifications?.length || 0;
+}
+
+export function useMarkAllAsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/notifications/read-all", {
+        method: "PATCH",
+      });
+
+      if (!response.ok) {
+        throw new Error(ERROR_MESSAGES.GENERIC);
+      }
+
+      return response.json();
+    },
+
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+
+      const previousNotifications = queryClient.getQueryData<Notification[]>(["notifications"]);
+
+      queryClient.setQueryData<Notification[]>(["notifications"], []);
+
+      return { previousNotifications };
+    },
+
+    onError: (err, variables, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(["notifications"], context.previousNotifications);
+      }
+      toast.error(ERROR_MESSAGES.GENERIC);
+    },
+
+    onSuccess: () => {
+      toast.success("Todas as notificações foram marcadas como lidas");
+    },
+  });
+}
+
+export function useDeleteNotification() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (notificationId: string) => {
+      const response = await fetch(`/api/notifications/${notificationId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error(ERROR_MESSAGES.GENERIC);
+      }
+    },
+
+    onMutate: async (notificationId) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+
+      const previousNotifications = queryClient.getQueryData<Notification[]>(["notifications"]);
+
+      queryClient.setQueryData<Notification[]>(["notifications"], (old = []) =>
+        old.filter(notification => notification.id !== notificationId)
+      );
+
+      return { previousNotifications };
+    },
+
+    onError: (err, notificationId, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(["notifications"], context.previousNotifications);
+      }
+      toast.error(ERROR_MESSAGES.GENERIC);
+    },
+  });
+}
+
 function showNotificationToast(notification: Notification) {
   const { type } = notification;
 
-  // Tipos que mostram perfil do usuário
   const profileTypes = [
     "FRIEND_REQUEST",
     "FRIEND_ACCEPTED",
@@ -68,38 +204,57 @@ function showNotificationToast(notification: Notification) {
   ];
 
   if (profileTypes.includes(type)) {
-    toast.custom(() => (
-      <div className="flex items-start gap-3 bg-card p-4 rounded-lg shadow-lg border min-w-[300px]">
-        <Image
-          src={notification.image || "/default-avatar.png"}
-          alt={notification.nameReference || "Usuário"}
-          width={50}
-          height={50}
-          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-        />
+    toast.custom((t) => (
+      <div
+        className="flex items-start gap-3 bg-card p-4 rounded-lg shadow-lg border min-w-[300px] max-w-md animate-in slide-in-from-right cursor-pointer hover:shadow-xl transition-shadow"
+        onClick={() => toast.dismiss(t)}
+      >
+        <div className="relative">
+          <Image
+            src={notification.image || "/default-avatar.png"}
+            alt={notification.nameReference || "Usuário"}
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+          />
+          <span className="absolute -bottom-1 -right-1 text-sm bg-background rounded-full w-5 h-5 flex items-center justify-center border border-border">
+            {getNotificationEmoji(type)}
+          </span>
+        </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+          <p className="font-semibold text-sm text-foreground">
             {notification.nameReference || "Usuário"}
           </p>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-0.5">
+          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
             {getTruncatedMessage(notification)}
           </p>
 
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground/70 mt-1">
             {getTimeAgo(notification.createdAt)}
           </p>
         </div>
 
-        <span className="text-xl flex-shrink-0">
-          {getNotificationEmoji(type)}
-        </span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toast.dismiss(t);
+          }}
+          className="text-muted-foreground/50 hover:text-muted-foreground flex-shrink-0 transition-colors"
+        >
+          ✕
+        </button>
       </div>
-    ));
+    ), {
+      duration: 5000,
+      position: 'top-right',
+    });
   } else {
     const emoji = getNotificationEmoji(type);
-    toast(`${emoji} ${notification.message}`);
+    toast(`${emoji} ${notification.message}`, {
+      duration: 4000,
+    });
   }
 }
 
@@ -116,6 +271,14 @@ function getTruncatedMessage(notification: Notification): string {
       return message.length > maxLength
         ? `${message.substring(0, maxLength)}...`
         : message;
+    case "WORKSPACE_INVITE":
+      return "Convidou você para uma workspace";
+    case "WORKSPACE_ACCEPTED":
+      return "Aceitou o convite da workspace";
+    case "ITEM_ASSIGNED":
+      return "Atribuiu um item para você";
+    case "ITEM_COMPLETED":
+      return "Completou um item";
     default:
       return notification.message;
   }
@@ -137,7 +300,9 @@ function getNotificationEmoji(type: string): string {
     FRIEND_REQUEST: "👥",
     FRIEND_ACCEPTED: "✅",
     WORKSPACE_INVITE: "💻",
+    WORKSPACE_ACCEPTED: "🎉",
     ITEM_ASSIGNED: "📦",
+    ITEM_COMPLETED: "✔️",
     CHAT_MESSAGE: "💬",
     SISTEM_MESSAGE: "📢",
     NOTICES_MESSAGE: "🔔",
