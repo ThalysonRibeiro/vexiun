@@ -1,0 +1,1 @@
+export { getTeam } from "./get-team";

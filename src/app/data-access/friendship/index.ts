@@ -1,0 +1,1 @@
+export { getMyFriends } from "./get-my-friends";
