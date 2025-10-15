@@ -1,12 +1,13 @@
+import { ERROR_MESSAGES } from "@/utils/error-messages";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  title: z.string().min(1, "Informe a atividade qeu deseja realizar"),
+  title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   desiredWeeklyFrequency: z.coerce.number()
-    .min(1, "Number must be greater than or equal to 1")
-    .max(7, "Number must be less than or equal to 7"),
+    .min(1, ERROR_MESSAGES.VALIDATION.MIN_LENGTH)
+    .max(7, ERROR_MESSAGES.VALIDATION.MAX_LENGTH),
 });
 
 export interface UseCreateGoalFormProps {

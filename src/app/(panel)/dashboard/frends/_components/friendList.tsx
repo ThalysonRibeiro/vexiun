@@ -1,29 +1,25 @@
 "use client"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogTrigger
 } from "@/components/ui/dialog"
 import { CardContent } from "@/components/ui/card"
 import { MessageCirclePlus, Search, Users } from "lucide-react"
-import { UserSearch } from "../../_components/utility-action-dashboard/user-search"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { FriendsType } from "./friends-content"
 import { useMemo, useState } from "react"
-import { deleteFriendship } from "../_action/delete-friend"
-import { InviteToWorkspace } from "./invite-to-workspaces"
+import { InviteToWorkspace } from "../../../../../components/invite-to-workspaces"
+import { deleteFriendship } from "@/app/actions/friendship"
+import { SendFrendshipRequest } from "../../_components/utility-action-dashboard/send-frendship-request"
 
 type RequestType = "accepted" | "pending"
 
-export function FriendList({ data, requestType }: { data: FriendsType[], requestType: RequestType }) {
-  const [searchTerm, setSearchTerm] = useState("");
+export function FriendList({ data, requestType }: { data: FriendsType[], requestType: RequestType; }) {
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const filteredaccepted = useMemo(() => {
     if (!searchTerm.trim()) return data;
@@ -36,7 +32,12 @@ export function FriendList({ data, requestType }: { data: FriendsType[], request
   }, [data, searchTerm]);
 
   const handleDelete = async (friendshipId: string) => {
-    await deleteFriendship({ friendshipId });
+    try {
+      setIsLoading(true);
+      await deleteFriendship({ friendshipId });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
 
@@ -46,7 +47,7 @@ export function FriendList({ data, requestType }: { data: FriendsType[], request
         <div className="py-2 space-y-4 text-center text-zinc-500">
           <Users className="w-12 h-12 mx-auto mb-2 opacity-30" />
           <p className="text-sm">Voçê não tem amigos ainda, adicione um agora!</p>
-          <UserSearch />
+          <SendFrendshipRequest />
         </div>
       ) : (
         <>

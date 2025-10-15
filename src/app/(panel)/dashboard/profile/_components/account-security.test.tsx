@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AccountSecurity from "./account-security";
-import { updateSettings } from "../_actions/update-settings";
 import { toast } from "sonner";
 import { UserWithCounts } from "../types/profile-types";
+import { updateSettings } from "@/app/actions/user";
 
 // Mock Intl.supportedValuesOf for the test environment
 Object.defineProperty(Intl, "supportedValuesOf", {
@@ -16,7 +16,6 @@ Object.defineProperty(Intl, "supportedValuesOf", {
 });
 
 // Mock dependencies
-jest.mock("../_actions/update-settings");
 jest.mock("sonner");
 
 // Mock fetch for sendVerificationEmail

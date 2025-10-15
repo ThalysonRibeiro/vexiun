@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { NameForme } from "./name-form";
-import { updateName } from "../_actions/update-name";
 import { toast } from "sonner";
 import { User } from "next-auth";
+import { updateName } from "@/app/actions/user";
 
 // Mock dependencies
-jest.mock("../_actions/update-name");
+jest.mock("@/app/actions/user");
 jest.mock("sonner");
 
 const mockUpdateName = updateName as jest.Mock;

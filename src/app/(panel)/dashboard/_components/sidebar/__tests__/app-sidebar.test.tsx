@@ -2,12 +2,12 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AppSidebar } from "../app-sidebar";
-import { deleteWorkspace } from "../../../_actions/delete-workspace";
 import { toast } from "sonner";
 import { Session } from "next-auth";
 import { Workspace } from "@/generated/prisma";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useSession } from "next-auth/react";
+import { deleteWorkspace } from "@/app/actions/workspace";
 
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn().mockReturnValue("/dashboard"),
@@ -17,7 +17,7 @@ jest.mock("next/navigation", () => ({
   })),
 }));
 jest.mock("next-auth/react");
-jest.mock("../../../_actions/delete-Workspace");
+jest.mock("@/app/actions/workspace");
 jest.mock("sonner");
 jest.mock("../Workspace-form", () => ({
   WorkspaceForm: jest.fn(({ setAddWorkspace }) => (
@@ -48,10 +48,10 @@ describe("AppSidebar component", () => {
     mockUseSession.mockReturnValue({ data: mockUserData, status: "authenticated" });
   });
 
-  const renderComponent = (Workspaces: Workspace[], userData: Session) => {
+  const renderComponent = (workspaces: Workspace[], userData: Session) => {
     return render(
       <SidebarProvider>
-        <AppSidebar Workspaces={Workspaces} userData={userData} />
+        <AppSidebar workspaces={workspaces} userData={userData} />
       </SidebarProvider>
     );
   };

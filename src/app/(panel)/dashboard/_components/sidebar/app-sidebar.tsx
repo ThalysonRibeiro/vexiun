@@ -26,7 +26,6 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { deleteWorkspace } from "../../_actions/delete-workspace"
 import { toast } from "sonner"
 import { useState, useCallback } from "react"
 import { Menu } from "./menu"
@@ -38,6 +37,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { DialogCreateWorkspace } from "../../workspace/[id]/_components/dialog-create-workspace"
 import { WorkspaceForm } from "./workspace-form"
 import { CatalystLogo } from "@/components/catalyst-logo"
+import { deleteWorkspace } from "@/app/actions/workspace"
+import { isErrorResponse } from "@/utils/error-handler"
+import { WorkspaceSummaryData } from "@/app/data-access/workspace"
 
 
 type NavigationLink =
@@ -78,60 +80,59 @@ const navigationLinks: NavigationLink[] = [
 ];
 
 interface AppSidebarProps {
-  Workspaces: Workspace[];
+  workspaces: WorkspaceSummaryData;
   userData: Session;
 }
 
 type Workspace = {
   id: string;
   title: string;
-};
+}
 
 interface EditingState {
   isEditing: boolean;
-  Workspace: Workspace | null;
+  workspace: Workspace | null;
 }
 
-export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
+export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
   const pathname = usePathname();
   const [editingState, setEditingState] = useState<EditingState>({
     isEditing: false,
-    Workspace: null
+    workspace: null
   });
+
   const [deletingWorkspaceId, setDeletingWorkspaceId] = useState<string | null>(null);
 
-  const handleStartEditingWorkspace = useCallback((Workspace: Workspace) => {
+  const handleStartEditingWorkspace = useCallback((workspace: Workspace) => {
     setEditingState({
       isEditing: true,
-      Workspace
+      workspace
     });
   }, []);
 
   const handleFinishEditingWorkspace = useCallback((value: boolean) => {
     setEditingState({
       isEditing: value,
-      Workspace: value ? editingState.Workspace : null
+      workspace: value ? editingState.workspace : null
     });
     return value;
-  }, [editingState.Workspace]);
+  }, [editingState.workspace]);
 
-  const handleDeleteWorkspace = useCallback(async (WorkspaceId: string) => {
+  const handleDeleteWorkspace = useCallback(async (workspaceId: string) => {
     if (!confirm('Deseja realmente a área de trabalho?, todos os grupos e items serão deletados justos')) {
       return;
     }
     if (deletingWorkspaceId) return; // Prevent double deletion
 
-    setDeletingWorkspaceId(WorkspaceId);
+    setDeletingWorkspaceId(workspaceId);
 
     try {
-      const response = await deleteWorkspace(WorkspaceId);
+      const response = await deleteWorkspace({ workspaceId });
 
-      if (response.error) {
+      if (isErrorResponse(response)) {
         toast.error(response.error);
         return;
       }
-
-      toast.success(response.data || "Workspace deletado com sucesso!");
     } catch (error) {
       toast.error("Erro inesperado ao deletar Workspace");
     } finally {
@@ -139,13 +140,19 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
     }
   }, [deletingWorkspaceId]);
 
-  const isWorkspaceBeingEdited = (WorkspaceId: string) => {
-    return editingState.isEditing && editingState.Workspace?.id === WorkspaceId;
+  const isWorkspaceBeingEdited = (workspaceId: string) => {
+    return editingState.isEditing && editingState.workspace?.id === workspaceId;
   };
 
-  const isWorkspaceBeingDeleted = (WorkspaceId: string) => {
-    return deletingWorkspaceId === WorkspaceId;
+  const isWorkspaceBeingDeleted = (workspaceId: string) => {
+    return deletingWorkspaceId === workspaceId;
   };
+
+  if (!workspaces) {
+    return null;
+  }
+
+  const groupsCount = workspaces.map(workspace => workspace.groupsCount).reduce((acc, count) => acc + count, 0);
 
   return (
     <Sidebar>
@@ -166,7 +173,7 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
                   {('sublinks' in link) ? (
                     <Collapsible>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="w-full justify-start">
+                        <SidebarMenuButton className="w-full justify-start cursor-pointer">
                           <link.icon className="h-4 w-4" />
                           <span>{link.title}</span>
                         </SidebarMenuButton>
@@ -213,19 +220,19 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
           <SidebarGroupContent>
             {/* Add Workspace Section */}
             <div className="w-full mb-2">
-              <DialogCreateWorkspace sidebar />
+              <DialogCreateWorkspace sidebar isNoWorkspace={groupsCount > 0 ? false : true} />
             </div>
 
             {/* Workspace List */}
             <SidebarMenu>
-              {Workspaces.map((Workspace) => (
-                <div key={Workspace.id}>
-                  {isWorkspaceBeingEdited(Workspace.id) ? (
+              {workspaces.map((workspace) => (
+                <div key={workspace.id}>
+                  {isWorkspaceBeingEdited(workspace.id) ? (
                     <div className="px-2">
                       <WorkspaceForm
-                        WorkspaceId={editingState.Workspace?.id}
+                        workspaceId={editingState.workspace?.id}
                         initialValues={{
-                          title: editingState.Workspace?.title || ""
+                          title: editingState.workspace?.title || ""
                         }}
                         setAddWorkspace={handleFinishEditingWorkspace}
                       />
@@ -233,12 +240,12 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
                   ) : (
                     <SidebarMenuItem>
                       <div className={cn("flex items-center w-full",
-                        pathname === `/dashboard/workspace/${Workspace.id}` && "border border-primary rounded-md")
+                        pathname === `/dashboard/workspace/${workspace.id}` && "border border-primary rounded-md")
                       }>
                         <SidebarMenuButton asChild className="flex-1">
-                          <Link href={`/dashboard/workspace/${Workspace.id}`}>
+                          <Link href={`/dashboard/workspace/${workspace.id}`}>
                             <Dock className="h-4 w-4" />
-                            <span className="truncate">{Workspace.title}</span>
+                            <span className="truncate">{workspace.title}</span>
                           </Link>
                         </SidebarMenuButton>
 
@@ -248,10 +255,10 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
                               variant="ghost"
                               size="sm"
                               className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                              disabled={isWorkspaceBeingDeleted(Workspace.id)}
+                              disabled={isWorkspaceBeingDeleted(workspace.id)}
                             >
                               <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Opções para {Workspace.title}</span>
+                              <span className="sr-only">Opções para {workspace.title}</span>
                             </Button>
                           </DropdownMenuTrigger>
 
@@ -260,7 +267,7 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                              onClick={() => handleStartEditingWorkspace(Workspace)}
+                              onClick={() => handleStartEditingWorkspace(workspace)}
                               className="cursor-pointer"
                             >
                               <Edit2 className="mr-2 h-4 w-4" />
@@ -268,13 +275,13 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                              onClick={() => handleDeleteWorkspace(Workspace.id)}
-                              disabled={isWorkspaceBeingDeleted(Workspace.id)}
+                              onClick={() => handleDeleteWorkspace(workspace.id)}
+                              disabled={isWorkspaceBeingDeleted(workspace.id)}
                               className="cursor-pointer"
                               variant="destructive"
                             >
                               <Trash className="mr-2 h-4 w-4" />
-                              {isWorkspaceBeingDeleted(Workspace.id) ? "Deletando..." : "Deletar"}
+                              {isWorkspaceBeingDeleted(workspace.id) ? "Deletando..." : "Deletar"}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -284,12 +291,6 @@ export function AppSidebar({ Workspaces, userData }: AppSidebarProps) {
                 </div>
               ))}
             </SidebarMenu>
-
-            {Workspaces.length === 0 && (
-              <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                Nenhuma Workspace criada
-              </div>
-            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

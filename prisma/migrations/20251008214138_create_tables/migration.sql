@@ -16,6 +16,9 @@ CREATE TYPE "Role" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'USER');
 -- CreateEnum
 CREATE TYPE "FriendStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'BLOCKED');
 
+-- CreateEnum
+CREATE TYPE "WorkspaceRole" AS ENUM ('OWNER', 'ADMIN', 'MEMBER', 'VIEWER');
+
 -- CreateTable
 CREATE TABLE "Goals" (
     "id" TEXT NOT NULL,
@@ -53,6 +56,8 @@ CREATE TABLE "Workspace" (
 CREATE TABLE "WorkspaceMember" (
     "workspaceId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "role" "WorkspaceRole" NOT NULL DEFAULT 'MEMBER',
+    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "WorkspaceMember_pkey" PRIMARY KEY ("workspaceId","userId")
 );
@@ -65,6 +70,8 @@ CREATE TABLE "WorkspaceInvitation" (
     "status" "SpatusInvitation" NOT NULL DEFAULT 'PENDING',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "invitedBy" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3),
 
     CONSTRAINT "WorkspaceInvitation_pkey" PRIMARY KEY ("id")
 );
@@ -256,6 +263,15 @@ CREATE TABLE "Authenticator" (
 );
 
 -- CreateIndex
+CREATE INDEX "WorkspaceMember_userId_idx" ON "WorkspaceMember"("userId");
+
+-- CreateIndex
+CREATE INDEX "WorkspaceMember_workspaceId_idx" ON "WorkspaceMember"("workspaceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "WorkspaceInvitation_workspaceId_userId_key" ON "WorkspaceInvitation"("workspaceId", "userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Assessments_userId_key" ON "Assessments"("userId");
 
 -- CreateIndex
@@ -302,6 +318,9 @@ ALTER TABLE "WorkspaceInvitation" ADD CONSTRAINT "WorkspaceInvitation_workspaceI
 
 -- AddForeignKey
 ALTER TABLE "WorkspaceInvitation" ADD CONSTRAINT "WorkspaceInvitation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WorkspaceInvitation" ADD CONSTRAINT "WorkspaceInvitation_invitedBy_fkey" FOREIGN KEY ("invitedBy") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Group" ADD CONSTRAINT "Group_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;

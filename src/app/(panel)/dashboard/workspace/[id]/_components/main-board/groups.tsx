@@ -6,7 +6,6 @@ import { GroupForm } from "./group-form";
 import { toast } from "sonner";
 import { CreateOrEditItemForm } from "./create-or-edit-item-form";
 import { ItemsTables } from "./items-tables";
-import { deleteGroup } from "../../_actions/delete-group";
 import {
   Collapsible,
   CollapsibleContent,
@@ -20,39 +19,21 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { GroupProgressBar } from "./group-progress-bar";
+import { deleteGroup } from "@/app/actions/group";
 import { CompletedItems } from "./completed-items";
-import { Prisma } from "@/generated/prisma";
-
-export type GroupWithItems = Prisma.GroupGetPayload<{
-  include: {
-    item: {
-      select: {
-        id: true,
-        title: true,
-        term: true,
-        priority: true,
-        status: true,
-        notes: true,
-        description: true,
-        createdBy: true,
-        assignedTo: true,
-        createdByUser: true,
-        assignedToUser: true,
-      }
-    }
-  }
-}>
+import { GroupsData } from "@/hooks/use-groups";
+import { useTeam } from "@/hooks/use-team";
 
 export function Groups({
-  groupsData, workspaceId
+  data, workspaceId,
 }: {
-  groupsData: GroupWithItems[], workspaceId: string
+  data: GroupsData, workspaceId: string;
 }) {
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
-
+  const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(workspaceId);
 
   const toggleDropdown = (groupId: string) => {
     setOpenGroups(prev => {
@@ -87,9 +68,8 @@ export function Groups({
       if (!confirm('Deseja realmente deletar o grupo? todos os itens serão deletados junto')) {
         return;
       }
-      await deleteGroup(id);
+      await deleteGroup({ groupId: id });
       toast.success("Grupo deletado com sucesso!");
-      // Remove o grupo do estado de grupos abertos
       setOpenGroups(prev => {
         const newSet = new Set(prev);
         newSet.delete(id);
@@ -102,7 +82,7 @@ export function Groups({
 
   return (
     <div className="space-y-6 mb-6">
-      {groupsData.length === 0 && <h2>Cadastre um grupo</h2>}
+      {data?.group.length === 0 && <h2>Cadastre um grupo</h2>}
       {/* Botão/Formulário para adicionar novo grupo */}
       <div className="pt-4 border-t border-gray-200">
         {isAddingGroup ? (
@@ -123,8 +103,7 @@ export function Groups({
       </div>
       {/* Lista de grupos */}
       <div className="space-y-6">
-        {groupsData.map(group => {
-          const unfinishedItems = group.item.filter(item => item.status !== 'DONE');
+        {data?.group.map(group => {
           const isGroupOpen = openGroups.has(group.id);
 
           return (
@@ -158,7 +137,7 @@ export function Groups({
                       className="text-sm font-normal"
                       style={{ color: group.textColor }}
                     >
-                      ({unfinishedItems.length}/{group.item.length})
+                      ({group.doneCount}/{group.pendingCount})
                     </span>
                     <Button
                       size="icon"
@@ -184,7 +163,7 @@ export function Groups({
                     style={{ borderColor: group.textColor }}
                   >
                     <CollapsibleContent>
-                      <ItemsTables items={unfinishedItems} />
+                      <ItemsTables groupId={group.id} team={team} />
 
                       <Dialog
                         open={openDialogs.has(group.id)}
@@ -224,6 +203,7 @@ export function Groups({
                               });
                             }}
                             editingItem={false}
+                            team={team ?? []}
                           />
                         </DialogContent>
                       </Dialog>
@@ -236,7 +216,7 @@ export function Groups({
           );
         })}
       </div>
-      <CompletedItems groupsData={groupsData} />
+      <CompletedItems />
     </div >
   );
 }

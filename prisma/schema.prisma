@@ -27,7 +27,9 @@ enum Priority {
 enum SpatusInvitation {
   PENDING
   ACCEPTED
-  REJECTED
+  DECLINED
+  EXPIRED
+  CANCELLED
 }
 
 enum NotificationType {
@@ -53,6 +55,13 @@ enum FriendStatus {
   ACCEPTED
   REJECTED
   BLOCKED
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
 }
 
 model Goals {
@@ -92,11 +101,15 @@ model Workspace {
 model WorkspaceMember {
   workspaceId String
   userId      String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now()) //rastrear quando entrou
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId])
 }
 
 model WorkspaceInvitation {
@@ -109,6 +122,12 @@ model WorkspaceInvitation {
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  invitedBy String // Quem enviou o convite
+  inviter   User      @relation("InvitedBy", fields: [invitedBy], references: [id], onDelete: Cascade)
+  expiresAt DateTime?
+
+  @@unique([workspaceId, userId])
 }
 
 model Group {
@@ -249,6 +268,7 @@ model User {
   assignedItems       Item[]                @relation("AssignedItems")
   createdItems        Item[]                @relation("CreatedItems")
   workspaceInvitation WorkspaceInvitation[]
+  inviter             WorkspaceInvitation[] @relation("InvitedBy")
   Notification        Notification[]
   assessments         Assessments?
 

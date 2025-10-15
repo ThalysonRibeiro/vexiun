@@ -4,7 +4,8 @@ import { AppSidebar } from "@/app/(panel)/dashboard/_components/sidebar/app-side
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { NotificationList } from "./_components/notification";
 import { UtilityActionDashboard } from "@/app/(panel)/dashboard/_components/utility-action-dashboard";
-import { getWorkspaces } from "./_data-access/get-workspace";
+import { getMyWorkspaces } from "@/app/data-access/workspace/get-my-workspace";
+import { unwrapServerData } from "@/utils/server-helpers";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -12,11 +13,12 @@ export default async function Layout({ children }: { children: React.ReactNode }
   if (!session) {
     redirect('/')
   }
-  const Workspaces = await getWorkspaces();
+  const workspaces = await getMyWorkspaces().then(unwrapServerData);
+
   return (
     <SidebarProvider>
-      <AppSidebar Workspaces={Workspaces} userData={session} />
-      <main className="relative w-full px-2 pt-4">
+      <AppSidebar workspaces={workspaces} userData={session} />
+      <main className="relative md:w-[calc(100dvw-16.5rem)] w-full px-2 pt-4">
         <SidebarTrigger className="fixed" />
         <NotificationList />
         <UtilityActionDashboard />

@@ -2,52 +2,36 @@
 import {
   Card,
   CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  CardContent, CardHeader,
+  CardTitle
 } from "@/components/ui/card";
-import { Item, Prisma, Status } from "@/generated/prisma";
+import { Status } from "@/generated/prisma";
 import { Eye, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
-import { updateItem } from "../../_actions/update-item";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { DialogContentNewItem } from "./dialog-new-item";
 import { Button } from "@/components/ui/button";
 import { borderColorPriority, borderColorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { InfoItem } from "../main-board/info-item";
-import { KanbanProps } from "./kanban-content";
+import { updateItem } from "@/app/actions/item";
+import { cn } from "@/lib/utils";
+import { ItemWhitCreatedAssignedUser, useInvalidateItems, useItemsByStatus } from "@/hooks/use-items";
+import { useParams } from "next/navigation";
+import { GroupsData } from "@/hooks/use-groups";
+import { useTeam } from "@/hooks/use-team";
 
-export type ItemWhitCreatedAssignedUser = Prisma.ItemGetPayload<{
-  select: {
-    id: true,
-    title: true,
-    term: true,
-    priority: true,
-    status: true,
-    notes: true,
-    description: true,
-    createdBy: true,
-    assignedTo: true,
-    createdByUser: true,
-    assignedToUser: true,
-  }
-}>
+export function KanbanGrid() {
+  const params = useParams();
+  const workspaceId = params.id as string
+  const { data, isLoading, error } = useItemsByStatus(workspaceId);
+  const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(workspaceId);
 
-export function KanbanGrid({ groupsData }: KanbanProps) {
+  const invalidateItems = useInvalidateItems();
   const [draggedItem, setDraggedItem] = useState<ItemWhitCreatedAssignedUser | null>(null);
   const [isCloseDialog, setIsCloseDialog] = useState<boolean>(false);
   const [getStatus, setGetStatus] = useState<Status>("NOT_STARTED");
-  const items: ItemWhitCreatedAssignedUser[] = [];
-  groupsData.forEach((groupStatus) => {
-    if (Array.isArray(groupStatus.item)) {
-      items.push(...groupStatus.item);
-    } else {
-      items.push(groupStatus.item);
-    }
-  });
 
   function handleDragStart(e: React.DragEvent, item: ItemWhitCreatedAssignedUser) {
     setDraggedItem(item);
@@ -57,7 +41,7 @@ export function KanbanGrid({ groupsData }: KanbanProps) {
     const dragPreview = document.createElement('div');
     const statusClass = `text-xs border-l-4 pl-1 ${borderColorStatus(item.status)}`;
     const priorityClass = `text-xs border-l-4 pl-1 ${borderColorPriority(item.priority)}`;
-    dragPreview.className = 'h-35 w-60 bg-background border-1 border-violet-500 rounded-lg p-3 shadow-lg opacity-90 space-y-1';
+    dragPreview.className = 'h-35 w-60 bg-background border-1 border-primary/50 rounded-lg p-3 shadow-lg opacity-90 space-y-1';
     dragPreview.innerHTML = `
       <div class="font-medium truncate">${item.title}</div>
       <div class="text-sm">
@@ -114,6 +98,7 @@ export function KanbanGrid({ groupsData }: KanbanProps) {
         title: draggedItem.title
       });;
     }
+    invalidateItems();
     setDraggedItem(null);
   }
 
@@ -122,27 +107,32 @@ export function KanbanGrid({ groupsData }: KanbanProps) {
       status: "DONE" as Status,
       title: "Concluído",
       bgColor: "bg-green-500",
-      count: items.filter(item => item.status === "DONE").length
+      count: data?.statusDone.length ?? 0
     },
     {
       status: "IN_PROGRESS" as Status,
-      title: "Em Progresso", // CORREÇÃO: título mais apropriado
+      title: "Em Progresso",
       bgColor: "bg-blue-500",
-      count: items.filter(item => item.status === "IN_PROGRESS").length
+      count: data?.statusInProgress.length ?? 0
     },
     {
       status: "STOPPED" as Status,
       title: "Parado",
       bgColor: "bg-red-500",
-      count: items.filter(item => item.status === "STOPPED").length
+      count: data?.statusStoped.length ?? 0
     },
     {
       status: "NOT_STARTED" as Status,
-      title: "Não Iniciado", // CORREÇÃO: título mais apropriado
+      title: "Não Iniciado",
       bgColor: "bg-zinc-500",
-      count: items.filter(item => item.status === "NOT_STARTED").length
+      count: data?.statusNotStarted.length ?? 0
     }
   ];
+
+  if (isLoading) {
+    return <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 border-4 border-t-accent rounded-full animate-spin border-primary">
+    </div>
+  }
 
 
   return (
@@ -150,7 +140,7 @@ export function KanbanGrid({ groupsData }: KanbanProps) {
       {statusConfig.map((config) => (
         <Card
           key={config.status}
-          className={`pt-0 overflow-hidden transition-all duration-200 ${draggedItem ? 'border border-dashed border-violet-500 bg-zinc-600/20' : ''
+          className={`pt-0 overflow-hidden transition-all duration-200 ${draggedItem ? 'border border-dashed border-primary/50 bg-zinc-600/20' : ''
             }`}
           onDrop={(e) => handleDrop(e, config.status)}
           onDragOver={handleDragOver}
@@ -158,34 +148,51 @@ export function KanbanGrid({ groupsData }: KanbanProps) {
           onDragLeave={handleDragLeave}
         >
           <CardHeader className={`${config.bgColor} py-4`}>
-            <CardTitle className="text-white">{config.title} ({config.count})</CardTitle>
-            <CardDescription></CardDescription>
-            <CardAction>
-              <Dialog open={isCloseDialog} onOpenChange={setIsCloseDialog}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant={"ghost"}
-                    size={"icon"}
-                    className="cursor-pointer hover:bg-transparent"
-                    onClick={() => setGetStatus(config.status)}
-                  >
-                    <Plus className="text-white" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContentNewItem groups={groupsData} closeDialog={setIsCloseDialog} status={getStatus} />
-              </Dialog>
-            </CardAction>
+            <CardTitle
+              className={cn("text-white", config.status === "DONE" && "mb-4"
+              )}>
+              {config.title} ({config.count})
+            </CardTitle>
+            {config.status !== "DONE" && (
+              <CardAction>
+                <Dialog open={isCloseDialog} onOpenChange={setIsCloseDialog}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant={"ghost"}
+                      size={"icon"}
+                      className="cursor-pointer hover:bg-transparent"
+                      onClick={() => setGetStatus(config.status)}
+                    >
+                      <Plus className="text-white" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContentNewItem
+                    closeDialog={setIsCloseDialog}
+                    status={getStatus} />
+                </Dialog>
+              </CardAction>
+            )}
           </CardHeader>
           <CardContent className="space-y-2 px-2 max-h-[65vh] overflow-auto">
-            {items
+            {data?.response
               .filter(item => item.status === config.status)
               .map(item => (
                 <div
                   key={item.id}
-                  className={`space-y-1 text-sm border rounded bg-background p-2 cursor-move kanban-item hover:shadow-md transition-all duration-200 ${draggedItem?.id === item.id ? 'opacity-50 scale-95 rotate-2 border border-dashed border-violet-500' : ''
-                    }`}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, item)}
+                  className={cn("space-y-1 text-sm border rounded bg-background p-2 kanban-item hover:shadow-md transition-all duration-200 select-none",
+                    draggedItem?.id === item.id ? 'opacity-50 scale-95 rotate-2 border border-dashed border-primary/50' : '',
+                    config.status !== "DONE" && "cursor-move"
+                  )}
+                  draggable={config.status !== "DONE"}
+                  onDragStart={(e) => {
+                    switch (config.status) {
+                      case "IN_PROGRESS":
+                      case "STOPPED":
+                      case "NOT_STARTED":
+                        handleDragStart(e, item)
+                        break;
+                    }
+                  }}
                 >
                   <h3 className="font-medium truncate">{item.title}</h3>
                   <div className="flex gap-4 text-muted-foreground">
@@ -199,7 +206,11 @@ export function KanbanGrid({ groupsData }: KanbanProps) {
                       <SheetTrigger className="cursor-pointer flex items-center gap-2 hover:bg-accent py-1 px-2 rounded transition-colors border border-dashed">
                         <Eye className="h-4 w-4" /> Visualizar
                       </SheetTrigger>
-                      <InfoItem data={item} />
+                      <InfoItem
+                        data={item}
+                        editable={config.status !== "DONE" ? true : false}
+                        team={team ?? []}
+                      />
                     </Sheet>
                   </div>
                 </div>

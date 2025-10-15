@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { DialogContentNewItem } from "../dialog-new-item";
-import { createItem } from "../../../_actions/create-item";
 import { toast } from "sonner";
 import { Group, Priority, Status } from "@/generated/prisma";
 import { Dialog } from "@/components/ui/dialog";
+import { createItem } from "@/app/actions/item";
 
 type ItemFormData = {
   title: string;
@@ -14,7 +14,6 @@ type ItemFormData = {
 };
 
 // Mock dependencies
-jest.mock("../../../_actions/create-item");
 jest.mock("sonner");
 
 // Mock react-hook-form

@@ -1,10 +1,10 @@
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
-import { getGroups } from "./_data-access/get-groups";
 import { WorkspaceContent } from "./_components/workspace-content";
-import { getPriorities } from "./_data-access/get-priorities";
-import { getStatus } from "./_data-access/get-status";
-import { getTeam } from "./_data-access/get-team";
+import { getGroups } from "@/app/data-access/groupe";
+import { getPriorities, getStatus } from "@/app/data-access/item";
+import { getTeam } from "@/app/data-access/team";
+import { unwrapServerData } from "@/utils/server-helpers";
 
 
 export default async function WorkspacePage({
@@ -17,10 +17,9 @@ export default async function WorkspacePage({
     redirect('/')
   }
   const workspaceId = (await params).id;
-  const groupsData = await getGroups(workspaceId);
-  const team = await getTeam({ workspaceId: workspaceId });
-  const prioritiesData = await getPriorities(workspaceId);
-  const statusData = await getStatus(workspaceId);
+  const groupsData = await getGroups(workspaceId).then(unwrapServerData);
+  const prioritiesData = await getPriorities(workspaceId).then(unwrapServerData);
+  const statusData = await getStatus(workspaceId).then(unwrapServerData);
 
   return (
     <main className="container mx-auto px-6 pt-6">
@@ -29,7 +28,6 @@ export default async function WorkspacePage({
         workspaceId={workspaceId}
         prioritiesData={prioritiesData}
         statusData={statusData}
-        team={team}
       />
     </main>
   )

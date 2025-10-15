@@ -1,12 +1,11 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { KanbanGrid } from "../kanban-grid";
-import { updateItem } from "../../../_actions/update-item";
 import { Item, Priority, Status } from "@/generated/prisma";
 import { DialogContentNewItem } from "../dialog-new-item";
 import { GroupWithItems } from "../../main-board/groups";
+import { updateItem } from "@/app/actions/item";
 
 // Mock dependencies
-jest.mock("../../../_actions/update-item");
 jest.mock("../dialog-new-item", () => ({
     DialogContentNewItem: jest.fn(() => <div data-testid="dialog-new-item-mock" />)
 }));

@@ -7,9 +7,10 @@ import { CheckCircle2, Plus } from "lucide-react";
 import { Progress, ProgressIndicator } from "@/components/ui/progress-bar";
 import { Separator } from "@/components/ui/separator"
 import { PedingGoals } from "./peding-goals";
-import { goalUndo } from "../_actions/goal-undo";
 import { toast } from "sonner";
 import { PendingGoal, WeekSummaryResponse } from "../_types";
+import { goalUndo } from "@/app/actions/goals";
+import { isErrorResponse } from "@/utils/error-handler";
 
 interface SummaryProps {
   data: PendingGoal[];
@@ -20,7 +21,7 @@ interface SummaryProps {
 
 export function Summary({ data, summaryData, timeZone, language }: SummaryProps) {
   if (!summaryData.summary) {
-    return null; // Fix: explicitly return null instead of undefined
+    return null;
   }
 
   const firstDayOfWeek = format(startOfWeek(new Date()), "d MMM", { locale: ptBR });
@@ -29,14 +30,13 @@ export function Summary({ data, summaryData, timeZone, language }: SummaryProps)
   async function handleUndo(goalId: string) {
     if (!goalId) {
       toast.error("Erro ao desfazer meta.");
-      return; // Add return to prevent further execution
+      return;
     }
     try {
       const response = await goalUndo({ id: goalId });
-      // Fix: Check for 'error' instead of 'erro'
-      if (response.error) {
-        toast.error(response.error); // Fix: Use response.error instead of response.data
-        return; // Prevent showing success message after error
+      if (isErrorResponse(response)) {
+        toast.error(response.error);
+        return;
       }
       toast("🙄👀 " + response.data);
     } catch (error) {
@@ -138,7 +138,6 @@ export function ProgressGoals({
   total: number;
   completed: number;
 }) {
-  // Fix: Handle division by zero to avoid NaN
   const completedPercentage = total === 0 ? 0 : Math.round((completed * 100) / total);
 
   return (

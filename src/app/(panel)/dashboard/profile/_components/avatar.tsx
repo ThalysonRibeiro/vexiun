@@ -1,10 +1,10 @@
 "use cliet"
 
+import { updateAvatar } from "@/app/actions/user";
 import { Loader2, Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { ChangeEvent, useState } from "react";
-import { updateAvatar } from "../_actions/update-avatar";
 import { toast } from "sonner";
 
 export default function Avatar({ avatarUrl, userId }: { avatarUrl: string | null; userId: string; }) {

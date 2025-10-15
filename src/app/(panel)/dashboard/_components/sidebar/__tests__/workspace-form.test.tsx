@@ -1,12 +1,11 @@
 
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { WorkspaceForm } from "../workspace-form";
-import { createWorkspace } from "../../../_actions/create-workspace";
-import { updateWorkspace } from "../../../_actions/update-workspace";
 import { toast } from "sonner";
+import { createWorkspace, updateWorkspace } from "@/app/actions/workspace";
 
-jest.mock("../../../_actions/create-Workspace");
-jest.mock("../../../_actions/update-Workspace");
+jest.mock("@/app/actions/workspace/create-Workspace");
+jest.mock("@/app/actions/workspace/update-Workspace");
 jest.mock("sonner");
 
 const mockCreateWorkspace = createWorkspace as jest.Mock;
@@ -48,7 +47,7 @@ describe("WorkspaceForm component", () => {
     render(
       <WorkspaceForm
         setAddWorkspace={setAddWorkspace}
-        WorkspaceId="Workspace-123"
+        workspaceId="Workspace-123"
         initialValues={initialValues}
       />
     );
@@ -61,7 +60,7 @@ describe("WorkspaceForm component", () => {
 
     await waitFor(() => {
       expect(mockUpdateWorkspace).toHaveBeenCalledWith({
-        WorkspaceId: "Workspace-123",
+        workspaceId: "Workspace-123",
         title: "Updated Workspace",
       });
     });

@@ -7,13 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
-import { PrioritiesCount } from "../[id]/_data-access/get-priorities";
 import { PrioritiesBar } from "../[id]/_components/priorities-bar";
-import { StatusCount } from "../[id]/_data-access/get-status";
 import { StatusBar } from "../[id]/_components/status-bar";
 import { useMobile } from "@/hooks/use-mobile";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PrioritiesCount, StatusCount } from "@/app/data-access/item";
 
 // Header refatorado para ser dinâmico
 interface Tab {

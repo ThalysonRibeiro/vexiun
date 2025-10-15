@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import MetricsPage from "../page";
-import { getGoalsMetrics } from "../_data-access/get-goals-metrics";
 import { GoalMetrics } from "../_types";
 import { MetricsContent } from "../_components/metrics-content";
+import { getGoalsMetrics } from "@/app/data-access/goals/get-metrics";
 
-jest.mock("../_data-access/get-goals-metrics");
+jest.mock("@/app/data-access/goals/get-metrics");
 jest.mock("../_components/metrics-content", () => ({
   MetricsContent: jest.fn(({ data }) => (
     <div data-testid="metrics-content" data-props={JSON.stringify(data)} />

@@ -6,14 +6,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,26 +21,46 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Priority, Status } from "@/generated/prisma"
-import { format } from "date-fns"
-import { useCallback, useEffect, useRef, useState } from "react"
-import { Input } from "@/components/ui/input"
-import { toast } from "sonner"
-import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus"
-import { Trash, Check, X, CircleAlert, MoreHorizontal, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { CalendarTerm } from "./calendar-term"
-import { Textarea } from "@/components/ui/textarea"
-import { updateItem } from "../../_actions/update-item"
-import { deleteItem } from "../../_actions/delete-item"
-import { cn } from "@/lib/utils"
-import { InfoItem } from "./info-item"
-import { Sheet, SheetTrigger } from "@/components/ui/sheet"
-import { ItemWhitCreatedAssignedUser } from "../kanban/kanban-grid"
-import { usePagination } from "@/hooks/use-pagination"
-import { PaginationControls } from "@/components/ui/pagination-controls"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Priority, Status } from "@/generated/prisma";
+import { format } from "date-fns";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
+import { Trash, Check, X, CircleAlert, MoreHorizontal, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarTerm } from "./calendar-term";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { InfoItem } from "./info-item";
+import { usePagination } from "@/hooks/use-pagination";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { deleteItem, updateItem } from "@/app/actions/item";
+import { isErrorResponse } from "@/utils/error-handler";
+import { DetailsEditor } from "./details-editor";
+import { JSONContent } from "@tiptap/core";
+import { nameFallback } from "@/utils/name-fallback";
+import { TeamUser } from "../workspace-content";
+import { ItemWhitCreatedAssignedUser, useInvalidateItems, useItems } from "@/hooks/use-items";
+
+interface ItemsTablesProps {
+  groupId: string
+  team: TeamUser;
+}
 
 type EditingField = 'title' | 'notes' | 'description' | 'term' | null;
 
@@ -49,13 +69,28 @@ interface EditingState {
   field: EditingField;
 }
 
-export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] }) {
+export function ItemsTables({ groupId, team }: ItemsTablesProps) {
+  const [dialogState, setDialogState] = useState<{
+    isOpen: boolean;
+    itemId: string | null;
+    isEditing: boolean;
+    content: JSONContent | null;
+  }>({
+    isOpen: false,
+    itemId: null,
+    isEditing: false,
+    content: null
+  });
   const [editing, setEditing] = useState<EditingState>({ itemId: null, field: null });
   const [editingData, setEditingData] = useState<ItemWhitCreatedAssignedUser | null>(null);
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const formRef = useRef<HTMLDivElement>(null);
 
-  const pagination = usePagination(items, 10);
+  const { data: items, isLoading: isLoadingItems, error } = useItems(groupId);
+  const invalidateItems = useInvalidateItems();
+
+
+  const pagination = usePagination(items?.itemsNotCompleted ?? [], 10);
   const currentItems = pagination.currentItems;
 
   const isEditing = (itemId: string, field: EditingField) =>
@@ -88,6 +123,38 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [editing.itemId, cancelEditing]);
 
+  const handleSaveDetails = async (item: ItemWhitCreatedAssignedUser) => {
+    if (!dialogState.content) return;
+
+    setIsLoading(item.id);
+
+    try {
+      const result = await updateItem({
+        itemId: item.id,
+        title: item.title,
+        status: item.status,
+        term: item.term,
+        priority: item.priority,
+        notes: item.notes,
+        description: item.description,
+        details: dialogState.content,
+        assignedTo: item.assignedTo
+      });
+
+      if (isErrorResponse(result)) {
+        toast.error("Erro ao atualizar detalhes");
+      } else {
+        invalidateItems();
+        toast.success("Detalhes atualizados com sucesso!");
+        setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
+      }
+    } catch (error) {
+      toast.error("Erro ao atualizar detalhes");
+    } finally {
+      setIsLoading(null);
+    }
+  };
+
   const handleSaveField = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
     if (!editingData) return;
 
@@ -104,9 +171,10 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
         description: editingData.description
       });
 
-      if (result?.error) {
+      if (isErrorResponse(result)) {
         toast.error("Erro ao atualizar item");
       } else {
+        invalidateItems();
         toast.success("Item atualizado com sucesso!");
         cancelEditing();
       }
@@ -115,9 +183,13 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
     } finally {
       setIsLoading(null);
     }
-  }, [editingData, cancelEditing]);
+  }, [editingData, cancelEditing, invalidateItems]);
 
-  const handleSelectChange = useCallback(async (item: ItemWhitCreatedAssignedUser, field: 'priority' | 'status', value: Priority | Status) => {
+  const handleSelectChange = useCallback(async (
+    item: ItemWhitCreatedAssignedUser,
+    field: 'priority' | 'status',
+    value: Priority | Status
+  ) => {
     setIsLoading(item.id);
 
     try {
@@ -128,12 +200,14 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
         term: item.term,
         priority: field === 'priority' ? value as Priority : item.priority,
         notes: item.notes,
-        description: item.description
+        description: item.description,
+        details: item.details as JSONContent
       });
 
-      if (result?.error) {
+      if (isErrorResponse(result)) {
         toast.error("Erro ao atualizar item");
       } else {
+        invalidateItems();
         toast.success("Item atualizado!");
       }
     } catch (error) {
@@ -141,7 +215,7 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
     } finally {
       setIsLoading(null);
     }
-  }, []);
+  }, [invalidateItems]);
 
   const handleDeleteItem = useCallback(async (itemId: string) => {
     setIsLoading(itemId);
@@ -150,7 +224,7 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
       if (!confirm('Deseja realmente deletar o item?, todos os dados serão deletados junto')) {
         return;
       }
-      await deleteItem(itemId);
+      await deleteItem({ itemId });
       toast.success("Item deletado com sucesso!");
     } catch (error) {
       toast.error("Erro ao deletar item");
@@ -159,7 +233,11 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
     }
   }, []);
 
-  const renderEditableCell = (item: ItemWhitCreatedAssignedUser, field: EditingField, value: string | null) => {
+  const renderEditableCell = (
+    item: ItemWhitCreatedAssignedUser,
+    field: EditingField,
+    value: string | null
+  ) => {
     if (isEditing(item.id, field) && field) {
       const fieldValue = editingData?.[field] as string || '';
 
@@ -173,7 +251,7 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
         >
           <Input
             value={fieldValue}
-            onChange={(e) => setEditingData(prev =>
+            onChange={(e) => setEditingData((prev: ItemWhitCreatedAssignedUser | null) =>
               prev ? { ...prev, [field]: e.target.value } : null
             )}
             onKeyDown={(e) => {
@@ -226,7 +304,12 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
     );
   };
 
-  if (items.length === 0) {
+  if (isLoading || isLoadingItems) {
+    return <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 border-4 border-t-accent rounded-full animate-spin border-primary">
+    </div>
+  }
+
+  if (items?.itemsNotCompleted.length === 0) {
     return (
       <div className="text-center py-8">
         Ainda não há itens cadastrados.
@@ -236,16 +319,18 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
 
   return (
     <div ref={formRef} className="w-full space-y-4">
-      <div className="w-full overflow-x-auto border rounded-lg">
+      <div className="w-full overflow-x-scroll border rounded-lg">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Titulo</TableHead>
-              <TableHead className="max-w-13 overflow-hidden border-x">Responsável</TableHead>
+              <TableHead>Notas</TableHead>
+              <TableHead className="max-w-25 overflow-hidden border-x text-center">Responsável</TableHead>
               <TableHead>Prioridade</TableHead>
               <TableHead className="border-x">Prazo</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-center border-l">Descrição</TableHead>
+              <TableHead className="text-center border-l">Detalhes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -271,7 +356,7 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
                               <Eye className="h-4 w-4" /> Visualizar
                             </SheetTrigger>
                           </DropdownMenuItem>
-                          <InfoItem data={item} />
+                          <InfoItem data={item} team={team} />
                         </Sheet>
                         <DropdownMenuItem
                           variant="destructive"
@@ -285,26 +370,104 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
                     </DropdownMenu>
                   </TableCell>
 
-                  <TableCell className="border-x">
-                    <Select>
-                      <SelectTrigger chevron={false} size="sm" className="px-0  rounded-full cursor-pointer">
-                        <Avatar>
-                          <AvatarImage src="https://lh3.googleusercontent.com/a/ACg8ocK1ykRmdptZ0O2ILjQZPecUAK03e4jIiW51WP_jLC-fti8ZXzab=s96-c" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">
-                          <Avatar>
-                            <AvatarImage src="https://lh3.googleusercontent.com/a/ACg8ocK1ykRmdptZ0O2ILjQZPecUAK03e4jIiW51WP_jLC-fti8ZXzab=s96-c" />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
-                          <p>name user</p>
-                        </SelectItem>
+                  <TableCell className="max-w-90 border-l">
+                    <div className="overflow-hidden">
+                      {isEditing(item.id, 'notes') ? (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSaveField(item);
+                          }}
+                          className="flex items-start gap-2"
+                        >
+                          <div className="flex-1 space-y-2">
+                            <Textarea
+                              value={editingData?.notes || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value.length <= 1000) {
+                                  setEditingData((prev: ItemWhitCreatedAssignedUser | null) =>
+                                    prev ? { ...prev, notes: value } : null
+                                  );
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Escape') cancelEditing();
+                                if (e.key === 'Enter' && e.ctrlKey) handleSaveField(item);
+                              }}
+                              autoFocus
+                              disabled={isLoading === item.id}
+                              className="max-h-[120px] w-full"
+                              placeholder="Digite as notas..."
+                              maxLength={1000}
+                            />
+                            <div className="flex justify-end">
+                              <span className={cn(
+                                "text-xs",
+                                (editingData?.notes || '').length > 900 && "text-red-500",
+                                (editingData?.notes || '').length > 800 && (editingData?.notes || '').length <= 900 && "text-yellow-500",
+                                (editingData?.notes || '').length <= 800 && "text-gray-500"
+                              )}>
+                                {(editingData?.notes || '').length}/1000
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <Button
+                              type="submit"
+                              size="sm"
+                              variant="ghost"
+                              disabled={isLoading === item.id}
+                              className="text-green-600 hover:text-green-700"
+                              title="Salvar (Ctrl + Enter)"
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={cancelEditing}
+                              disabled={isLoading === item.id}
+                              className="text-red-600 hover:text-red-700"
+                              title="Cancelar (Esc)"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div
+                          onClick={() => startEditing(item, 'notes')}
+                          className="cursor-pointer hover:bg-accent p-1 rounded transition-colors group"
+                          title="Clique para editar"
+                        >
+                          {item.notes ? (
+                            <p className="overflow-hidden text-ellipsis" style={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              lineHeight: '1.4em',
+                              maxHeight: '2.8em'
+                            }}>
+                              {item.notes}
+                            </p>
+                          ) : (
+                            <span className="text-gray-400 italic">
+                              Clique para adicionar notas
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
 
-
-                      </SelectContent>
-                    </Select>
+                  <TableCell className="border-x flex items-center gap-2" title="Para trocar de responsável edite o item">
+                    <Avatar>
+                      <AvatarImage src={item.assignedToUser?.image as string} />
+                      <AvatarFallback>{nameFallback(item.assignedToUser?.name as string)}</AvatarFallback>
+                    </Avatar>
+                    <span>{item.assignedToUser?.name?.split(" ")[0] ?? "CATALYST"}</span>
                   </TableCell>
 
                   <TableCell className={colorPriority(item.priority)}>
@@ -343,7 +506,8 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
                         <CalendarTerm
                           initialDate={editingData?.term || item.term}
                           onChange={(dateRange) => {
-                            setEditingData(prev => prev ? { ...prev, term: dateRange } : null);
+                            setEditingData((prev: ItemWhitCreatedAssignedUser | null) =>
+                              prev ? { ...prev, term: dateRange } : null);
                           }}
                         />
                         <Button
@@ -432,7 +596,7 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
                               onChange={(e) => {
                                 const value = e.target.value;
                                 if (value.length <= 1000) {
-                                  setEditingData(prev =>
+                                  setEditingData((prev: ItemWhitCreatedAssignedUser | null) =>
                                     prev ? { ...prev, description: value } : null
                                   );
                                 }
@@ -507,6 +671,78 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
                       )}
                     </div>
                   </TableCell>
+
+                  <TableCell className="border-l flex items-center justify-center">
+                    <Dialog
+                      open={dialogState.isOpen && dialogState.itemId === item.id}
+                      onOpenChange={(open) => {
+                        if (open) {
+                          setDialogState({
+                            isOpen: true,
+                            itemId: item.id,
+                            isEditing: false,
+                            content: (item.details as JSONContent) ?? {}
+                          });
+                        } else {
+                          setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
+                        }
+                      }}
+                    >
+                      <DialogTrigger className="cursor-pointer flex items-center gap-2 hover:bg-accent p-1 rounded transition-colors group">
+                        <Eye className="h-4 w-4" /> Visualizar
+                      </DialogTrigger>
+                      <DialogContent
+                        className="min-h-50 max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-hidden"
+                      >
+                        <DialogHeader>
+                          <DialogTitle>Detalhes do item</DialogTitle>
+                          <DialogDescription>
+                            {dialogState.isEditing
+                              ? "Editando detalhes - suas alterações não foram salvas"
+                              : `Visualizando detalhes de ${item.title || 'item'}`}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="pb-6 w-full overflow-y-scroll min-h-50 max-h-120">
+                          <DetailsEditor
+                            autofocus={true}
+                            editable={dialogState.isEditing}
+                            content={dialogState.content ?? {}}
+                            onContentChange={(newContent) => {
+                              setDialogState(prev => ({ ...prev, content: newContent }));
+                            }}
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2 border-t pt-4">
+                          {!dialogState.isEditing ? (
+                            <Button onClick={() => setDialogState(prev => ({ ...prev, isEditing: true }))}>
+                              Editar
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setDialogState(prev => ({
+                                    ...prev,
+                                    isEditing: false,
+                                    content: (item.details as JSONContent) ?? {}
+                                  }));
+                                }}
+                              >
+                                Cancelar
+                              </Button>
+                              <Button
+                                onClick={() => handleSaveDetails(item)}
+                                disabled={isLoading === item.id}
+                              >
+                                Salvar
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -514,7 +750,7 @@ export function ItemsTables({ items }: { items: ItemWhitCreatedAssignedUser[] })
         </Table>
       </div>
 
-      {items.length > 10 && (
+      {(items?.itemsNotCompleted ?? []).length > 10 && (
         <PaginationControls {...pagination} />
       )}
     </div>

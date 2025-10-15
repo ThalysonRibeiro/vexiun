@@ -1,7 +1,8 @@
 import getSession from "@/lib/getSession";
 import { ProfileContent } from "./_components/profile-content";
 import { redirect } from "next/navigation";
-import { getDetailUser } from "../_data-access/get-detail-user";
+import { getDetailUser } from "@/app/data-access/user";
+import { unwrapServerData } from "@/utils/server-helpers";
 
 export default async function Profile() {
   const session = await getSession();
@@ -10,7 +11,7 @@ export default async function Profile() {
   }
   if (!session.user) return null;
 
-  const detailUser = await getDetailUser();
+  const detailUser = await getDetailUser().then(unwrapServerData);
   if (!detailUser) return null;
 
   return (

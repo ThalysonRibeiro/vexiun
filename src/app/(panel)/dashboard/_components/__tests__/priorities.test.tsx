@@ -1,11 +1,11 @@
 import { render } from "@testing-library/react";
 import { Priorities } from "../priorities";
-import { getPriorities, PrioritiesCount } from "../../workspace/[id]/_data-access/get-priorities";
+import { getPriorities } from "@/app/data-access/item";
+import { PrioritiesCount } from "@/app/data-access/item/get-priorities";
 import { PrioritiesBar } from "../../workspace/[id]/_components/priorities-bar";
 
 
-jest.mock("../../workspace/[id]/_data-access/get-priorities");
-
+jest.mock("@/app/data-access/item/get-priorities");
 jest.mock("../../workspace/[id]/_components/priorities-bar", () => ({
   PrioritiesBar: jest.fn(() => <div data-testid="priorities-bar" />),
 }));

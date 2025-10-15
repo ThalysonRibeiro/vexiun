@@ -1,17 +1,18 @@
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
-import { GetWeekSummary } from "./goals/_data-access/get-week-summary";
 import { ProgressGoals } from "./goals/_components/summary";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginAlert } from "@/components/login-alert";
-import { getDetailUser } from "./_data-access/get-detail-user";
 import { Priorities } from "./_components/priorities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { getWorkspaces } from "./_data-access/get-workspace";
 import { DialogCreateWorkspace } from "./workspace/[id]/_components/dialog-create-workspace";
+import { getDetailUser } from "@/app/data-access/user";
+import { getMyWorkspaces } from "@/app/data-access/workspace/get-my-workspace";
+import { getWeekSummary } from "@/app/data-access/goals";
+import { unwrapServerData } from "@/utils/server-helpers";
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -19,13 +20,13 @@ export default async function Dashboard() {
   if (!session) {
     redirect('/')
   }
-  const Workspaces = await getWorkspaces();
-  const weekSummaryDate = await GetWeekSummary();
-  const detailUser = await getDetailUser();
-  if (!detailUser) return null;
-  if (!weekSummaryDate.summary) {
-    return null
-  }
+
+  const workspaces = await getMyWorkspaces().then(unwrapServerData);
+  const weekSummaryDate = await getWeekSummary(session?.user?.id as string);
+  const detailUser = await getDetailUser().then(unwrapServerData);
+  if (!detailUser) { return null };
+  if (!weekSummaryDate?.summary) { return null }
+  if (!workspaces) { return null };
 
   return (
     <>
@@ -52,7 +53,7 @@ export default async function Dashboard() {
 
             <DialogCreateWorkspace sidebar={false} />
 
-            {Workspaces.map(workspace => (
+            {workspaces.map(workspace => (
               <Link
                 href={`/dashboard/workspace/${workspace.id}`}
                 key={workspace.id}

@@ -1,20 +1,37 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { CreateWorkspace } from "../../../_components/utility-action-dashboard/create-workspace"
 
-export function DialogCreateWorkspace({ sidebar }: { sidebar: boolean }) {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+export function DialogCreateWorkspace({
+  sidebar, isNoWorkspace = false,
+}: {
+  sidebar: boolean; isNoWorkspace?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState<boolean>(isNoWorkspace)
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         {sidebar ? (
           <div className="cursor-pointer border rounded-md py-2 px-4 hover:bg-accent">
             <div className="flex items-center justify-betweenr gap-2.5">
-              <div>Adicionar áreas de Trabalho</div>
+              <div>Adicionar área de Trabalho</div>
               <Plus className="w-5 h-5 opacity-25" />
             </div>
           </div>

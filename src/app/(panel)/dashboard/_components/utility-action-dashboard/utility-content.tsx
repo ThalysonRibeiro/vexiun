@@ -12,7 +12,8 @@ import UtilityButton, { UtilityButtonItem } from "../../../../../components/ui/u
 import { ComponentType, ReactNode, useState } from "react"
 import { ChatMessage } from "./chat-message"
 import { CreateWorkspace } from "./create-workspace"
-import { UserSearch } from "./user-search"
+import { SendFrendshipRequest } from "./send-frendship-request"
+
 
 type DialogType = 'friend' | 'project' | 'chat';
 
@@ -34,7 +35,7 @@ const DIALOGS: DialogConfig[] = [
     icon: User,
     label: 'Adicionar Amigo',
     delay: 0,
-    renderContent: () => <UserSearch />,
+    renderContent: () => <SendFrendshipRequest />,
   },
   {
     type: 'project',

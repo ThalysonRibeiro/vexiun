@@ -2,7 +2,6 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,33 +12,50 @@ import {
   CollapsibleContent
 } from "@/components/ui/collapsible";
 import { useState } from "react";
-import { Check, ChevronDown, CircleAlert } from "lucide-react";
+import { Check, ChevronDown, CircleAlert, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GroupWithItems } from "./groups";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { colorPriority, colorStatus } from "@/utils/colorStatus";
 import { format } from "date-fns";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { usePagination } from "@/hooks/use-pagination";
-import { DescriptionEditor } from "./description-editor";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { DetailsEditor } from "./details-editor";
+import { JSONContent } from "@tiptap/core";
+import { nameFallback } from "@/utils/name-fallback";
+import { useCompletedItems, useItems } from "@/hooks/use-items";
+import { useParams } from "next/navigation";
 
-export function CompletedItems({ groupsData }: { groupsData: GroupWithItems[] }) {
+export function CompletedItems() {
+  const params = useParams();
+  const workspaceId = params.id as string;
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { data: items, isLoading: isLoading, error } = useCompletedItems(workspaceId);
 
+  const pagination = usePagination(items ?? [], 10);
 
-  const completedItems = groupsData.flatMap(group =>
-    group.item.filter(item => item.status === 'DONE')
-  );
-  const pagination = usePagination(completedItems, 10);
-
-  if (completedItems.length === 0) {
+  if (!items) {
     return;
   };
+
+  if (isLoading) {
+    return <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 border-4 border-t-accent rounded-full animate-spin border-primary">
+    </div>
+  }
 
   return (
     <div className="w-full mb-6">
       <div className="flex items-center gap-3 mb-4">
-        <h3 className="text-green-500 text-lg font-bold">Concluídos: <span className="text-sm font-normal">({completedItems.length})</span></h3>
+        <h3 className="text-green-500 text-lg font-bold">Concluídos: <span className="text-sm font-normal">
+          ({items?.length})</span>
+        </h3>
         <button className="cursor-pointer" onClick={() => setIsOpen(prev => !prev)}>
           <ChevronDown className={cn("cursor-pointer transition-all duration-300", isOpen && "-rotate-90")} />
         </button>
@@ -48,18 +64,19 @@ export function CompletedItems({ groupsData }: { groupsData: GroupWithItems[] })
         open={isOpen}
         className="ml-6 space-y-4 border-l border-green-500 pl-4">
         <CollapsibleContent>
-          {/* <ItemsTables items={completedItems} /> */}
 
           <div className="w-full overflow-x-auto border rounded-lg">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Titulo</TableHead>
-                  <TableHead className="max-w-13 overflow-hidden border-x">Responsável</TableHead>
+                  <TableHead className="border-l">Notas</TableHead>
+                  <TableHead className="max-w-25 overflow-hidden border-x">Responsável</TableHead>
                   <TableHead>Prioridade</TableHead>
                   <TableHead className="border-x">Prazo</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-center border-l">Descrição</TableHead>
+                  <TableHead className="text-center border-l">Detalhes</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -72,11 +89,23 @@ export function CompletedItems({ groupsData }: { groupsData: GroupWithItems[] })
                           {titleCapitalized}
                         </p>
                       </TableCell>
-                      <TableCell className="border-x">
+                      <TableCell className="max-w-90 border-l">
+                        <p className="overflow-hidden text-ellipsis" style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          lineHeight: '1.4em',
+                          maxHeight: '2.8em'
+                        }}>
+                          {item.notes}
+                        </p>
+                      </TableCell>
+                      <TableCell className="border-x flex items-center justify-around">
                         <Avatar>
                           <AvatarImage src="https://lh3.googleusercontent.com/a/ACg8ocK1ykRmdptZ0O2ILjQZPecUAK03e4jIiW51WP_jLC-fti8ZXzab=s96-c" />
                           <AvatarFallback>F</AvatarFallback>
                         </Avatar>
+                        <div>{nameFallback("name user")}</div>
                       </TableCell>
                       <TableCell className={colorPriority(item.priority)}>
                         {item.priority}
@@ -118,18 +147,41 @@ export function CompletedItems({ groupsData }: { groupsData: GroupWithItems[] })
                           {item.description}
                         </p>
                       </TableCell>
+                      <TableCell className="border-l flex items-center justify-center">
+                        <Dialog>
+                          <DialogTrigger className="cursor-pointer flex items-center gap-2 hover:bg-accent p-1 rounded transition-colors group">
+                            <Eye className="h-4 w-4" /> Visualizar
+                          </DialogTrigger>
+                          <DialogContent
+                            className="min-h-50 max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-hidden"
+                          >
+                            <DialogHeader>
+                              <DialogTitle>Detalhes do item</DialogTitle>
+                              <DialogDescription>
+                                {`Visualizando detalhes de ${item.title || 'item'}`}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="pb-6 w-full overflow-y-scroll min-h-50 max-h-120">
+                              <DetailsEditor
+                                editable={false}
+                                content={item.details as JSONContent}
+                                onContentChange={() => { }}
+                              />
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
           </div>
-          {completedItems.length > 10 && (
+          {items.length > 10 && (
             <PaginationControls {...pagination} />
           )}
 
         </CollapsibleContent>
-        <DescriptionEditor />
       </Collapsible>
     </div>
   )

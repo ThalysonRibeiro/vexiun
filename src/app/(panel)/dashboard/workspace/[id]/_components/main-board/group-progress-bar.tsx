@@ -1,8 +1,10 @@
-import { Item, Status } from "@/generated/prisma";
-import { ItemWhitCreatedAssignedUser } from "../kanban/kanban-grid";
+import { Status } from "@/generated/prisma";
 
 interface GroupProgressBarProps {
-  items: ItemWhitCreatedAssignedUser[];
+  items: {
+    id: string;
+    status: Status;
+  }[];
 }
 
 export function GroupProgressBar({ items }: GroupProgressBarProps) {
@@ -10,6 +12,9 @@ export function GroupProgressBar({ items }: GroupProgressBarProps) {
   if (total === 0) {
     return null;
   }
+
+  console.log(items);
+
 
   const statusCounts = Object.fromEntries(
     Object.entries(

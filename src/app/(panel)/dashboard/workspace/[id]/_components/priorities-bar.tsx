@@ -1,5 +1,5 @@
+import { PrioritiesCount } from "@/app/data-access/item";
 import { colorPriority, priorityKeys, priorityMap } from "@/utils/colorStatus";
-import { PrioritiesCount } from "../_data-access/get-priorities";
 
 interface PrioritiesBarProps {
   priorities: PrioritiesCount[];
@@ -7,13 +7,13 @@ interface PrioritiesBarProps {
 }
 
 export function PrioritiesBar({ priorities, label = true }: PrioritiesBarProps) {
-  const total = priorities.reduce((acc, priority) => acc + priority.count, 0);
+  const total = priorities?.reduce((acc, priority) => acc + priority.count, 0);
 
   return (
     <div className="relative group">
       {label && <h3 className="font-semibold text-sm text-center">Prioridade geral</h3>}
       <div data-testid="progress-bar-container" className=" flex w-full h-4 rounded-md overflow-hidden">
-        {priorities.map((priority) => (
+        {priorities?.map((priority) => (
           <div
             key={priority.priority}
             className={`h-full`}

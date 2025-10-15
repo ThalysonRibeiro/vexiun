@@ -11,8 +11,8 @@ import {
 import { GroupFormData, UseGroupForm } from "./use-group-form";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { updateGroup } from "../../_actions/update-group";
-import { createGroup } from "../../_actions/create-group";
+import { createGroup, updateGroup } from "@/app/actions/group";
+import { isErrorResponse } from "@/utils/error-handler";
 
 
 interface CreateGroupFormProps {
@@ -62,7 +62,7 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
         title: formData.title,
         textColor: formData.textColor,
       });
-      if (response.error) {
+      if (isErrorResponse(response)) {
         toast.error("Erro ao cadastrar grupo");
         return;
       }

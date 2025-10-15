@@ -21,9 +21,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { RadioGroup, RadioGroupIndicator, RadioGroupItem } from "@/components/ui/radio-group";
-import { createGoal } from "../_actions/create-goal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMobile } from "@/hooks/use-mobile";
+import { createGoal } from "@/app/actions/goals";
+import { isErrorResponse, isSuccessResponse } from "@/utils/error-handler";
 
 interface CreateGoalProps {
   initialValues?: {
@@ -44,10 +45,13 @@ export function CreateGoals({ initialValues }: CreateGoalProps) {
         title: formData.title,
         desiredWeeklyFrequency: formData.desiredWeeklyFrequency
       });
-      if (response.error) {
+      if (isErrorResponse(response)) {
         toast.error(response.error)
       }
-      toast.success(response.data);
+      if (isSuccessResponse(response)) {
+        toast.success(response.message);
+      }
+
       form.reset();
     } catch (error) {
     }

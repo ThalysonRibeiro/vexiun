@@ -15,15 +15,12 @@ import { notificationColor, notificationMap } from "@/utils/colorStatus";
 import { NotificationType } from "@/generated/prisma";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { markNotificationAsRead } from "../../_actions/mark-notification-as-read";
 import { useNotifications } from "@/hooks/use-notifications";
-import { markAllAsRead } from "../../_actions/mark-all-notification-as-read";
 import { toast } from "sonner";
-import { deleteNotification } from "../../_actions/delete-notification";
-import { acceptFriendRequest } from "../../_actions/accept-friend-request";
-import { rejectFriendRequest } from "../../_actions/reject-friend-request";
-import { acceptWorkspaceInvite } from "../../_actions/accept-workspace-invite";
-import { rejectWorkspaceInvite } from "../../_actions/reject-workspace-invite";
+import { acceptFriendship, declinedFriendship } from "@/app/actions/friendship";
+import { acceptWorkspaceInvitation, declineWorkspaceInvitation } from "@/app/actions/workspace";
+import { deleteNotification, markAllAsRead, markNotificationAsRead } from "@/app/actions/notification";
+import { isSuccessResponse } from "@/utils/error-handler";
 
 
 export function NotificationContent() {
@@ -32,42 +29,61 @@ export function NotificationContent() {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const handleMarkAsRead = async (id: string) => {
-    await markNotificationAsRead(id);
-    refetch();
+    const result = await markNotificationAsRead({ notificationId: id });
+    if (isSuccessResponse(result)) {
+      refetch();
+    } else {
+      toast.error(result.error);
+    }
   };
 
   const handleMarkAllRead = async () => {
     const result = await markAllAsRead();
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
+    if (isSuccessResponse(result)) {
       refetch();
+    } else {
+      toast.error(result.error);
     }
   };
 
   const handleDelete = async (id: string) => {
-    const result = await deleteNotification(id);
-
-    if (result.error) {
-      toast.error(result.error);
-    } else {
+    const result = await deleteNotification({ notificationId: id });
+    if (isSuccessResponse(result)) {
       refetch();
+    } else {
+      toast.error(result.error);
     }
   };
 
   const handleAcceptFriend = async (requestId: string) => {
-    await acceptFriendRequest({ requestId });
+    try {
+      await acceptFriendship({ requestId });
+    } catch (error) {
+      toast.error("Falha ao aceitar solicitação");
+    }
   };
   const handleRejectFriend = async (requestId: string) => {
-    await rejectFriendRequest({ requestId });
+    try {
+      await declinedFriendship({ requestId });
+    } catch (error) {
+      toast.error("Falha ao rejeitar solicitação");
+    }
   };
 
-  const handleAcceptWorkspaceInvite = async (WorkspaceId: string, userId: string) => {
-    await acceptWorkspaceInvite({ WorkspaceId, userId });
+  const handleAcceptWorkspaceInvite = async (workspaceId: string, userId: string) => {
+    try {
+      await acceptWorkspaceInvitation({ workspaceId, userId });
+    } catch (error) {
+      toast.error("Falha ao aceitar convite");
+    }
   }
-  const handleRejectWorkspaceInvite = async (WorkspaceId: string) => {
-    await rejectWorkspaceInvite({ WorkspaceId });
+  const handleDeclineWorkspaceInvitation = async (workspaceId: string) => {
+    try {
+      await declineWorkspaceInvitation({ workspaceId });
+    } catch (error) {
+      toast.error("Falha ao rejeitar convite")
+    }
   }
   const withoutAvatar = [
     "SISTEM_MESSAGE",
@@ -239,7 +255,7 @@ export function NotificationContent() {
                             e.stopPropagation();
                             switch (notification.type) {
                               case "WORKSPACE_INVITE":
-                                handleRejectWorkspaceInvite(notification.referenceId as string);
+                                handleDeclineWorkspaceInvitation(notification.referenceId as string);
                                 break;
                               default:
                                 handleRejectFriend(notification.userId as string)

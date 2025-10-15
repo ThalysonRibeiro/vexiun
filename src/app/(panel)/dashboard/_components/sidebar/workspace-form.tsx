@@ -10,21 +10,21 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useEffect, useRef, useState } from "react";
-import { createWorkspace } from "../../_actions/create-workspace";
 import { toast } from "sonner";
-import { updateWorkspace } from "../../_actions/update-workspace";
 import { useWorkspace, WorkspaceFormData } from "../utility-action-dashboard/use-workspace-form";
+import { updateWorkspace } from "@/app/actions/workspace";
+import { isSuccessResponse } from "@/utils/error-handler";
 
 interface WorkspaceFormProps {
   setAddWorkspace: (value: boolean) => boolean;
-  WorkspaceId?: string;
+  workspaceId?: string;
   initialValues?: {
     title: string;
   }
 }
 
 
-export function WorkspaceForm({ setAddWorkspace, WorkspaceId, initialValues }: WorkspaceFormProps) {
+export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: WorkspaceFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -43,42 +43,24 @@ export function WorkspaceForm({ setAddWorkspace, WorkspaceId, initialValues }: W
   async function onSubmit(formData: WorkspaceFormData) {
     setIsLoading(true);
 
-    if (WorkspaceId) {
+    if (workspaceId) {
       const response = await updateWorkspace({
-        workspaceId: WorkspaceId,
+        workspaceId: workspaceId,
         title: formData.title
       });
       setIsLoading(false);
       setAddWorkspace(false);
-      if (response.error) {
+      if (!isSuccessResponse(response)) {
         toast.error(response.error);
       }
-      toast.success(response.data);
-    } else {
-      try {
-        const response = await createWorkspace({
-          title: formData.title
-        });
-        if (response.error) {
-          toast.error("Erro ao cadastrar Workspace");
-          return;
-        }
-        toast.success("Workspace cadastrada com sucesso!");
-        setAddWorkspace(false);
-        form.reset();
-      } catch (error) {
-        toast.error("Erro inesperado");
-      }
-      finally {
-        setIsLoading(false);
-      }
+      toast.success("Atualizado com sucesso");
     }
-  }
 
-  if (isLoading) {
-    return (
-      <p>carregando...</p>
-    )
+    if (isLoading) {
+      return (
+        <p>carregando...</p>
+      )
+    }
   }
 
   return (
@@ -91,7 +73,7 @@ export function WorkspaceForm({ setAddWorkspace, WorkspaceId, initialValues }: W
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  {WorkspaceId !== undefined
+                  {workspaceId !== undefined
                     ? "Atualizar Workspace"
                     : "Adicionar Workspace"
                   }

@@ -7,13 +7,8 @@ import { CheckCheck, X, Sparkles, Check, Bell, Trash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { deleteNotification } from '../_actions/delete-notification';
-import { deleteMultipleNotifications } from '../_actions/delete-multiple-notification';
-import { deleteAllNotifications } from '../_actions/delete-all-notification';
-import { deleteReadNotifications } from '../_actions/delete-read-notification';
-import { smartCleanup } from '../_actions/smart-Cleanup';
-import { markAllAsRead } from '../_actions/mark-all-notification-as-read';
-import { markNotificationAsRead } from '../_actions/mark-notification-as-read';
+import { deleteAllNotifications, deleteMultipleNotifications, deleteNotification, deleteReadNotifications, markAllAsRead, markNotificationAsRead, smartCleanup } from '@/app/actions/notification';
+import { isSuccessResponse, successResponse } from '@/utils/error-handler';
 
 export default function NotificationsPage() {
   const { data: notifications = [], refetch } = useNotifications();
@@ -40,12 +35,12 @@ export default function NotificationsPage() {
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true);
-    const result = await deleteNotification(id);
+    const result = await deleteNotification({ notificationId: id });
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
+    if (isSuccessResponse(result)) {
       refetch();
+    } else {
+      toast.error(result.error);
     }
     setIsDeleting(false);
   };
@@ -54,14 +49,14 @@ export default function NotificationsPage() {
     if (selectedIds.length === 0) return;
 
     setIsDeleting(true);
-    const result = await deleteMultipleNotifications(selectedIds);
+    const result = await deleteMultipleNotifications({ notificationIds: selectedIds });
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
+    if (isSuccessResponse(result)) {
       toast.success(`${selectedIds.length} notificações deletadas`);
       setSelectedIds([]);
       refetch();
+    } else {
+      toast.error(result.error);
     }
     setIsDeleting(false);
   };
@@ -72,11 +67,11 @@ export default function NotificationsPage() {
     setIsDeleting(true);
     const result = await deleteAllNotifications();
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success(`${result.count} notificações deletadas`);
+    if (isSuccessResponse(result)) {
+      toast.success(`${result} notificações deletadas`);
       refetch();
+    } else {
+      toast.error(result.error);
     }
     setIsDeleting(false);
   };
@@ -85,11 +80,11 @@ export default function NotificationsPage() {
     setIsDeleting(true);
     const result = await deleteReadNotifications();
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
-      toast.success(`${result.count} notificações lidas deletadas`);
+    if (isSuccessResponse(result)) {
+      toast.success(`${result} notificações lidas deletadas`);
       refetch();
+    } else {
+      toast.error(result.error);
     }
     setIsDeleting(false);
   };
@@ -98,18 +93,20 @@ export default function NotificationsPage() {
     setIsDeleting(true);
     const result = await smartCleanup();
 
-    if (result.error) {
-      toast.error(result.error);
-    } else if (result.deleted) {
+    if (isSuccessResponse(result)) {
+      const { data } = result;
       toast(
         <div>
-          <div>✅ Limpeza concluída! {result.deleted.total} notificações removidas.</div>
-          <div>{result.deleted.isRead} lidas antigas,</div>
-          <div>{result.deleted.unread} não lidas antigas,</div>
-          <div>{result.deleted.old} excedentes</div>
+          <div>✅ Limpeza concluída!</div>
+          <div>{data?.deleted?.total} notificações removidas.</div>
+          <div>{data?.deleted?.isRead} lidas antigas,</div>
+          <div>{data?.deleted?.unread} não lidas antigas,</div>
+          <div>{data?.deleted?.old} excedentes</div>
         </div>
       );
       refetch();
+    } else {
+      toast.error(result.error);
     }
     setIsDeleting(false);
   };
@@ -118,16 +115,16 @@ export default function NotificationsPage() {
     setIsDeleting(true);
     const result = await markAllAsRead();
 
-    if (result.error) {
-      toast.error(result.error);
-    } else {
+    if (isSuccessResponse(result)) {
       refetch();
+    } else {
+      toast.error(result.error);
     }
     setIsDeleting(false);
   };
 
   const handleMarkAsRead = async (id: string) => {
-    await markNotificationAsRead(id);
+    await markNotificationAsRead({ notificationId: id });
     refetch();
   };
 

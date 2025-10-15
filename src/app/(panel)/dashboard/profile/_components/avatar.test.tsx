@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Avatar from "./avatar";
 import { useSession } from "next-auth/react";
-import { updateAvatar } from "../_actions/update-avatar";
 import { toast } from "sonner";
+import { updateAvatar } from "@/app/actions/user";
 
 // Mock dependencies
 jest.mock("next-auth/react");
-jest.mock("../_actions/update-avatar");
+jest.mock("@/app/actions/user");
 jest.mock("sonner");
 global.fetch = jest.fn();
 

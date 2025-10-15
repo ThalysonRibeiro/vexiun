@@ -1,16 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import GoalsPage from "./page";
-import { getWeekPendingGoal } from "./_data-access/get-week-pendingGoal";
-import { GetWeekSummary } from "./_data-access/get-week-summary";
-import { getDetailUser } from "../_data-access/get-detail-user";
-import { GoalsContent } from "./_components/goals-content";
-import { PendingGoal, WeekSummaryResponse } from "./_types";
 import { UserWithCounts } from "../profile/types/profile-types";
-
-// Mock the data fetching functions
-jest.mock("./_data-access/get-week-pendingGoal");
-jest.mock("./_data-access/get-week-summary");
-jest.mock("../_data-access/get-detail-user");
+import { getWeekPendingGoal, getWeekSummary, PendingGoal, WeekSummaryResponse } from "@/app/data-access/goals";
+import { getDetailUser } from "@/app/data-access/user";
 
 // Mock the client component to check the props it receives
 jest.mock("./_components/goals-content", () => ({
@@ -25,7 +17,7 @@ jest.mock("./_components/goals-content", () => ({
 }));
 
 const mockGetWeekPendingGoal = getWeekPendingGoal as jest.MockedFunction<typeof getWeekPendingGoal>;
-const mockGetWeekSummary = GetWeekSummary as jest.MockedFunction<typeof GetWeekSummary>;
+const mockGetWeekSummary = getWeekSummary as jest.MockedFunction<typeof getWeekSummary>;
 const mockGetDetailUser = getDetailUser as jest.MockedFunction<typeof getDetailUser>;
 
 const mockPendingGoals: PendingGoal[] = [

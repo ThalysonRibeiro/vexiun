@@ -1,6 +1,5 @@
-import { colorStatus, statusKeys, statusMap } from "@/utils/colorStatus";
-import { StatusCount } from "../_data-access/get-status";
 import { Status } from "@/generated/prisma";
+import { StatusCount } from "@/app/data-access/item";
 
 interface StatusBarProps {
   status: StatusCount[];

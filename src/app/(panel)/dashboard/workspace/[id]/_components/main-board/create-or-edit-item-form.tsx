@@ -15,40 +15,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ItemFormData, UseItemForm } from "./use-item-form";
+import { ItemFormData, UseItemForm, UseItemFormProps } from "./use-item-form";
 import { Input } from "@/components/ui/input";
-import { Priority, Status } from "@/generated/prisma";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CalendarTerm } from "./calendar-term";
-import { createItem } from "../../_actions/create-item";
 import { Textarea } from "@/components/ui/textarea";
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
-import { updateItem } from "../../_actions/update-item";
-import { useMobile } from "@/hooks/use-mobile";
+import { createItem, updateItem } from "@/app/actions/item";
+import { isErrorResponse } from "@/utils/error-handler";
+import { DetailsEditor } from "./details-editor";
+import { TeamUser } from "../workspace-content";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { nameFallback } from "@/utils/name-fallback";
+import { useSession } from "next-auth/react";
+import { useInvalidateItems } from "@/hooks/use-items";
 
 interface CreateItemFormProps {
   closeForm: (value: boolean) => void;
-  initialValues?: {
-    title: string;
-    term: Date;
-    priority: Priority;
-    status: Status;
-    notes: string;
-    description: string;
-  }
+  initialValues?: UseItemFormProps['initialValues'];
   groupId: string;
   itemId?: string;
   editingItem: boolean;
+  team: TeamUser;
 }
 
-export function CreateOrEditItemForm({ closeForm, initialValues, groupId, itemId, editingItem }: CreateItemFormProps) {
+export function CreateOrEditItemForm({
+  closeForm, initialValues, groupId, itemId, editingItem, team
+}: CreateItemFormProps
+) {
+  const invalidateItems = useInvalidateItems();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = UseItemForm({ initialValues });
-  const isMobile = useMobile();
-
+  const { data: session } = useSession();
 
   async function onSubmit(formData: ItemFormData) {
     setIsLoading(true);
@@ -61,12 +62,15 @@ export function CreateOrEditItemForm({ closeForm, initialValues, groupId, itemId
           term: formData?.term,
           priority: formData?.priority,
           notes: formData?.notes,
-          description: formData?.description
+          description: formData?.description,
+          assignedTo: formData?.assignedTo ?? session?.user?.id,
+          details: formData?.details,
         });
 
-        if (result?.error) {
+        if (isErrorResponse(result)) {
           toast.error("Erro ao atualizar item");
         } else {
+          invalidateItems();
           toast.success("Item atualizado com sucesso!");
         }
         closeForm(false);
@@ -78,14 +82,19 @@ export function CreateOrEditItemForm({ closeForm, initialValues, groupId, itemId
           title: formData.title,
           term: formData.term,
           priority: formData.priority,
-          notes: formData.notes || "",
-          description: formData.description || "",
-          status: "NOT_STARTED"
+          notes: formData.notes,
+          description: formData.description,
+          status: "NOT_STARTED",
+          assignedTo: formData.assignedTo ?? session?.user?.id,
+          details: formData.details,
         });
-        if (response.error) {
+        if (isErrorResponse(response)) {
+          console.log(response.error);
+
           toast.error("Erro ao cadastrar item");
           return;
         }
+        invalidateItems();
         toast.success("Item cadastrado com sucesso!");
         closeForm(false);
         form.reset();
@@ -141,7 +150,7 @@ export function CreateOrEditItemForm({ closeForm, initialValues, groupId, itemId
                   <Textarea
                     {...field}
                     placeholder="Notas adicionais para seu item"
-                    className="min-h-65 max-h-65 w-full"
+                    className="max-h-25 w-full"
                   />
                 </FormControl>
                 <FormDescription />
@@ -149,6 +158,26 @@ export function CreateOrEditItemForm({ closeForm, initialValues, groupId, itemId
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="flex-1 w-full">
+                <FormLabel>Descrição</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Descreva seu item aqui..."
+                    className="max-h-35 w-full"
+                  />
+                </FormControl>
+                <FormDescription />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="flex flex-wrap items-center justify-between gap-2">
             <FormField
               control={form.control}
@@ -237,29 +266,66 @@ export function CreateOrEditItemForm({ closeForm, initialValues, groupId, itemId
                 </FormItem>
               )}
             />
+            {team && (
+              <FormField
+                control={form.control}
+                name="assignedTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Responsável</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? undefined}
+                      >
+                        <SelectTrigger
+                          className="bg-transparent dark:bg-transparent cursor-pointer w-full"
+                        >
+                          <SelectValue placeholder={team[0].name?.split(" ")[0] ?? undefined} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {team.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              <Avatar>
+                                <AvatarImage src={user.image ?? undefined} />
+                                <AvatarFallback>{nameFallback(user.name ?? undefined)}</AvatarFallback>
+                              </Avatar>
+                              <span>{user.name?.split(" ")[0]}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
         </div>
 
+
         <FormField
           control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem className="flex-1 w-full">
-              <FormLabel>Descrição</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="Descreva seu item aqui..."
-                  className="max-h-[500px] min-h-[400px] w-full"
-                />
-              </FormControl>
-              <FormDescription />
-              <FormMessage />
-            </FormItem>
-          )}
+          name="details"
+          render={({ field }) => {
+            return (
+              <FormItem>
+                <FormLabel>
+                  Detalhes
+                </FormLabel>
+                <FormControl>
+                  <div className="h-full min-h-80 max-h-80">
+                    <DetailsEditor
+                      content={field.value ?? {}}
+                      onContentChange={field.onChange}
+                    />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )
+          }}
         />
-        <Button type="submit" className={cn("mt-3.5 w-fit px-10"
-        )}>
+        <Button type="submit" className={cn("mt-3.5 w-fit px-10")}>
           {editingItem ? 'Salvar' : 'Cadastrar'}
         </Button>
       </form>

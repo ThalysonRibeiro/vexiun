@@ -1,16 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/getSession";
-import { getDetailUser } from "../_data-access/get-detail-user";
 import Profile from "./page";
 import { ProfileContent } from "./_components/profile-content";
 import { UserWithCounts } from "./types/profile-types";
 import { Session } from "next-auth";
+import { getDetailUser } from "@/app/data-access/user";
 
 // Mock dependencies
 jest.mock("next/navigation");
 jest.mock("@/lib/getSession");
-jest.mock("../_data-access/get-detail-user");
+jest.mock("@/app/data-access/user");
 
 // Mock the client component to isolate the server component"s logic
 jest.mock("./_components/profile-content", () => ({
@@ -47,6 +47,9 @@ const mockDetailUser: UserWithCounts = {
   emailVerified: new Date(),
   emailVerificationToken: null,
   verificationExpiresAt: null,
+  role: "USER",
+  isActive: true,
+  createdBy: null,
   acceptTerms: true,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -54,7 +57,7 @@ const mockDetailUser: UserWithCounts = {
     sessions: 5,
   },
   goals: [],
-  UserSettings: {
+  userSettings: {
     id: "settings-123",
     userId: "user-123",
     pushNotifications: true,

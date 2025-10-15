@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CreateGoals } from "../create-goals";
-import { createGoal } from "../../_actions/create-goal";
 import { toast } from "sonner";
 import { useMobile } from "@/hooks/use-mobile";
 import { Sheet } from "@/components/ui/sheet";
+import { createGoal } from "@/app/actions/goals";
 
 // Mock dependencies
-jest.mock("../../_actions/create-goal");
+jest.mock("../create-goals");
 jest.mock("sonner");
 jest.mock("@/hooks/use-mobile");
 

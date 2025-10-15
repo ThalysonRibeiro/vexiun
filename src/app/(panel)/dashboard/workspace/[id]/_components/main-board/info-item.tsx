@@ -8,23 +8,33 @@ import {
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus"
-import { Edit } from "lucide-react"
+import { Edit, X } from "lucide-react"
 import { useRef, useState } from "react"
 import { CreateOrEditItemForm } from "./create-or-edit-item-form"
-import { ItemWhitCreatedAssignedUser } from "../kanban/kanban-grid"
+import { JSONContent } from "@tiptap/core"
+import { TeamUser } from "../workspace-content"
+import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items"
 
-export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
+export function InfoItem({
+  data, editable = true, team
+}: {
+  data: ItemWhitCreatedAssignedUser;
+  editable?: boolean;
+  team: TeamUser;
+}) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const shetRef = useRef<HTMLDivElement>(null);
 
   return (
     <SheetContent ref={shetRef} className="overflow-y-scroll ">
-      <Button className="w-fit ml-4 mt-4 border-dashed" variant={"outline"}
-        onClick={() => setIsEditing(prev => !prev)}
-      >
-        {isEditing ? 'Cancelar' : 'Editar'} <Edit />
-      </Button>
-      {isEditing ? (
+      {editable && (
+        <Button className="w-fit ml-4 mt-4 border-dashed" variant={"outline"}
+          onClick={() => setIsEditing(prev => !prev)}
+        >
+          {isEditing ? 'Cancelar' : 'Editar'} {isEditing ? <X /> : <Edit />}
+        </Button>
+      )}
+      {isEditing && editable ? (
         <>
           <div className="p-4 space-y-4">
             <CreateOrEditItemForm
@@ -35,8 +45,11 @@ export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
                 priority: data.priority,
                 status: data.status,
                 notes: data.notes,
-                description: data.description
+                description: data.description,
+                assignedTo: data.assignedTo,
+                details: data.details as JSONContent
               }}
+              team={team}
               groupId={""}
               itemId={data.id}
               editingItem={true}
@@ -50,9 +63,7 @@ export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
               {data.title[0].toUpperCase()}
               {data.title.slice(1)}
             </SheetTitle>
-            <SheetDescription>
-              {data.notes}
-            </SheetDescription>
+            {data.notes && <SheetDescription>{data.notes}</SheetDescription>}
           </SheetHeader>
           <div className="p-4 space-y-4">
 
@@ -61,7 +72,7 @@ export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
                 <span>
                   Prioridade:
                 </span>
-                <span className={cn("px-2 py-1 w-fit rounded-lg", colorPriority(data.priority))}>
+                <span className={cn("px-2 py-1 w-fit rounded", colorPriority(data.priority))}>
                   {priorityMap[data.priority]}
                 </span>
               </div>
@@ -69,7 +80,7 @@ export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
                 <span>
                   Status:
                 </span>
-                <span className={cn("px-2 py-1 w-fit rounded-lg", colorStatus(data.status))}>
+                <span className={cn("px-2 py-1 w-fit rounded", colorStatus(data.status))}>
                   {statusMap[data.status]}
                 </span>
               </div>
@@ -78,7 +89,7 @@ export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
                   Prazo:
                 </span>
                 <span className={cn(
-                  "px-2 py-1 w-fit rounded-lg",
+                  "px-2 py-1 w-fit rounded",
                   new Date(data.term).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
                     ? "bg-red-500 text-white"
                     : "bg-green-500 text-white"
@@ -89,12 +100,12 @@ export function InfoItem({ data }: { data: ItemWhitCreatedAssignedUser }) {
             </div>
 
             <div className="text-sm">
-              <span>
+              <label>
                 Descrição:
-              </span>
-              <p className="mt-1 italic bg-accent p-2 rounded-lg border">
-                {data.description}
-              </p>
+              </label>
+              <div className="mt-1 italic bg-accent p-2 rounded border">
+                {data.description ? <span>{data.description}</span> : "Não definido"}
+              </div>
             </div>
           </div>
         </>

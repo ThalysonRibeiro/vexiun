@@ -6,12 +6,12 @@ import {
 import { CreateGoals } from "./create-goals"
 import { EmptyGoal } from "./empyt-goal"
 import { Summary } from "./summary"
-import { PendingGoal, WeekSummaryResponse } from "../_types"
+import { PendingGoal, WeekSummaryResponse } from "@/app/data-access/goals"
 
 
 interface GoalsContentProps {
   data: PendingGoal[];
-  summaryData: WeekSummaryResponse;
+  summaryData: WeekSummaryResponse | null;
   timeZone: string;
   language: string;
 }

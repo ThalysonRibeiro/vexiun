@@ -4,6 +4,15 @@ export const APP_NAME = "Catalyst";
 export const APP_DESCRIPTION = "Accelerate your team's productivity";
 export const APP_TAGLINE = "Where collaboration meets velocity";
 
+export const UI_LABELS = {
+  ASSIGN: "Atribuir",
+  ASSIGN_TO: "Atribuir a",
+  ASSIGNED_TO: "Atribuído a",
+  ASSIGNEE: "Responsável",
+  UNASSIGNED: "Não atribuído",
+  REASSIGN: "Reatribuir",
+} as const;
+
 export interface TestimonialsProps {
   quote: string;
   author: string;

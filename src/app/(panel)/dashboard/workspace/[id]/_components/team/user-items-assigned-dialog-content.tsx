@@ -2,9 +2,6 @@
 
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useEffect, useState } from "react";
-import { getItemsAssignedToUset } from "../../_data-access/get-items-assigned-to-user";
-import { toast } from "sonner";
-import { UserSearchType } from "@/app/(panel)/dashboard/_components/utility-action-dashboard/create-workspace";
 import { Item } from "@/generated/prisma";
 
 

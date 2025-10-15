@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { Plus, Trash } from "lucide-react"
-import { goalCompletion } from "../_actions/goal-completion"
 import { toast } from "sonner"
-import { deleteGoal } from "../_actions/delete-goal"
 import { PendingGoal } from "../_types"
 import { cn } from "@/lib/utils"
+import { deleteGoal, goalCompletion } from "@/app/actions/goals"
+import { isErrorResponse, isSuccessResponse } from "@/utils/error-handler"
 
 export function PedingGoals({ data }: { data: PendingGoal[] }) {
 
@@ -17,11 +17,13 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
     }
     try {
       const response = await goalCompletion({ goalId });
-      if (response.error) {
+      if (isErrorResponse(response)) {
         toast.error(response.error);
-        return; // Importante: return aqui para não chamar success
+        return;
       }
-      toast.success(response.data);
+      if (isSuccessResponse(response)) {
+        toast.success(response.message);
+      }
     } catch (error) {
       toast.error("Falha ao completar meta");
     }
@@ -34,11 +36,13 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
     }
     try {
       const response = await deleteGoal({ goalId });
-      if (response.error) {
+      if (isErrorResponse(response)) {
         toast.error(response.error);
-        return; // Importante: return aqui para não chamar success
+        return;
       }
-      toast.success(response.data);
+      if (isSuccessResponse(response)) {
+        toast.success(response.message);
+      }
     } catch (error) {
       toast.error("Falha ao deletar meta");
     }
