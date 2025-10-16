@@ -75,8 +75,6 @@ export const priorityKeys = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "STANDARD"];
 
 
 export const notificationMap = {
-  FRIEND_REQUEST: "PEDIDO DE AMIZADE",
-  FRIEND_ACCEPTED: "AMIZADE ACEITA",
   WORKSPACE_INVITE: "CONVITE DE PROJETO",
   WORKSPACE_ACCEPTED: "CONVITE ACEITO",
   ITEM_ASSIGNED: "ITEM ATRIBUÍDO",
@@ -88,10 +86,6 @@ export const notificationMap = {
 
 export const notificationColor = (notification: NotificationType) => {
   switch (notification) {
-    case "FRIEND_REQUEST":
-      return "border border-blue-400 text-blue-400";
-    case "FRIEND_ACCEPTED":
-      return "border border-green-400 text-green-400";
     case "WORKSPACE_INVITE":
       return "border border-violet-400 text-violet-400";
     case "WORKSPACE_ACCEPTED":

@@ -1,11 +1,5 @@
 
 export const notificationMessages = {
-  FRIEND_REQUEST: (senderName: string) =>
-    `${senderName} enviou uma solicitação de amizade`,
-
-  FRIEND_ACCEPTED: (friendName: string) =>
-    `${friendName} aceitou seu pedido de amizade`,
-
   WORKSPACE_INVITE: (senderName: string, workspaceName: string) =>
     `${senderName} convidou você para "${workspaceName}"`,
 

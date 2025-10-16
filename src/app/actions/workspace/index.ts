@@ -1,7 +1,14 @@
 export { createWorkspace } from "./create";
+export type { CreateWorkspaceType } from "./create";
 export { updateWorkspace } from "./update";
+export type { UpdateWorkspaceType } from "./update";
 export { deleteWorkspace } from "./delete";
+export type { DeleteWorkspaceType } from "./delete";
 export { addWorkspaceMember } from "./add-member";
+export type { AddWorkspaceMemberResponse, AddWorkspaceMemberType } from "./add-member";
 export { acceptWorkspaceInvitation } from "./accept-invite";
+export type { AcceptWorkspaceInvitationType } from "./accept-invite";
 export { declineWorkspaceInvitation } from "./decline-invite";
+export type { DeclineWorkspaceInvitationType } from "./decline-invite";
 export { cancelWorkspaceInvitation } from "./cancel-invitation";
+export type { CancelWorkspaceInvitationType } from "./cancel-invitation";

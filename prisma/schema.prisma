@@ -33,8 +33,6 @@ enum SpatusInvitation {
 }
 
 enum NotificationType {
-  FRIEND_REQUEST // Solicitação de amizade
-  FRIEND_ACCEPTED // Quando alguém aceitou
   WORKSPACE_INVITE // Convite para um projeto
   WORKSPACE_ACCEPTED // Projeto aceito
   ITEM_COMPLETED // Item completo
@@ -48,13 +46,6 @@ enum Role {
   SUPER_ADMIN
   ADMIN
   USER
-}
-
-enum FriendStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  BLOCKED
 }
 
 enum WorkspaceRole {
@@ -190,21 +181,6 @@ model Assessments {
   updatedAt DateTime @updatedAt
 }
 
-model UserFriend {
-  id          String       @id @default(cuid())
-  requesterId String
-  addresseeId String
-  status      FriendStatus @default(PENDING)
-
-  requester User @relation("RequestedFriends", fields: [requesterId], references: [id])
-  addressee User @relation("ReceivedFriends", fields: [addresseeId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([requesterId, addresseeId])
-}
-
 model Chat {
   id      String  @id @default(cuid())
   title   String?
@@ -271,9 +247,6 @@ model User {
   inviter             WorkspaceInvitation[] @relation("InvitedBy")
   Notification        Notification[]
   assessments         Assessments?
-
-  requestedFriends UserFriend[] @relation("RequestedFriends")
-  receivedFriends  UserFriend[] @relation("ReceivedFriends")
 
   message    Message[]
   chatMember ChatMember[]

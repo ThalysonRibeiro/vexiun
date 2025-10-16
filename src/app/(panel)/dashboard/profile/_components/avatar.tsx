@@ -1,6 +1,7 @@
 "use cliet"
 
 import { updateAvatar } from "@/app/actions/user";
+import { useUpdateAvatar } from "@/hooks/use-user";
 import { Loader2, Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -11,6 +12,7 @@ export default function Avatar({ avatarUrl, userId }: { avatarUrl: string | null
   const [preview, setPreview] = useState<string | null>(avatarUrl);
   const [loading, setLoading] = useState<boolean>(false);
   const { update } = useSession();
+  const updateAvatar = useUpdateAvatar();
 
   async function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
@@ -31,7 +33,7 @@ export default function Avatar({ avatarUrl, userId }: { avatarUrl: string | null
         return;
       }
       setPreview(urlImage);
-      await updateAvatar({ avatarUrl: urlImage });
+      await updateAvatar.mutateAsync({ avatarUrl: urlImage });
       await update({
         image: urlImage
       })

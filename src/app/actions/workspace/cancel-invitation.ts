@@ -4,27 +4,30 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { validateWorkspacePermission } from "@/lib/db/validators";
 import { z } from "zod";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { DuplicateError, NotFoundError, RelationError } from "@/lib/errors";
+import { AuthenticationError, DuplicateError, NotFoundError, RelationError, ValidationError } from "@/lib/errors";
 
 const formSchema = z.object({
-  invitationId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  invitationId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
 });
 
-export async function cancelWorkspaceInvitation(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const userId = session?.user?.id;
+export type CancelWorkspaceInvitationType = z.infer<typeof formSchema>;
 
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+export async function cancelWorkspaceInvitation(formData: CancelWorkspaceInvitationType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     const invitation = await prisma.workspaceInvitation.findUnique({
       where: { id: formData.invitationId },
       select: {

@@ -4,8 +4,9 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateWorkspaceExists } from "@/lib/db/validators";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 
 const formSchema = z.object({
   workspaceId: z.string()
@@ -14,19 +15,20 @@ const formSchema = z.object({
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
 });
 
-export async function updateWorkspace(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type UpdateWorkspaceType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+export async function updateWorkspace(formData: UpdateWorkspaceType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     const existingWorkspace = await validateWorkspaceExists(formData.workspaceId);
     await prisma.workspace.update({
       where: { id: existingWorkspace.id },

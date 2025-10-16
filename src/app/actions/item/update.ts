@@ -4,12 +4,15 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateItemEditPermission, validateItemExists } from "@/lib/db/validators";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
 import { JSONContent } from "@tiptap/core";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 
 const formSchema = z.object({
-  itemId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  itemId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   status: z.enum(["DONE", "IN_PROGRESS", "STOPPED", "NOT_STARTED"]),
   term: z.date().optional(),
@@ -17,29 +20,27 @@ const formSchema = z.object({
   notes: z.string().optional(),
   description: z.string().optional(),
   details: z.custom<JSONContent>().nullable().optional(),
-  assignedTo: z.string().nullable().optional(),
+  assignedTo: z.string()
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)
+    .nullable().optional(),
 });
 
-type FormSchema = z.infer<typeof formSchema>;
+export type UpdateItemType = z.infer<typeof formSchema>;
 
-export async function updateItem(formData: FormSchema) {
-  const session = await auth();
-  if (!session?.user) {
-    return {
-      error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED
-    };
-  }
-
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return {
-      error: schema.error.issues[0].message
-    }
-  }
-
+export async function updateItem(formData: UpdateItemType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     await validateItemExists(formData.itemId);
-    await validateItemEditPermission(formData.itemId, session.user.id as string)
+    await validateItemEditPermission(formData.itemId, userId)
 
     const updateData = Object.fromEntries(
       Object.entries({
@@ -61,7 +62,7 @@ export async function updateItem(formData: FormSchema) {
 
     revalidatePath("/dashboard/Workspace");
 
-    return successResponse();
+    return successResponse("Item atualizado com sucesso");
   } catch (error) {
     return handleError(error, ERROR_MESSAGES.GENERIC);
   }

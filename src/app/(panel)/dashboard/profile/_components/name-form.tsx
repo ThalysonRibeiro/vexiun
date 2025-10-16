@@ -8,21 +8,23 @@ import { UseNameForm } from "./use-settings-form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { updateName } from "@/app/actions/user";
+import { useUpdateName } from "@/hooks/use-user";
+import { isSuccessResponse } from "@/utils/error-handler";
 
 export function NameForme({ user }: { user: User }) {
   const [isAdding, setIsAdding] = useState<boolean>(false);
-
   const form = UseNameForm({ initialValues: { name: user?.name || "" } });
+  const updateName = useUpdateName();
 
   async function onSubmit(formData: { name: string }) {
     if (!user.id) return;
     try {
-      const response = await updateName({
+      const response = await updateName.mutateAsync({
         userId: user.id,
         name: formData.name
       });
-      if (response?.error) {
-        toast.error(response.error);
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao atualizar nome");
         return;
       }
       toast.success("Nome alterado com sucesso!");

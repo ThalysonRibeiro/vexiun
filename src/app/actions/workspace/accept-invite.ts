@@ -6,27 +6,30 @@ import { auth } from "@/lib/auth";
 import { WorkspaceRole } from "@/generated/prisma";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { createAndSendNotification } from "../notification";
-import { handleError, successResponse } from "@/utils/error-handler";
-import { DuplicateError, NotFoundError, RelationError } from "@/lib/errors";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
+import { AuthenticationError, DuplicateError, NotFoundError, RelationError, ValidationError } from "@/lib/errors";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
 
 const formSchema = z.object({
-  userId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  workspaceId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  workspaceId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
 });
 
-export async function acceptWorkspaceInvitation(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type AcceptWorkspaceInvitationType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
+export async function acceptWorkspaceInvitation(formData: AcceptWorkspaceInvitationType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     await prisma.$transaction(async (tx) => {
       const invitation = await tx.workspaceInvitation.findUnique({
         where: {
@@ -96,7 +99,7 @@ export async function acceptWorkspaceInvitation(formData: z.infer<typeof formSch
     });
 
     revalidatePath("/dashboard");
-    return successResponse();
+    return successResponse("Convite aceito com sucesso");
   } catch (error) {
     return handleError(error, ERROR_MESSAGES.GENERIC);
   };

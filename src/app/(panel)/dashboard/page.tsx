@@ -31,7 +31,7 @@ export default async function Dashboard() {
   return (
     <>
       <LoginAlert emailNotifications={detailUser.userSettings?.emailNotifications} />
-      <main className="container mx-auto px-6 pt-6">
+      <main className="container mx-auto px-6 pt-10">
         <section className="flex flex-col space-y-4">
           <div>
             <h1 className="text-2xl font-semibold">Bem vindo de volta!</h1>

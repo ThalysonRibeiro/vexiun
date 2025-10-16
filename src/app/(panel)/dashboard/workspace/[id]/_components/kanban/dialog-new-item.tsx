@@ -4,7 +4,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -26,13 +26,13 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CalendarTerm } from "../main-board/calendar-term";
-import { Group, Priority, Status } from "@/generated/prisma";
+import { Priority, Status } from "@/generated/prisma";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { createItem } from "@/app/actions/item";
-import { isErrorResponse } from "@/utils/error-handler";
-import { GroupsData, useGroups } from "@/hooks/use-groups";
+import { isSuccessResponse } from "@/utils/error-handler";
+import { useGroups } from "@/hooks/use-groups";
 import { useParams } from "next/navigation";
+import { useCreateItem } from "@/hooks/use-items";
 
 interface DialogContentNewItemProps {
   closeDialog: (value: boolean) => void;
@@ -53,10 +53,11 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
   const { data, isLoading, error } = useGroups(workspaceId);
   const form = UseItemForm({ initialValues });
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+  const createItem = useCreateItem();
 
   async function onSubmit(formData: ItemFormData) {
     try {
-      const response = await createItem({
+      const response = await createItem.mutateAsync({
         groupId: selectedGroupId || data?.group[0].id as string,
         title: formData.title,
         term: formData.term,
@@ -65,7 +66,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
         notes: formData.notes || "",
         description: formData.description || ""
       });
-      if (isErrorResponse(response)) {
+      if (!isSuccessResponse(response)) {
         toast.error("Erro ao cadastrar item");
         return;
       }

@@ -5,16 +5,13 @@ CREATE TYPE "Status" AS ENUM ('DONE', 'IN_PROGRESS', 'STOPPED', 'NOT_STARTED');
 CREATE TYPE "Priority" AS ENUM ('CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'STANDARD');
 
 -- CreateEnum
-CREATE TYPE "SpatusInvitation" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
+CREATE TYPE "SpatusInvitation" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'EXPIRED', 'CANCELLED');
 
 -- CreateEnum
-CREATE TYPE "NotificationType" AS ENUM ('FRIEND_REQUEST', 'FRIEND_ACCEPTED', 'WORKSPACE_INVITE', 'WORKSPACE_ACCEPTED', 'ITEM_COMPLETED', 'ITEM_ASSIGNED', 'CHAT_MESSAGE', 'SISTEM_MESSAGE', 'NOTICES_MESSAGE');
+CREATE TYPE "NotificationType" AS ENUM ('WORKSPACE_INVITE', 'WORKSPACE_ACCEPTED', 'ITEM_COMPLETED', 'ITEM_ASSIGNED', 'CHAT_MESSAGE', 'SISTEM_MESSAGE', 'NOTICES_MESSAGE');
 
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'USER');
-
--- CreateEnum
-CREATE TYPE "FriendStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'BLOCKED');
 
 -- CreateEnum
 CREATE TYPE "WorkspaceRole" AS ENUM ('OWNER', 'ADMIN', 'MEMBER', 'VIEWER');
@@ -133,18 +130,6 @@ CREATE TABLE "Assessments" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Assessments_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "UserFriend" (
-    "id" TEXT NOT NULL,
-    "requesterId" TEXT NOT NULL,
-    "addresseeId" TEXT NOT NULL,
-    "status" "FriendStatus" NOT NULL DEFAULT 'PENDING',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "UserFriend_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -275,9 +260,6 @@ CREATE UNIQUE INDEX "WorkspaceInvitation_workspaceId_userId_key" ON "WorkspaceIn
 CREATE UNIQUE INDEX "Assessments_userId_key" ON "Assessments"("userId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserFriend_requesterId_addresseeId_key" ON "UserFriend"("requesterId", "addresseeId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
@@ -339,12 +321,6 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "Assessments" ADD CONSTRAINT "Assessments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UserFriend" ADD CONSTRAINT "UserFriend_requesterId_fkey" FOREIGN KEY ("requesterId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UserFriend" ADD CONSTRAINT "UserFriend_addresseeId_fkey" FOREIGN KEY ("addresseeId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Chat" ADD CONSTRAINT "Chat_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "Workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,3 +1,4 @@
+import { createItem, CreateItemType, deleteItem, DeleteItemType, updateItem, UpdateItemType } from "@/app/actions/item";
 import {
   getCompletedItems,
   getItemsAssignedToUser,
@@ -36,9 +37,6 @@ export type ItemWhitCreatedAssignedUser = Prisma.ItemGetPayload<{
 export type ItemsResults = Awaited<ReturnType<typeof getPublicItems>>;
 export type ItemsData = Extract<ItemsResults, { success: true }>['data'];
 
-/**
- * Hook para buscar items
-*/
 export function useItems(groupId: string) {
   return useQuery<ItemsData>({
     queryKey: ["items", groupId] as const,
@@ -59,11 +57,6 @@ export function useItems(groupId: string) {
 export type CompletedItemsResults = Awaited<ReturnType<typeof getCompletedItems>>;
 export type CompletedItemsData = Extract<CompletedItemsResults, { success: true }>['data'];
 
-
-
-/**
- * Hook para items com status completo
- */
 export function useCompletedItems(workspaceId: string) {
   return useQuery<CompletedItemsData>({
     queryKey: ["items", "completed", workspaceId] as const,
@@ -105,9 +98,6 @@ export function useItemsByStatus(workspaceId: string) {
 export type ItemAssignedToUserResult = Awaited<ReturnType<typeof getItemsAssignedToUser>>;
 export type ItemAssignedToUserData = Extract<ItemAssignedToUserResult, { success: true }>['data'];
 
-/**
- * Hook busca items associado ao usuario
- */
 export function useItemsAssignedToUser(assignedTo: string) {
   return useQuery<ItemAssignedToUserData>({
     queryKey: ["items", "assigned-to-user", assignedTo] as const,
@@ -124,17 +114,71 @@ export function useItemsAssignedToUser(assignedTo: string) {
   });
 }
 
-/**
-* Hook para invalidar cache, Invalida todas as queries de items
-*/
-
-// Aí você invalida TUDO de uma vez:
 export function useInvalidateItems() {
   const queryClient = useQueryClient();
 
   return () => {
-    queryClient.invalidateQueries({ queryKey: ["items"] }); // ✅ Invalida tudo que começa com "items"
+    queryClient.invalidateQueries({ queryKey: ["items"] });
   };
+}
+
+export function useCreateItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateItemType) => {
+      const result = await createItem(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["item"] });
+    },
+  });
+}
+
+export function useUpdateItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: UpdateItemType) => {
+      const result = await updateItem(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["item", variables.itemId] });
+    },
+    retry: 1
+  });
+}
+
+export function useDeleteItem() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: DeleteItemType) => {
+      const result = await deleteItem(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["item", variables.itemId] });
+    },
+    retry: 1
+  });
 }
 
 

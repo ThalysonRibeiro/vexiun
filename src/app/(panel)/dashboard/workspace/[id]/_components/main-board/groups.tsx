@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { GroupProgressBar } from "./group-progress-bar";
 import { deleteGroup } from "@/app/actions/group";
 import { CompletedItems } from "./completed-items";
-import { GroupsData } from "@/hooks/use-groups";
+import { GroupsData, useDeleteGroup } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";
 
 export function Groups({
@@ -34,6 +34,7 @@ export function Groups({
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
   const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(workspaceId);
+  const deleteGroup = useDeleteGroup();
 
   const toggleDropdown = (groupId: string) => {
     setOpenGroups(prev => {
@@ -68,7 +69,7 @@ export function Groups({
       if (!confirm('Deseja realmente deletar o grupo? todos os itens serão deletados junto')) {
         return;
       }
-      await deleteGroup({ groupId: id });
+      await deleteGroup.mutateAsync({ groupId: id });
       toast.success("Grupo deletado com sucesso!");
       setOpenGroups(prev => {
         const newSet = new Set(prev);
@@ -163,7 +164,7 @@ export function Groups({
                     style={{ borderColor: group.textColor }}
                   >
                     <CollapsibleContent>
-                      <ItemsTables groupId={group.id} team={team} />
+                      <ItemsTables groupId={group.id} team={team ?? []} />
 
                       <Dialog
                         open={openDialogs.has(group.id)}

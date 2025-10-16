@@ -3,30 +3,35 @@ import prisma from "@/lib/prisma";
 import { z } from "zod"
 import { auth } from "@/lib/auth";
 import { NotificationType } from "@/generated/prisma";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 
 const broadcastSchema = z.object({
   message: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   type: z.enum(["SISTEM_MESSAGE", "NOTICES_MESSAGE"]),
-  referenceId: z.string().optional(),
+  referenceId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID).optional(),
 });
 
+export type BroadcastNotificationType = z.infer<typeof broadcastSchema>;
+
 export async function sendBroadcastNotification(
-  formData: z.infer<typeof broadcastSchema>
-) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = broadcastSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+  formData: BroadcastNotificationType
+): Promise<ActionResponse<{
+  success: boolean;
+  totalSend: number;
+} | string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = broadcastSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     const result = await sendNotificationAllUsers({
       type: formData.type,
       message: formData.message,
@@ -34,7 +39,6 @@ export async function sendBroadcastNotification(
     });
     return successResponse(result, "Notificação enviada com sucesso");
   } catch (error) {
-    console.error("Erro ao enviar broadcast:", error);
     return handleError(error, ERROR_MESSAGES.GENERIC);
   };
 };

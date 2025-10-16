@@ -3,27 +3,28 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 
 const formSchema = z.object({
-  notificationId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  notificationId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
 });
 
+export type MarkNotificationAsReadType = z.infer<typeof formSchema>;
 
-export async function markNotificationAsRead(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  }
-
+export async function markNotificationAsRead(formData: MarkNotificationAsReadType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     await prisma.notification.update({
       where: {
         id: formData.notificationId,
@@ -35,7 +36,6 @@ export async function markNotificationAsRead(formData: z.infer<typeof formSchema
     revalidatePath("/dashboard/notifications");
     return successResponse("Notificação marcada como lida com sucesso");
   } catch (error) {
-    console.error(error);
     return handleError(error, ERROR_MESSAGES.GENERIC);
   };
 };

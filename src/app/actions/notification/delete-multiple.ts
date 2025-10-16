@@ -3,26 +3,28 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 
 const formSchema = z.object({
-  notificationIds: z.array(z.string().cuid()),
+  notificationIds: z.array(z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)),
 });
 
-export async function deleteMultipleNotifications(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type DeleteMultipleNotificationsType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+export async function deleteMultipleNotifications(formData: DeleteMultipleNotificationsType): Promise<ActionResponse<number | string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     await prisma.notification.deleteMany({
       where: {
         id: { in: formData.notificationIds },

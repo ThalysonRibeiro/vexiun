@@ -12,15 +12,21 @@ import { Edit, X } from "lucide-react"
 import { useRef, useState } from "react"
 import { CreateOrEditItemForm } from "./create-or-edit-item-form"
 import { JSONContent } from "@tiptap/core"
-import { TeamUser } from "../workspace-content"
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items"
+
+type TeamUser = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  email: string;
+}
 
 export function InfoItem({
   data, editable = true, team
 }: {
   data: ItemWhitCreatedAssignedUser;
   editable?: boolean;
-  team: TeamUser;
+  team: TeamUser[];
 }) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const shetRef = useRef<HTMLDivElement>(null);

@@ -7,11 +7,15 @@ import { notificationMessages } from "@/lib/notifications/messages";
 import { validateGroupExists, validateUserExists } from "@/lib/db/validators";
 import { createAndSendNotification } from "@/app/actions/notification";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { JSONContent } from "@tiptap/core";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { Item } from "@/generated/prisma";
 
 const formSchema = z.object({
-  groupId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  groupId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   term: z.date().optional(),
   priority: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW", "STANDARD"]),
@@ -19,27 +23,32 @@ const formSchema = z.object({
   notes: z.string().optional(),
   description: z.string().optional(),
   details: z.custom<JSONContent>().nullable().optional(),
-  assignedTo: z.string().nullable().optional(),
+  assignedTo: z.string()
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)
+    .nullable()
+    .optional()
 });
 
-export async function createItem(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type CreateItemType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-  const existingGrop = await validateGroupExists(formData.groupId);
-
-  if (formData.assignedTo && formData.assignedTo !== session?.user?.id) {
-    await validateUserExists(formData?.assignedTo as string);
-  };
-
+export async function createItem(formData: CreateItemType): Promise<ActionResponse<Item | string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
+    const existingGrop = await validateGroupExists(formData.groupId);
+
+    if (formData.assignedTo && formData.assignedTo !== session?.user?.id) {
+      await validateUserExists(formData?.assignedTo as string);
+    };
+
     const newItem = await prisma.item.create({
       data: {
         groupId: existingGrop.id,

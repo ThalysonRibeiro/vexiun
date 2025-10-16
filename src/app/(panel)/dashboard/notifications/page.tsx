@@ -1,5 +1,14 @@
 'use client'
-import { useNotifications } from '@/hooks/use-notifications';
+import {
+  useDeleteAllNotifications,
+  useDeleteMultipleNotifications,
+  useDeleteNotification,
+  useDeleteReadNotifications,
+  useMarkAllAsRead,
+  useMarkNotificationAsRead,
+  useNotifications,
+  useSmartCleanup
+} from '@/hooks/use-notifications';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,13 +16,19 @@ import { CheckCheck, X, Sparkles, Check, Bell, Trash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { deleteAllNotifications, deleteMultipleNotifications, deleteNotification, deleteReadNotifications, markAllAsRead, markNotificationAsRead, smartCleanup } from '@/app/actions/notification';
-import { isSuccessResponse, successResponse } from '@/utils/error-handler';
+import { isSuccessResponse } from '@/utils/error-handler';
 
 export default function NotificationsPage() {
   const { data: notifications = [], refetch } = useNotifications();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
+  const deleteAllNotifications = useDeleteAllNotifications();
+  const deleteMultipleNotifications = useDeleteMultipleNotifications();
+  const deleteReadNotifications = useDeleteReadNotifications();
+  const deleteNotification = useDeleteNotification();
+  const markAllAsRead = useMarkAllAsRead();
+  const markNotificationAsRead = useMarkNotificationAsRead();
+  const smartCleanup = useSmartCleanup();
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -35,13 +50,12 @@ export default function NotificationsPage() {
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true);
-    const result = await deleteNotification({ notificationId: id });
+    const result = await deleteNotification.mutateAsync({ notificationId: id });
 
-    if (isSuccessResponse(result)) {
-      refetch();
-    } else {
-      toast.error(result.error);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao deletar notificação");
     }
+    refetch();
     setIsDeleting(false);
   };
 
@@ -49,15 +63,14 @@ export default function NotificationsPage() {
     if (selectedIds.length === 0) return;
 
     setIsDeleting(true);
-    const result = await deleteMultipleNotifications({ notificationIds: selectedIds });
+    const result = await deleteMultipleNotifications.mutateAsync({ notificationIds: selectedIds });
 
-    if (isSuccessResponse(result)) {
-      toast.success(`${selectedIds.length} notificações deletadas`);
-      setSelectedIds([]);
-      refetch();
-    } else {
-      toast.error(result.error);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao deletar notificações");
     }
+    toast.success(`${selectedIds.length} notificações deletadas`);
+    setSelectedIds([]);
+    refetch();
     setIsDeleting(false);
   };
 
@@ -65,67 +78,68 @@ export default function NotificationsPage() {
     if (!confirm('Deseja realmente deletar todas as notificações?')) return;
 
     setIsDeleting(true);
-    const result = await deleteAllNotifications();
+    const result = await deleteAllNotifications.mutateAsync();
 
-    if (isSuccessResponse(result)) {
-      toast.success(`${result} notificações deletadas`);
-      refetch();
-    } else {
-      toast.error(result.error);
+    if (!isSuccessResponse(result)) {
+      toast.error("Error ao deletar notificações");
+      setIsDeleting(false);
     }
+    toast.success(`${result.data} notificações deletadas`);
+    refetch();
     setIsDeleting(false);
   };
 
   const handleDeleteRead = async () => {
     setIsDeleting(true);
-    const result = await deleteReadNotifications();
+    const result = await deleteReadNotifications.mutateAsync();
 
-    if (isSuccessResponse(result)) {
-      toast.success(`${result} notificações lidas deletadas`);
-      refetch();
-    } else {
-      toast.error(result.error);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao deletar notificações");
     }
+    toast.success(`${result.data} notificações lidas deletadas`);
+    refetch();
     setIsDeleting(false);
   };
 
   const handleSmartCleanup = async () => {
     setIsDeleting(true);
-    const result = await smartCleanup();
+    const result = await smartCleanup.mutateAsync();
 
-    if (isSuccessResponse(result)) {
-      const { data } = result;
-      toast(
-        <div>
-          <div>✅ Limpeza concluída!</div>
-          <div>{data?.deleted?.total} notificações removidas.</div>
-          <div>{data?.deleted?.isRead} lidas antigas,</div>
-          <div>{data?.deleted?.unread} não lidas antigas,</div>
-          <div>{data?.deleted?.old} excedentes</div>
-        </div>
-      );
-      refetch();
-    } else {
-      toast.error(result.error);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao limpar notificações");
     }
+    const { data } = result;
+    toast(
+      <div>
+        <div>✅ Limpeza concluída!</div>
+        <div>{data?.deleted?.total} notificações removidas.</div>
+        <div>{data?.deleted?.isRead} lidas antigas,</div>
+        <div>{data?.deleted?.unread} não lidas antigas,</div>
+        <div>{data?.deleted?.old} excedentes</div>
+      </div>
+    );
+    refetch();
     setIsDeleting(false);
   };
 
   const handleMarkAllRead = async () => {
     setIsDeleting(true);
-    const result = await markAllAsRead();
+    const result = await markAllAsRead.mutateAsync();
 
     if (isSuccessResponse(result)) {
-      refetch();
-    } else {
-      toast.error(result.error);
+      toast.error("Error ao marcar notificações como lidas");
     }
+    refetch();
+
     setIsDeleting(false);
   };
 
   const handleMarkAsRead = async (id: string) => {
-    await markNotificationAsRead({ notificationId: id });
-    refetch();
+    const result = await markNotificationAsRead.mutateAsync({ notificationId: id });
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao marcar como lida");
+    }
+    refetch();;
   };
 
   return (

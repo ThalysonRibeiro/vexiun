@@ -91,13 +91,6 @@ export function Menu({ userData }: MenuProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="cursor-pointer">
-          <Link href="/dashboard/frends" className="flex items-center gap-2">
-            <Users className="mr-2 h-4 w-4" />
-            Amigos
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="cursor-pointer">
           <Link href="/dashboard/notifications" className="flex items-center gap-2">
             <Bell className="mr-2 h-4 w-4" />
             Notificações

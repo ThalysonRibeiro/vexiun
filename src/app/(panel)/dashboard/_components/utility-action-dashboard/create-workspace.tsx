@@ -4,9 +4,9 @@ import { Step, Stepper } from "@/components/ui/stepper";
 import { toast } from "sonner";
 import { WorkspaceStepForm } from "./workspace-step-form";
 import { useWorkspace, WorkspaceFormData } from "./use-workspace-form";
-import { createWorkspace } from "@/app/actions/workspace";
 import { isSuccessResponse } from "@/utils/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
+import { useCreateWorkspace } from "@/hooks/use-workspace";
 
 export type UserSearchType = {
   id: string,
@@ -21,6 +21,8 @@ export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => vo
   const [loading, setLoading] = useState<boolean>(false);
   const userSearchRef = useRef<UserSearchRef>(null);
   const form = useWorkspace({});
+  const createWorkspace = useCreateWorkspace();
+
 
 
   const onSubmit = async () => {
@@ -30,7 +32,7 @@ export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => vo
         return;
       }
       const ids = selectedUsers.map(user => user.id);
-      const response = await createWorkspace({
+      const response = await createWorkspace.mutateAsync({
         title: firstStepData?.title,
         invitationUsersId: ids,
         revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]

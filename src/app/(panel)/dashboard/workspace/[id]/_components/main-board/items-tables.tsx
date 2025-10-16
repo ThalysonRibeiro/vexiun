@@ -49,17 +49,22 @@ import { InfoItem } from "./info-item";
 import { usePagination } from "@/hooks/use-pagination";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { deleteItem, updateItem } from "@/app/actions/item";
-import { isErrorResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/utils/error-handler";
 import { DetailsEditor } from "./details-editor";
 import { JSONContent } from "@tiptap/core";
 import { nameFallback } from "@/utils/name-fallback";
-import { TeamUser } from "../workspace-content";
-import { ItemWhitCreatedAssignedUser, useInvalidateItems, useItems } from "@/hooks/use-items";
+import { ItemWhitCreatedAssignedUser, useDeleteItem, useItems, useUpdateItem } from "@/hooks/use-items";
 
 interface ItemsTablesProps {
   groupId: string
-  team: TeamUser;
+  team: TeamUser[];
+}
+
+type TeamUser = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  email: string;
 }
 
 type EditingField = 'title' | 'notes' | 'description' | 'term' | null;
@@ -87,7 +92,8 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
   const formRef = useRef<HTMLDivElement>(null);
 
   const { data: items, isLoading: isLoadingItems, error } = useItems(groupId);
-  const invalidateItems = useInvalidateItems();
+  const updateItem = useUpdateItem();
+  const deleteItem = useDeleteItem();
 
 
   const pagination = usePagination(items?.itemsNotCompleted ?? [], 10);
@@ -129,7 +135,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
     setIsLoading(item.id);
 
     try {
-      const result = await updateItem({
+      const result = await updateItem.mutateAsync({
         itemId: item.id,
         title: item.title,
         status: item.status,
@@ -141,10 +147,9 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
         assignedTo: item.assignedTo
       });
 
-      if (isErrorResponse(result)) {
+      if (!isSuccessResponse(result)) {
         toast.error("Erro ao atualizar detalhes");
       } else {
-        invalidateItems();
         toast.success("Detalhes atualizados com sucesso!");
         setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
       }
@@ -161,7 +166,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
     setIsLoading(item.id);
 
     try {
-      const result = await updateItem({
+      const result = await updateItem.mutateAsync({
         itemId: item.id,
         title: editingData.title,
         status: editingData.status,
@@ -171,10 +176,9 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
         description: editingData.description
       });
 
-      if (isErrorResponse(result)) {
+      if (!isSuccessResponse(result)) {
         toast.error("Erro ao atualizar item");
       } else {
-        invalidateItems();
         toast.success("Item atualizado com sucesso!");
         cancelEditing();
       }
@@ -183,7 +187,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
     } finally {
       setIsLoading(null);
     }
-  }, [editingData, cancelEditing, invalidateItems]);
+  }, [editingData, cancelEditing, updateItem]);
 
   const handleSelectChange = useCallback(async (
     item: ItemWhitCreatedAssignedUser,
@@ -193,7 +197,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
     setIsLoading(item.id);
 
     try {
-      const result = await updateItem({
+      const result = await updateItem.mutateAsync({
         itemId: item.id,
         title: item.title,
         status: field === 'status' ? value as Status : item.status,
@@ -204,10 +208,9 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
         details: item.details as JSONContent
       });
 
-      if (isErrorResponse(result)) {
+      if (!isSuccessResponse(result)) {
         toast.error("Erro ao atualizar item");
       } else {
-        invalidateItems();
         toast.success("Item atualizado!");
       }
     } catch (error) {
@@ -215,7 +218,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
     } finally {
       setIsLoading(null);
     }
-  }, [invalidateItems]);
+  }, [updateItem]);
 
   const handleDeleteItem = useCallback(async (itemId: string) => {
     setIsLoading(itemId);
@@ -224,14 +227,14 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
       if (!confirm('Deseja realmente deletar o item?, todos os dados serão deletados junto')) {
         return;
       }
-      await deleteItem({ itemId });
+      await deleteItem.mutateAsync({ itemId });
       toast.success("Item deletado com sucesso!");
     } catch (error) {
       toast.error("Erro ao deletar item");
     } finally {
       setIsLoading(null);
     }
-  }, []);
+  }, [deleteItem]);
 
   const renderEditableCell = (
     item: ItemWhitCreatedAssignedUser,

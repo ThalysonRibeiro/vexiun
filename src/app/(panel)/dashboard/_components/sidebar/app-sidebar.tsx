@@ -37,9 +37,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { DialogCreateWorkspace } from "../../workspace/[id]/_components/dialog-create-workspace"
 import { WorkspaceForm } from "./workspace-form"
 import { CatalystLogo } from "@/components/catalyst-logo"
-import { deleteWorkspace } from "@/app/actions/workspace"
-import { isErrorResponse } from "@/utils/error-handler"
 import { WorkspaceSummaryData } from "@/app/data-access/workspace"
+import { useDeleteWorkspace } from "@/hooks/use-workspace"
 
 
 type NavigationLink =
@@ -100,8 +99,8 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
     isEditing: false,
     workspace: null
   });
-
   const [deletingWorkspaceId, setDeletingWorkspaceId] = useState<string | null>(null);
+  const deleteWorkspace = useDeleteWorkspace();
 
   const handleStartEditingWorkspace = useCallback((workspace: Workspace) => {
     setEditingState({
@@ -127,18 +126,15 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
     setDeletingWorkspaceId(workspaceId);
 
     try {
-      const response = await deleteWorkspace({ workspaceId });
+      const response = await deleteWorkspace.mutateAsync({ workspaceId });
+      toast.success(response.data)
 
-      if (isErrorResponse(response)) {
-        toast.error(response.error);
-        return;
-      }
     } catch (error) {
       toast.error("Erro inesperado ao deletar Workspace");
     } finally {
       setDeletingWorkspaceId(null);
     }
-  }, [deletingWorkspaceId]);
+  }, [deletingWorkspaceId, deleteWorkspace]);
 
   const isWorkspaceBeingEdited = (workspaceId: string) => {
     return editingState.isEditing && editingState.workspace?.id === workspaceId;
@@ -220,7 +216,9 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
           <SidebarGroupContent>
             {/* Add Workspace Section */}
             <div className="w-full mb-2">
-              <DialogCreateWorkspace sidebar isNoWorkspace={groupsCount > 0 ? false : true} />
+              <DialogCreateWorkspace
+                sidebar
+                isNoWorkspace={workspaces.length === 0 ? true : false} />
             </div>
 
             {/* Workspace List */}

@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError } from "@/lib/errors";
 
 export async function smartCleanup(): Promise<ActionResponse<{
   deleted: {
@@ -13,14 +14,14 @@ export async function smartCleanup(): Promise<ActionResponse<{
     total: number
   }
 }>> {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -76,7 +77,6 @@ export async function smartCleanup(): Promise<ActionResponse<{
       }
     })
   } catch (error) {
-    console.error(error);
     return handleError(error, ERROR_MESSAGES.GENERIC);
   };
 };

@@ -12,8 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useWorkspace, WorkspaceFormData } from "../utility-action-dashboard/use-workspace-form";
-import { updateWorkspace } from "@/app/actions/workspace";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { useUpdateWorkspace } from "@/hooks/use-workspace";
 
 interface WorkspaceFormProps {
   setAddWorkspace: (value: boolean) => boolean;
@@ -27,8 +26,8 @@ interface WorkspaceFormProps {
 export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: WorkspaceFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
-
   const form = useWorkspace({ initialValues: initialValues });
+  const updateWorkspace = useUpdateWorkspace();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -44,16 +43,14 @@ export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: W
     setIsLoading(true);
 
     if (workspaceId) {
-      const response = await updateWorkspace({
+      const response = await updateWorkspace.mutateAsync({
         workspaceId: workspaceId,
         title: formData.title
       });
       setIsLoading(false);
       setAddWorkspace(false);
-      if (!isSuccessResponse(response)) {
-        toast.error(response.error);
-      }
-      toast.success("Atualizado com sucesso");
+
+      toast.success(response.data);
     }
 
     if (isLoading) {

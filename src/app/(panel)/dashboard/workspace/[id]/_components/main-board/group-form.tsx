@@ -7,12 +7,12 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import { GroupFormData, UseGroupForm } from "./use-group-form";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { createGroup, updateGroup } from "@/app/actions/group";
-import { isErrorResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/utils/error-handler";
+import { useCreateGroup, useUpdateGroup } from "@/hooks/use-groups";
 
 
 interface CreateGroupFormProps {
@@ -28,8 +28,9 @@ interface CreateGroupFormProps {
 export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: CreateGroupFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
-
   const form = UseGroupForm({ initialValues: initialValues });
+  const createGroup = useCreateGroup();
+  const updateGroup = useUpdateGroup();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -45,8 +46,8 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
     setIsLoading(true);
 
     if (groupId) {
-      await updateGroup({
-        id: groupId,
+      await updateGroup.mutateAsync({
+        groupId,
         title: formData.title,
         textColor: formData.textColor
       });
@@ -57,12 +58,12 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
     }
 
     try {
-      const response = await createGroup({
+      const response = await createGroup.mutateAsync({
         workspaceId: workspaceId,
         title: formData.title,
         textColor: formData.textColor,
       });
-      if (isErrorResponse(response)) {
+      if (!isSuccessResponse(response)) {
         toast.error("Erro ao cadastrar grupo");
         return;
       }

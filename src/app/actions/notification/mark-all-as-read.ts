@@ -2,18 +2,19 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError } from "@/lib/errors";
 
-export async function markAllAsRead() {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-
+export async function markAllAsRead(): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+
     await prisma.notification.updateMany({
       where: {
         userId,

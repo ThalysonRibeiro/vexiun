@@ -6,28 +6,29 @@ import { auth } from "@/lib/auth";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { createAndSendNotification } from "../notification";
 import { handleError, successResponse } from "@/utils/error-handler";
-import { NotFoundError } from "@/lib/errors";
+import { AuthenticationError, NotFoundError, ValidationError } from "@/lib/errors";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
 
 const formSchema = z.object({
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  invitationUsersId: z.array(z.string().cuid()).optional(),
+  invitationUsersId: z.array(z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)).optional(),
   revalidatePaths: z.array(z.string()).optional(),
 });
 
-export async function createWorkspace(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type CreateWorkspaceType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+export async function createWorkspace(formData: CreateWorkspaceType) {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     const newWorkspace = await prisma.$transaction(async (tx) => {
 
       const workspace = await tx.workspace.create({

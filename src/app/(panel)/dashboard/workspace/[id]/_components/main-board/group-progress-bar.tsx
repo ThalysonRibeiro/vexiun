@@ -13,9 +13,6 @@ export function GroupProgressBar({ items }: GroupProgressBarProps) {
     return null;
   }
 
-  console.log(items);
-
-
   const statusCounts = Object.fromEntries(
     Object.entries(
       items.reduce((acc, item) => {

@@ -1,8 +1,9 @@
 "use server"
 import { auth } from "@/lib/auth";
 import { validateWorkspaceExists } from "@/lib/db/validators";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 import prisma from "@/lib/prisma";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -13,19 +14,22 @@ const formSchema = z.object({
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
 });
 
-export async function deleteWorkspace(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type DeleteWorkspaceType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
 
+export async function deleteWorkspace(formData: DeleteWorkspaceType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
+
     const existingWorkspace = await validateWorkspaceExists(formData.workspaceId);
 
     await prisma.$transaction(async (tx) => {

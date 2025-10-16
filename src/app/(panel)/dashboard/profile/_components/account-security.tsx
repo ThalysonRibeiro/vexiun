@@ -7,18 +7,19 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { AlertCircle, CheckCircle, Mail, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsFormData, UseSettingsForm } from "./use-settings-form";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { UserWithCounts } from "../types/profile-types";
-import { updateSettings } from "@/app/actions/user";
-import { isErrorResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/utils/error-handler";
+import { useUpdateSettings } from "@/hooks/use-user";
 
 export default function AccountSecurity({ detailUser }: { detailUser: UserWithCounts }) {
   const isVerified = detailUser.emailVerified !== null;
+  const updateSettings = useUpdateSettings();
 
   if (!detailUser.userSettings) {
     return null
@@ -79,15 +80,15 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
       return;
     }
     try {
-      const response = await updateSettings({
+      const response = await updateSettings.mutateAsync({
         userId: detailUser.id,
         emailNotifications: formData.emailNotifications,
         pushNotifications: formData.pushNotifications,
         language: formData.language,
         timezone: formData.timezone,
       });
-      if (isErrorResponse(response)) {
-        toast.error(response.error);
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao atualizar configurações de segurança");
         return;
       }
       toast.success(response.message || "Configurações de segurança atualizadas com sucesso!");

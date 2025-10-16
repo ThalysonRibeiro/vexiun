@@ -14,10 +14,10 @@ import { UserSearchType } from "@/app/(panel)/dashboard/_components/utility-acti
 import { toast } from "sonner";
 import { CardUser } from "@/components/card-user";
 import { UserItemsAssignedDialogContent } from "./user-items-assigned-dialog-content";
-import { addWorkspaceMember } from "@/app/actions/workspace";
 import { isSuccessResponse } from "@/utils/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
 import { useTeam } from "@/hooks/use-team";
+import { useAddWorkspaceMember } from "@/hooks/use-workspace";
 
 
 export function Team({ workspaceId }: { workspaceId: string }) {
@@ -25,6 +25,7 @@ export function Team({ workspaceId }: { workspaceId: string }) {
   const [loading, setLoading] = useState<boolean>(false);
   const userSearchRef = useRef<UserSearchRef>(null);
   const { data, isLoading, error } = useTeam(workspaceId);
+  const addWorkspaceMember = useAddWorkspaceMember();
 
   // Obter IDs de usuários que já são membros para excluí-los da busca
   const existingMemberIds = data?.map(member => member.id) || [];
@@ -39,7 +40,7 @@ export function Team({ workspaceId }: { workspaceId: string }) {
 
     setLoading(true);
     try {
-      const response = await addWorkspaceMember({
+      const response = await addWorkspaceMember.mutateAsync({
         workspaceId,
         invitationUsersId: ids,
         revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]
@@ -50,7 +51,7 @@ export function Team({ workspaceId }: { workspaceId: string }) {
         return;
       }
 
-      toast.success(`Convites enviados para: ${ids.length} ${ids.length > 1 ? "usuários" : "usuário"}`);
+      toast.success(response.message);
       setSelectedUsers([]);
       userSearchRef.current?.reset();
     } catch (error) {

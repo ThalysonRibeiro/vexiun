@@ -14,8 +14,6 @@ const formSchema = z.object({
   referenceId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   message: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   type: z.enum([
-    NotificationType.FRIEND_REQUEST,
-    NotificationType.FRIEND_ACCEPTED,
     NotificationType.WORKSPACE_INVITE,
     NotificationType.WORKSPACE_ACCEPTED,
     NotificationType.ITEM_ASSIGNED,
@@ -41,8 +39,6 @@ export async function createAndSendNotification(formData: z.infer<typeof formSch
 
     switch (formData.type) {
       case "CHAT_MESSAGE":
-      case "FRIEND_REQUEST":
-      case "FRIEND_ACCEPTED":
         const userReferenceExists = await validateUserExists(formData.referenceId);
 
         return await createNotification({

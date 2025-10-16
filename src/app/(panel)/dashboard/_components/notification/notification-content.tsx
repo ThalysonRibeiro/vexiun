@@ -15,36 +15,42 @@ import { notificationColor, notificationMap } from "@/utils/colorStatus";
 import { NotificationType } from "@/generated/prisma";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useNotifications } from "@/hooks/use-notifications";
+import {
+  useMarkAllAsRead,
+  useMarkNotificationAsRead,
+  useNotifications
+} from "@/hooks/use-notifications";
 import { toast } from "sonner";
-import { acceptFriendship, declinedFriendship } from "@/app/actions/friendship";
-import { acceptWorkspaceInvitation, declineWorkspaceInvitation } from "@/app/actions/workspace";
-import { deleteNotification, markAllAsRead, markNotificationAsRead } from "@/app/actions/notification";
+import { deleteNotification } from "@/app/actions/notification";
 import { isSuccessResponse } from "@/utils/error-handler";
-
+import {
+  useAcceptWorkspaceInvitation,
+  useDeclineWorkspaceInvitation
+} from "@/hooks/use-workspace";
 
 export function NotificationContent() {
-  const { refetch } = useNotifications();
-  const { data: notifications = [], isLoading } = useNotifications();
+  const { data: notifications = [], refetch } = useNotifications();
+  const acceptWorkspaceInvitation = useAcceptWorkspaceInvitation();
   const unreadCount = notifications.filter(n => !n.isRead).length;
+  const declineWorkspaceInvitation = useDeclineWorkspaceInvitation();
+  const markAllAsRead = useMarkAllAsRead();
+  const markNotificationAsRead = useMarkNotificationAsRead();
 
   const handleMarkAsRead = async (id: string) => {
-    const result = await markNotificationAsRead({ notificationId: id });
-    if (isSuccessResponse(result)) {
-      refetch();
-    } else {
-      toast.error(result.error);
+    const result = await markNotificationAsRead.mutateAsync({ notificationId: id });
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao marcar como lida");
     }
+    refetch();
   };
 
   const handleMarkAllRead = async () => {
-    const result = await markAllAsRead();
+    const result = await markAllAsRead.mutateAsync();
 
-    if (isSuccessResponse(result)) {
-      refetch();
-    } else {
-      toast.error(result.error);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao marcar todas como lidas");
     }
+    refetch();
   };
 
   const handleDelete = async (id: string) => {
@@ -56,31 +62,17 @@ export function NotificationContent() {
     }
   };
 
-  const handleAcceptFriend = async (requestId: string) => {
+  const handleAcceptWorkspaceInvite = async (workspaceId: string,) => {
     try {
-      await acceptFriendship({ requestId });
-    } catch (error) {
-      toast.error("Falha ao aceitar solicitação");
-    }
-  };
-  const handleRejectFriend = async (requestId: string) => {
-    try {
-      await declinedFriendship({ requestId });
-    } catch (error) {
-      toast.error("Falha ao rejeitar solicitação");
-    }
-  };
-
-  const handleAcceptWorkspaceInvite = async (workspaceId: string, userId: string) => {
-    try {
-      await acceptWorkspaceInvitation({ workspaceId, userId });
+      await acceptWorkspaceInvitation.mutateAsync({ workspaceId, });
     } catch (error) {
       toast.error("Falha ao aceitar convite");
     }
   }
+
   const handleDeclineWorkspaceInvitation = async (workspaceId: string) => {
     try {
-      await declineWorkspaceInvitation({ workspaceId });
+      await declineWorkspaceInvitation.mutateAsync({ workspaceId });
     } catch (error) {
       toast.error("Falha ao rejeitar convite")
     }
@@ -92,13 +84,10 @@ export function NotificationContent() {
   const excludedTypes = [
     "SISTEM_MESSAGE",
     "NOTICES_MESSAGE",
-    "FRIEND_ACCEPTED",
     "WORKSPACE_ACCEPTED",
     "ITEM_COMPLETED"
   ];
-  if (isLoading) {
-    return <div>Carregando...</div>;
-  };
+
   return (
     <div className="absolute top-4 right-16 z-50">
       <DropdownMenu>
@@ -158,7 +147,6 @@ export function NotificationContent() {
                 onClick={() => {
                   switch (notification.type) {
                     case "CHAT_MESSAGE":
-                    case "FRIEND_REQUEST":
                     case "WORKSPACE_INVITE":
                     case "ITEM_ASSIGNED":
                       break;
@@ -231,17 +219,7 @@ export function NotificationContent() {
                           className="ml-auto h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-green-500 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
-                            switch (notification.type) {
-                              case "WORKSPACE_INVITE":
-                                handleAcceptWorkspaceInvite(
-                                  notification.referenceId as string,
-                                  notification.userId as string
-                                );
-                                break;
-                              default:
-                                handleAcceptFriend(notification.userId as string)
-                                break;
-                            }
+                            handleAcceptWorkspaceInvite(notification.referenceId as string,);
                             handleDelete(notification.id);
                           }}
                         >
@@ -253,14 +231,7 @@ export function NotificationContent() {
                           className="ml-auto h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
-                            switch (notification.type) {
-                              case "WORKSPACE_INVITE":
-                                handleDeclineWorkspaceInvitation(notification.referenceId as string);
-                                break;
-                              default:
-                                handleRejectFriend(notification.userId as string)
-                                break;
-                            }
+                            handleDeclineWorkspaceInvitation(notification.referenceId as string);
                             handleDelete(notification.id);
                           }}
                         >

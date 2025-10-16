@@ -24,14 +24,13 @@ import { CalendarTerm } from "./calendar-term";
 import { Textarea } from "@/components/ui/textarea";
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
-import { createItem, updateItem } from "@/app/actions/item";
-import { isErrorResponse } from "@/utils/error-handler";
+import { updateItem } from "@/app/actions/item";
+import { isErrorResponse, isSuccessResponse } from "@/utils/error-handler";
 import { DetailsEditor } from "./details-editor";
-import { TeamUser } from "../workspace-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
 import { useSession } from "next-auth/react";
-import { useInvalidateItems } from "@/hooks/use-items";
+import { useCreateItem, useInvalidateItems } from "@/hooks/use-items";
 
 interface CreateItemFormProps {
   closeForm: (value: boolean) => void;
@@ -39,17 +38,24 @@ interface CreateItemFormProps {
   groupId: string;
   itemId?: string;
   editingItem: boolean;
-  team: TeamUser;
+  team: TeamUser[];
+}
+
+type TeamUser = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  email: string;
 }
 
 export function CreateOrEditItemForm({
   closeForm, initialValues, groupId, itemId, editingItem, team
 }: CreateItemFormProps
 ) {
-  const invalidateItems = useInvalidateItems();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = UseItemForm({ initialValues });
   const { data: session } = useSession();
+  const createItem = useCreateItem();
 
   async function onSubmit(formData: ItemFormData) {
     setIsLoading(true);
@@ -70,14 +76,14 @@ export function CreateOrEditItemForm({
         if (isErrorResponse(result)) {
           toast.error("Erro ao atualizar item");
         } else {
-          invalidateItems();
+          ;
           toast.success("Item atualizado com sucesso!");
         }
         closeForm(false);
         form.reset();
 
       } else {
-        const response = await createItem({
+        const response = await createItem.mutateAsync({
           groupId: groupId,
           title: formData.title,
           term: formData.term,
@@ -88,13 +94,10 @@ export function CreateOrEditItemForm({
           assignedTo: formData.assignedTo ?? session?.user?.id,
           details: formData.details,
         });
-        if (isErrorResponse(response)) {
-          console.log(response.error);
-
+        if (isSuccessResponse(response)) {
           toast.error("Erro ao cadastrar item");
           return;
         }
-        invalidateItems();
         toast.success("Item cadastrado com sucesso!");
         closeForm(false);
         form.reset();
@@ -255,7 +258,6 @@ export function CreateOrEditItemForm({
                   <FormControl>
                     <CalendarTerm
                       onChange={(date) => {
-                        console.log("Data passada:", date);
                         field.onChange(date)
                       }}
                       initialDate={field.value || new Date()} // Adiciona esta linha

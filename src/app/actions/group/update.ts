@@ -5,44 +5,49 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateGroupExists } from "@/lib/db/validators";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { handleError } from "@/utils/error-handler";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
+import { AuthenticationError, ValidationError } from "@/lib/errors";
 
 const formSchema = z.object({
-  id: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  groupId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   textColor: z.string().min(4, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
 });
 
-export async function updateGroup(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type UpdateGroupType = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
-  const existingGroup = await validateGroupExists(formData.id);
-
-  if (!existingGroup) {
-    return {
-      error: ERROR_MESSAGES.NOT_FOUND.GROUP
-    }
-  }
-
+export async function updateGroup(formData: UpdateGroupType): Promise<ActionResponse<string>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
+
+    const existingGroup = await validateGroupExists(formData.groupId);
+
+    if (!existingGroup) {
+      return {
+        error: ERROR_MESSAGES.NOT_FOUND.GROUP
+      }
+    }
+
     await prisma.group.update({
-      where: { id: formData.id },
+      where: { id: formData.groupId },
       data: {
         title: formData.title,
         textColor: formData.textColor
       }
     });
     revalidatePath("/dashboard/Workspace");
-    return;
+    return successResponse("Grupo atualizado com sucesso");
   } catch (error) {
     return handleError(error, ERROR_MESSAGES.GENERIC);
   }

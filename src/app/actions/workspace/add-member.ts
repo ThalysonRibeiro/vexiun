@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateWorkspacePermission, validateWorkspaceExists } from "@/lib/db/validators";
 import { createAndSendNotification } from "../notification";
-import { handleError, successResponse } from "@/utils/error-handler";
-import { DuplicateError, NotFoundError } from "@/lib/errors";
+import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
+import { AuthenticationError, DuplicateError, NotFoundError, ValidationError } from "@/lib/errors";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
 
 const formSchema = z.object({
@@ -19,21 +19,27 @@ const formSchema = z.object({
   revalidatePaths: z.array(z.string()).optional(),
 });
 
-export async function addWorkspaceMember(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
+export type AddWorkspaceMemberType = z.infer<typeof formSchema>;
+export type AddWorkspaceMemberResponse = {
+  invitedCount: number;
+  skippedCount: number;
+}
 
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+export async function addWorkspaceMember(formData: AddWorkspaceMemberType): Promise<ActionResponse<AddWorkspaceMemberResponse>> {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      throw new AuthenticationError();
+    }
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    };
     const [workspace, member] = await Promise.all([
       validateWorkspaceExists(formData.workspaceId),
-      validateWorkspacePermission(formData.workspaceId, session.user.id, "ADMIN"),
+      validateWorkspacePermission(formData.workspaceId, userId, "ADMIN"),
     ]);
 
     const result = await prisma.$transaction(async (tx) => {
@@ -78,6 +84,14 @@ export async function addWorkspaceMember(formData: z.infer<typeof formSchema>) {
       if (idsToInvite.length === 0) {
         throw new DuplicateError(ERROR_MESSAGES.DUPLICATE.MEMBERS);
       };
+
+      await tx.workspaceInvitation.deleteMany({
+        where: {
+          workspaceId: formData.workspaceId,
+          userId: { in: idsToInvite },
+          status: { in: ["DECLINED", "CANCELLED", "EXPIRED"] },
+        }
+      })
 
       await tx.workspaceInvitation.createMany({
         data: idsToInvite.map((userId) => ({

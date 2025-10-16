@@ -1,52 +1,25 @@
+import {
+  BroadcastNotificationType,
+  deleteAllNotifications,
+  deleteMultipleNotifications,
+  DeleteMultipleNotificationsType,
+  deleteNotification,
+  DeleteNotificationType,
+  deleteReadNotifications,
+  markAllAsRead,
+  markNotificationAsRead,
+  MarkNotificationAsReadType,
+  sendBroadcastNotification,
+  smartCleanup
+} from "@/app/actions/notification";
 import { Notification } from "@/generated/prisma";
+import { isSuccessResponse } from "@/utils/error-handler";
 import { ERROR_MESSAGES } from "@/utils/error-messages";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-export function useMarkAsRead() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (notificationId: string) => {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: "PATCH",
-      });
-
-      if (!response.ok) {
-        throw new Error(ERROR_MESSAGES.GENERIC);
-      }
-
-      return response.json();
-    },
-
-    onMutate: async (notificationId) => {
-      await queryClient.cancelQueries({ queryKey: ["notifications"] });
-
-      const previousNotifications = queryClient.getQueryData<Notification[]>(["notifications"]);
-
-      queryClient.setQueryData<Notification[]>(["notifications"], (old = []) =>
-        old.filter(notification => notification.id !== notificationId)
-      );
-
-      return { previousNotifications };
-    },
-
-    onError: (err, notificationId, context) => {
-      if (context?.previousNotifications) {
-        queryClient.setQueryData(["notifications"], context.previousNotifications);
-      }
-      toast.error(ERROR_MESSAGES.GENERIC);
-    },
-
-    onSettled: (data, error) => {
-      if (error) {
-        queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      }
-    },
-  });
-}
 
 export function useNotifications() {
   const previousNotifications = useRef<Notification[]>([]);
@@ -116,41 +89,38 @@ export function useUnreadNotificationsCount() {
   return notifications?.length || 0;
 }
 
+export function useMarkNotificationAsRead() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: MarkNotificationAsReadType) => {
+      const result = await markNotificationAsRead(data);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", variables.notificationId] });
+    },
+  });
+}
+
 export function useMarkAllAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
-      const response = await fetch("/api/notifications/read-all", {
-        method: "PATCH",
-      });
-
-      if (!response.ok) {
-        throw new Error(ERROR_MESSAGES.GENERIC);
+      const result = await markAllAsRead();
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
       }
 
-      return response.json();
+      return result;
     },
-
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["notifications"] });
-
-      const previousNotifications = queryClient.getQueryData<Notification[]>(["notifications"]);
-
-      queryClient.setQueryData<Notification[]>(["notifications"], []);
-
-      return { previousNotifications };
-    },
-
-    onError: (err, variables, context) => {
-      if (context?.previousNotifications) {
-        queryClient.setQueryData(["notifications"], context.previousNotifications);
-      }
-      toast.error(ERROR_MESSAGES.GENERIC);
-    },
-
     onSuccess: () => {
-      toast.success("Todas as notificações foram marcadas como lidas");
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 }
@@ -159,33 +129,110 @@ export function useDeleteNotification() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (notificationId: string) => {
-      const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: "DELETE",
-      });
+    mutationFn: async (data: DeleteNotificationType) => {
+      const result = await deleteNotification(data);
 
-      if (!response.ok) {
-        throw new Error(ERROR_MESSAGES.GENERIC);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
       }
+
+      return result;
     },
-
-    onMutate: async (notificationId) => {
-      await queryClient.cancelQueries({ queryKey: ["notifications"] });
-
-      const previousNotifications = queryClient.getQueryData<Notification[]>(["notifications"]);
-
-      queryClient.setQueryData<Notification[]>(["notifications"], (old = []) =>
-        old.filter(notification => notification.id !== notificationId)
-      );
-
-      return { previousNotifications };
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
+  });
+}
 
-    onError: (err, notificationId, context) => {
-      if (context?.previousNotifications) {
-        queryClient.setQueryData(["notifications"], context.previousNotifications);
+export function useDeleteAllNotifications() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const result = await deleteAllNotifications();
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
       }
-      toast.error(ERROR_MESSAGES.GENERIC);
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+}
+
+export function useDeleteMultipleNotifications() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: DeleteMultipleNotificationsType) => {
+      const result = await deleteMultipleNotifications(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", variables.notificationIds] });
+    },
+  });
+}
+
+export function useDeleteReadNotifications() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const result = await deleteReadNotifications();
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+}
+
+export function useSmartCleanup() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const result = await smartCleanup();
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+}
+
+export function useSendBroadcastNotification() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: BroadcastNotificationType) => {
+      const result = await sendBroadcastNotification(data);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 }
@@ -194,8 +241,6 @@ function showNotificationToast(notification: Notification) {
   const { type } = notification;
 
   const profileTypes = [
-    "FRIEND_REQUEST",
-    "FRIEND_ACCEPTED",
     "CHAT_MESSAGE",
     "WORKSPACE_INVITE",
     "WORKSPACE_ACCEPTED",
@@ -262,10 +307,6 @@ function getTruncatedMessage(notification: Notification): string {
   const maxLength = 60;
 
   switch (notification.type) {
-    case "FRIEND_REQUEST":
-      return "Enviou uma solicitação de amizade";
-    case "FRIEND_ACCEPTED":
-      return "Aceitou sua solicitação de amizade";
     case "CHAT_MESSAGE":
       const message = notification.message || "Enviou uma mensagem";
       return message.length > maxLength
@@ -297,8 +338,6 @@ function getTimeAgo(date: Date): string {
 
 function getNotificationEmoji(type: string): string {
   const emojis: Record<string, string> = {
-    FRIEND_REQUEST: "👥",
-    FRIEND_ACCEPTED: "✅",
     WORKSPACE_INVITE: "💻",
     WORKSPACE_ACCEPTED: "🎉",
     ITEM_ASSIGNED: "📦",

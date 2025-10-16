@@ -1,13 +1,11 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/utils/error-handler";
 import { getGroups } from "@/app/data-access/groupe";
+import { createGroup, CreateGroupType, deleteGroup, DeleteGroupType, updateGroup, UpdateGroupType } from "@/app/actions/group";
 
 export type GroupsResponse = Awaited<ReturnType<typeof getGroups>>;
 export type GroupsData = Extract<GroupsResponse, { success: true }>['data'];
 
-/**
- * Hook para buscar grupos
- */
 export function useGroups(workspaceId: string) {
   return useQuery({
     queryKey: ["groups", workspaceId] as const,
@@ -24,13 +22,69 @@ export function useGroups(workspaceId: string) {
   });
 }
 
-/**
-* Hook para invalidar cache, Invalida todas as queries de grupos
-*/
 export function useInvalidateGreoups() {
   const queryClient = useQueryClient();
 
   return () => {
     queryClient.invalidateQueries({ queryKey: ["groups"] });
   };
+}
+
+export function useCreateGroup() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateGroupType) => {
+      const result = await createGroup(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["group", variables.workspaceId] });
+    },
+  });
+}
+
+export function useUpdateGroup() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: UpdateGroupType) => {
+      const result = await updateGroup(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["group", variables.groupId] });
+    },
+    retry: 1
+  });
+}
+
+export function useDeleteGroup() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: DeleteGroupType) => {
+      const result = await deleteGroup(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["group", variables.groupId] });
+    },
+    retry: 1
+  });
 }
