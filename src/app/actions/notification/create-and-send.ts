@@ -4,8 +4,8 @@ import { z } from "zod"
 import { auth } from "@/lib/auth";
 import { NotificationType } from "@/generated/prisma";
 import { validateItemExists, validateUserExists, validateWorkspaceExists } from "@/lib/db/validators";
-import { handleError } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { handleError } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 const formSchema = z.object({
   image: z.string().optional(),

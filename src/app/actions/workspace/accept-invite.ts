@@ -6,9 +6,9 @@ import { auth } from "@/lib/auth";
 import { WorkspaceRole } from "@/generated/prisma";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { createAndSendNotification } from "../notification";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { AuthenticationError, DuplicateError, NotFoundError, RelationError, ValidationError } from "@/lib/errors";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { AuthenticationError, DuplicateError, NotFoundError, RelationError, ValidationError } from "@/lib/errors/custom-errors";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 const formSchema = z.object({
   workspaceId: z.string()

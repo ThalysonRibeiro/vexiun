@@ -4,9 +4,9 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache";
 import { validateWorkspaceAccess } from "@/lib/db/validators";
 import { auth } from "@/lib/auth";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 import { Group } from "@/generated/prisma";
 
 const formSchema = z.object({

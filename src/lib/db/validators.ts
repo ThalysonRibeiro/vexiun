@@ -1,7 +1,7 @@
 import { WorkspaceRole } from "@/generated/prisma";
 import prisma from "../prisma";
-import { NotFoundError, PermissionError } from "../errors";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { NotFoundError, PermissionError } from "../errors/custom-errors";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 /**
  * Verifica se o usuário existe

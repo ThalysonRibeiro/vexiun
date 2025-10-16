@@ -2,9 +2,9 @@
 import prisma from "@/lib/prisma";
 import { z } from "zod"
 import { revalidatePath } from "next/cache";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { NotFoundError } from "@/lib/errors";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { NotFoundError } from "@/lib/errors/custom-errors";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
 
 const formSchema = z.object({
   id: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),

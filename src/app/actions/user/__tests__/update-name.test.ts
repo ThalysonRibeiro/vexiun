@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { updateName } from "../update-name";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 // Mock dependencies
 jest.mock("@/lib/prisma", () => ({

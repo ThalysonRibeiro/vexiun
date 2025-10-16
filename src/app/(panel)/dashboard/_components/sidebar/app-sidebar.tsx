@@ -27,10 +27,10 @@ import {
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { useState, useCallback } from "react"
+import { useState, useCallback, startTransition } from "react"
 import { Menu } from "./menu"
 import { Session } from "next-auth"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { FaTasks } from "react-icons/fa"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -95,6 +95,7 @@ interface EditingState {
 
 export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter()
   const [editingState, setEditingState] = useState<EditingState>({
     isEditing: false,
     workspace: null
@@ -118,19 +119,23 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
   }, [editingState.workspace]);
 
   const handleDeleteWorkspace = useCallback(async (workspaceId: string) => {
-    if (!confirm('Deseja realmente a área de trabalho?, todos os grupos e items serão deletados justos')) {
+    if (!confirm('Deseja realmente deletar a área de trabalho? Todos os grupos e items serão deletados juntos.')) {
       return;
     }
-    if (deletingWorkspaceId) return; // Prevent double deletion
+    if (deletingWorkspaceId) return;
 
     setDeletingWorkspaceId(workspaceId);
 
     try {
       const response = await deleteWorkspace.mutateAsync({ workspaceId });
-      toast.success(response.data)
+      toast.success(response.data);
+
+      // Navegação hard (força reload completo)
+      window.location.href = "/dashboard";
 
     } catch (error) {
       toast.error("Erro inesperado ao deletar Workspace");
+      window.location.href = "/dashboard";
     } finally {
       setDeletingWorkspaceId(null);
     }

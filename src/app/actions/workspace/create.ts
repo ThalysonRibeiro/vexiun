@@ -5,9 +5,9 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { createAndSendNotification } from "../notification";
-import { handleError, successResponse } from "@/utils/error-handler";
-import { AuthenticationError, NotFoundError, ValidationError } from "@/lib/errors";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
+import { AuthenticationError, NotFoundError, ValidationError } from "@/lib/errors/custom-errors";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 const formSchema = z.object({
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),

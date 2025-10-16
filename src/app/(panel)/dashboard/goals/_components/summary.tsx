@@ -10,7 +10,7 @@ import { PedingGoals } from "./peding-goals";
 import { toast } from "sonner";
 import { PendingGoal, WeekSummaryResponse } from "../_types";
 import { goalUndo } from "@/app/actions/goals";
-import { isErrorResponse } from "@/utils/error-handler";
+import { isErrorResponse } from "@/lib/errors/error-handler";
 
 interface SummaryProps {
   data: PendingGoal[];

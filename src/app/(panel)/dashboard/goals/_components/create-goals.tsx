@@ -24,7 +24,7 @@ import { RadioGroup, RadioGroupIndicator, RadioGroupItem } from "@/components/ui
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMobile } from "@/hooks/use-mobile";
 import { createGoal } from "@/app/actions/goals";
-import { isErrorResponse, isSuccessResponse } from "@/utils/error-handler";
+import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler";
 
 interface CreateGoalProps {
   initialValues?: {

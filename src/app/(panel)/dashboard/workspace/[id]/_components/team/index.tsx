@@ -14,7 +14,7 @@ import { UserSearchType } from "@/app/(panel)/dashboard/_components/utility-acti
 import { toast } from "sonner";
 import { CardUser } from "@/components/card-user";
 import { UserItemsAssignedDialogContent } from "./user-items-assigned-dialog-content";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
 import { useTeam } from "@/hooks/use-team";
 import { useAddWorkspaceMember } from "@/hooks/use-workspace";

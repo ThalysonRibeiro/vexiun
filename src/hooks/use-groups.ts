@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { getGroups } from "@/app/data-access/groupe";
 import { createGroup, CreateGroupType, deleteGroup, DeleteGroupType, updateGroup, UpdateGroupType } from "@/app/actions/group";
 
@@ -63,7 +63,12 @@ export function useUpdateGroup() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["group", variables.groupId] });
+      queryClient.removeQueries({ queryKey: ["group", variables.groupId] });
+      queryClient.invalidateQueries({
+        queryKey: ["group"],
+        exact: false,
+        refetchType: "active"
+      });
     },
     retry: 1
   });
@@ -83,7 +88,12 @@ export function useDeleteGroup() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["group", variables.groupId] });
+      queryClient.removeQueries({ queryKey: ["group", variables.groupId] });
+      queryClient.invalidateQueries({
+        queryKey: ["group"],
+        exact: false,
+        refetchType: "active"
+      });
     },
     retry: 1
   });

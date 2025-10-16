@@ -1,5 +1,5 @@
 import { Priority, Status } from "@/generated/prisma";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { JSONContent } from "@tiptap/core";
 import { useForm } from "react-hook-form";

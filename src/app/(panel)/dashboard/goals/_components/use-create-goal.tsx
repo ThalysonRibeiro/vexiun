@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

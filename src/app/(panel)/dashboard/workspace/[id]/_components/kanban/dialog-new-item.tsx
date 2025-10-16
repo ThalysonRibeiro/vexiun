@@ -29,10 +29,17 @@ import { CalendarTerm } from "../main-board/calendar-term";
 import { Priority, Status } from "@/generated/prisma";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useGroups } from "@/hooks/use-groups";
 import { useParams } from "next/navigation";
-import { useCreateItem } from "@/hooks/use-items";
+import { useCreateItem, useInvalidateItems } from "@/hooks/use-items";
+import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { nameFallback } from "@/utils/name-fallback";
+import { DetailsEditor } from "../main-board/details-editor";
+import { useTeam } from "@/hooks/use-team";
+import { colorPriority, priorityMap } from "@/utils/colorStatus";
+import { cn } from "@/lib/utils";
 
 interface DialogContentNewItemProps {
   closeDialog: (value: boolean) => void;
@@ -44,16 +51,19 @@ interface DialogContentNewItemProps {
     notes: string;
     description: string;
   }
-  status: Status
+  status: Status;
 }
 
 export function DialogContentNewItem({ closeDialog, initialValues, status }: DialogContentNewItemProps) {
   const params = useParams();
   const workspaceId = params.id as string;
+  const { data: session } = useSession();
   const { data, isLoading, error } = useGroups(workspaceId);
+  const { data: team } = useTeam(workspaceId);
   const form = UseItemForm({ initialValues });
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const createItem = useCreateItem();
+  const invalidateItems = useInvalidateItems();
 
   async function onSubmit(formData: ItemFormData) {
     try {
@@ -62,14 +72,17 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
         title: formData.title,
         term: formData.term,
         priority: formData.priority,
-        status: status,
         notes: formData.notes || "",
-        description: formData.description || ""
+        description: formData.description || "",
+        status: "NOT_STARTED",
+        assignedTo: formData.assignedTo ?? session?.user?.id,
+        details: formData.details,
       });
       if (!isSuccessResponse(response)) {
         toast.error("Erro ao cadastrar item");
         return;
       }
+      invalidateItems()
       toast.success("Item cadastrado com sucesso!");
       form.reset();
       closeDialog(false);
@@ -104,7 +117,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
         </SelectContent>
       </Select>
       <Form {...form}>
-        <form className="flex flex-col justify-between items-center gap-4 px-2" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="flex flex-col justify-between items-center gap-4 px-2 max-h-120 overflow-y-scroll" onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
             control={form.control}
             name="title"
@@ -142,6 +155,26 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Descrição</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Descreva o item"
+                    className="max-h-30 h-15"
+                  />
+                </FormControl>
+                <FormDescription />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="flex gap-4 w-full">
             <FormField
               control={form.control}
@@ -154,15 +187,15 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Prioridade" />
+                      <SelectTrigger className={cn("", colorPriority(field.value))} size="sm">
+                        <SelectValue placeholder={priorityMap["STANDARD"]} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CRITICAL">Crítico</SelectItem>
-                        <SelectItem value="HIGH">Alto</SelectItem>
-                        <SelectItem value="MEDIUM">Medio</SelectItem>
-                        <SelectItem value="LOW">Baixo</SelectItem>
-                        <SelectItem value="STANDARD">Padrão</SelectItem>
+                        <SelectItem value="CRITICAL" className={colorPriority("CRITICAL")}>Crítico</SelectItem>
+                        <SelectItem value="HIGH" className={colorPriority("HIGH")}>Alto</SelectItem>
+                        <SelectItem value="MEDIUM" className={colorPriority("MEDIUM")}>Medio</SelectItem>
+                        <SelectItem value="LOW" className={colorPriority("LOW")}>Baixo</SelectItem>
+                        <SelectItem value="STANDARD" className={colorPriority("STANDARD")}>Padrão</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -190,26 +223,75 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                 </FormItem>
               )}
             />
+
           </div>
+
+          {team && (
+            <FormField
+              control={form.control}
+              name="assignedTo"
+              render={({ field }) => {
+                const selectedTeam = team.find(t => t.id === field.value) ?? team[0]
+                return (
+                  <FormItem className="mr-auto w-full">
+                    <FormLabel>Responsável</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? undefined}
+                      >
+                        <SelectTrigger className="flex items-center gap-2 w-full">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-6 h-6">
+                              <AvatarImage src={selectedTeam.image ?? undefined} />
+                              <AvatarFallback>{nameFallback(selectedTeam.name ?? undefined)}</AvatarFallback>
+                            </Avatar>
+                            <span>{selectedTeam.name}</span>
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {team.map((user) => (
+                            <SelectItem key={user.id} value={user.id}>
+                              <Avatar>
+                                <AvatarImage src={user.image ?? undefined} />
+                                <AvatarFallback>{nameFallback(user.name ?? undefined)}</AvatarFallback>
+                              </Avatar>
+                              <span className="truncate min-w-0 max-w-50 sm:max-w-90">
+                                {user.name}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )
+              }}
+            />
+          )}
 
           <FormField
             control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Descrição</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Descreva o item"
-                    className="max-h-30 h-15"
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
+            name="details"
+            render={({ field }) => {
+              return (
+                <FormItem className="w-full">
+                  <FormLabel>
+                    Detalhes
+                  </FormLabel>
+                  <FormControl>
+                    <div className="h-full min-h-80 max-h-100">
+                      <DetailsEditor
+                        content={field.value ?? {}}
+                        onContentChange={field.onChange}
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )
+            }}
           />
+
           <Button type="submit" className="mt-3.5 w-full">Cadastrar</Button>
         </form>
       </Form>

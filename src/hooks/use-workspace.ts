@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { acceptWorkspaceInvitation } from "@/app/actions/workspace/accept-invite";
 import { AcceptWorkspaceInvitationType } from "@/app/actions/workspace/accept-invite";
 import {
@@ -57,6 +57,7 @@ export function useUpdateWorkspace() {
 
 export function useDeleteWorkspace() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (data: DeleteWorkspaceType) => {
       const result = await deleteWorkspace(data);
@@ -68,7 +69,21 @@ export function useDeleteWorkspace() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace", variables.workspaceId] });
+      // Remove tudo relacionado ao workspace do cache
+      queryClient.removeQueries({
+        queryKey: ["workspace", variables.workspaceId]
+      });
+      queryClient.removeQueries({
+        queryKey: ["groups", variables.workspaceId]
+      });
+      queryClient.removeQueries({
+        queryKey: ["priorities", variables.workspaceId]
+      });
+      queryClient.removeQueries({
+        queryKey: ["status", variables.workspaceId]
+      });
+
+      // NÃO invalida nada - deixa quieto
     },
     retry: 1
   });

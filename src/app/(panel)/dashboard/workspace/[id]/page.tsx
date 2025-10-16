@@ -16,19 +16,25 @@ export default async function WorkspacePage({
   if (!session) {
     redirect('/')
   }
-  const workspaceId = (await params).id;
-  const groupsData = await getGroups(workspaceId).then(unwrapServerData);
-  const prioritiesData = await getPriorities(workspaceId).then(unwrapServerData);
-  const statusData = await getStatus(workspaceId).then(unwrapServerData);
 
-  return (
-    <main className="container mx-auto px-6 pt-6">
-      <WorkspaceContent
-        groupsData={groupsData}
-        workspaceId={workspaceId}
-        prioritiesData={prioritiesData}
-        statusData={statusData}
-      />
-    </main>
-  )
+  const workspaceId = (await params).id;
+
+  try {
+    const groupsData = await getGroups(workspaceId).then(unwrapServerData);
+    const prioritiesData = await getPriorities(workspaceId).then(unwrapServerData);
+    const statusData = await getStatus(workspaceId).then(unwrapServerData);
+
+    return (
+      <main className="container mx-auto px-6 pt-6">
+        <WorkspaceContent
+          groupsData={groupsData}
+          workspaceId={workspaceId}
+          prioritiesData={prioritiesData}
+          statusData={statusData}
+        />
+      </main>
+    )
+  } catch (error) {
+    redirect('/dashboard');
+  }
 }

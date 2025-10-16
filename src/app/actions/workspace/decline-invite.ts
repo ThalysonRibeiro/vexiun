@@ -2,9 +2,9 @@
 import prisma from "@/lib/prisma";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { AuthenticationError, NotFoundError, RelationError, ValidationError } from "@/lib/errors";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { AuthenticationError, NotFoundError, RelationError, ValidationError } from "@/lib/errors/custom-errors";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 const formSchema = z.object({
   workspaceId: z.string()

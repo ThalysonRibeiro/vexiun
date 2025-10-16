@@ -6,10 +6,10 @@ import { auth } from "@/lib/auth";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { validateGroupExists, validateUserExists } from "@/lib/db/validators";
 import { createAndSendNotification } from "@/app/actions/notification";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
 import { JSONContent } from "@tiptap/core";
-import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 import { Item } from "@/generated/prisma";
 
 const formSchema = z.object({

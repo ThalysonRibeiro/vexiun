@@ -13,8 +13,8 @@ import {
   smartCleanup
 } from "@/app/actions/notification";
 import { Notification } from "@/generated/prisma";
-import { isSuccessResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useRef } from "react";

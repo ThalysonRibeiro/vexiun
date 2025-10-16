@@ -3,9 +3,9 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { z } from "zod"
 import { revalidatePath } from "next/cache";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { ValidationError } from "@/lib/errors";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { ValidationError } from "@/lib/errors/custom-errors";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
 
 const formSchema = z.object({
   title: z.string()

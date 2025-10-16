@@ -16,7 +16,7 @@ import { CheckCheck, X, Sparkles, Check, Bell, Trash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { isSuccessResponse } from '@/utils/error-handler';
+import { isSuccessResponse } from '@/lib/errors/error-handler';
 
 export default function NotificationsPage() {
   const { data: notifications = [], refetch } = useNotifications();

@@ -2,11 +2,11 @@
 import prisma from "@/lib/prisma";
 import { z } from "zod"
 import { revalidatePath } from "next/cache";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
 import { validateUserExists } from "@/lib/db/validators";
 import { auth } from "@/lib/auth";
-import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const formSchema = z.object({
   userId: z.string()

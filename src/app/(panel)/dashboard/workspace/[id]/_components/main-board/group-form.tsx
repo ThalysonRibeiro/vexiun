@@ -11,7 +11,7 @@ import {
 import { GroupFormData, UseGroupForm } from "./use-group-form";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useCreateGroup, useUpdateGroup } from "@/hooks/use-groups";
 
 

@@ -1,10 +1,10 @@
 "use server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { AuthenticationError } from "@/lib/errors";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { AuthenticationError } from "@/lib/errors/custom-errors";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
 import { validateGroupExists } from "@/lib/db/validators";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 export async function getPublicItems(groupId: string) {
   try {

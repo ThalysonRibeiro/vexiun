@@ -6,7 +6,7 @@ import {
   getPublicItems
 } from "@/app/data-access/item";
 import { Prisma } from "@/generated/prisma";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export type ItemData = Awaited<ReturnType<typeof getPublicItems>>;
@@ -135,8 +135,8 @@ export function useCreateItem() {
 
       return result;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["item"] });
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["items", variables.groupId] });
     },
   });
 }
@@ -155,7 +155,12 @@ export function useUpdateItem() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["item", variables.itemId] });
+      queryClient.setQueryData(["items", variables.itemId], result.data);
+      queryClient.invalidateQueries({
+        queryKey: ["items"],
+        exact: false,
+        refetchType: "active"
+      })
     },
     retry: 1
   });
@@ -175,7 +180,12 @@ export function useDeleteItem() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["item", variables.itemId] });
+      queryClient.removeQueries({ queryKey: ["items", variables.itemId] });
+      queryClient.invalidateQueries({
+        queryKey: ["items"],
+        exact: false,
+        refetchType: "active"
+      });
     },
     retry: 1
   });

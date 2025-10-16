@@ -22,7 +22,7 @@ import {
 } from "@/hooks/use-notifications";
 import { toast } from "sonner";
 import { deleteNotification } from "@/app/actions/notification";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import {
   useAcceptWorkspaceInvitation,
   useDeclineWorkspaceInvitation

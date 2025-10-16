@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
 import { updateItem } from "@/app/actions/item";
-import { isErrorResponse, isSuccessResponse } from "@/utils/error-handler";
+import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler";
 import { DetailsEditor } from "./details-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";

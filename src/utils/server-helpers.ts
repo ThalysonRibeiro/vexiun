@@ -1,4 +1,4 @@
-import { ActionResponse, isSuccessResponse } from "./error-handler";
+import { ActionResponse, isSuccessResponse } from "../lib/errors/error-handler";
 
 export function unwrapServerData<T>(result: ActionResponse<T>): T {
   if (!isSuccessResponse(result)) {

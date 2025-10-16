@@ -4,10 +4,10 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateItemEditPermission, validateItemExists } from "@/lib/db/validators";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 import { JSONContent } from "@tiptap/core";
-import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const formSchema = z.object({
   itemId: z.string()

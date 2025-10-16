@@ -1,10 +1,10 @@
 "use server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { AuthenticationError, PermissionError } from "@/lib/errors";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { AuthenticationError, PermissionError } from "@/lib/errors/custom-errors";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
 import { validateWorkspaceAccess } from "@/lib/db/validators";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 export async function getItemsByStatus(workspaceId: string) {
   try {

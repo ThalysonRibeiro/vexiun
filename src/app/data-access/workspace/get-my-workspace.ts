@@ -1,9 +1,9 @@
 "use server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { AuthenticationError } from "@/lib/errors";
-import { handleError, successResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { AuthenticationError } from "@/lib/errors/custom-errors";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 export type WorkspaceSummaryResponse = Awaited<ReturnType<typeof getMyWorkspaces>>;
 export type WorkspaceSummaryData = Extract<WorkspaceSummaryResponse, { success: true }>['data']

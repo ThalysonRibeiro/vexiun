@@ -13,6 +13,7 @@ import { useRef, useState } from "react"
 import { CreateOrEditItemForm } from "./create-or-edit-item-form"
 import { JSONContent } from "@tiptap/core"
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items"
+import { DetailsEditor } from "./details-editor"
 
 type TeamUser = {
   id: string;
@@ -113,6 +114,13 @@ export function InfoItem({
                 {data.description ? <span>{data.description}</span> : "Não definido"}
               </div>
             </div>
+
+            <DetailsEditor
+              content={data.details as JSONContent}
+              editable={false}
+              onContentChange={() => { }}
+            />
+
           </div>
         </>
       )}

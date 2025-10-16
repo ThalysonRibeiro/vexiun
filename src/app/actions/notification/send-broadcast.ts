@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 import { z } from "zod"
 import { auth } from "@/lib/auth";
 import { NotificationType } from "@/generated/prisma";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const broadcastSchema = z.object({
   message: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),

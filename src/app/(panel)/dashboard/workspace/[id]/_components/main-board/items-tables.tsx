@@ -49,7 +49,7 @@ import { InfoItem } from "./info-item";
 import { usePagination } from "@/hooks/use-pagination";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { DetailsEditor } from "./details-editor";
 import { JSONContent } from "@tiptap/core";
 import { nameFallback } from "@/utils/name-fallback";
@@ -74,13 +74,15 @@ interface EditingState {
   field: EditingField;
 }
 
+interface DialogStateProps {
+  isOpen: boolean;
+  itemId: string | null;
+  isEditing: boolean;
+  content: JSONContent | null;
+}
+
 export function ItemsTables({ groupId, team }: ItemsTablesProps) {
-  const [dialogState, setDialogState] = useState<{
-    isOpen: boolean;
-    itemId: string | null;
-    isEditing: boolean;
-    content: JSONContent | null;
-  }>({
+  const [dialogState, setDialogState] = useState<DialogStateProps>({
     isOpen: false,
     itemId: null,
     isEditing: false,
@@ -327,7 +329,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Titulo</TableHead>
-              <TableHead>Notas</TableHead>
+              <TableHead className="border-l">Notas</TableHead>
               <TableHead className="max-w-25 overflow-hidden border-x text-center">Responsável</TableHead>
               <TableHead>Prioridade</TableHead>
               <TableHead className="border-x">Prazo</TableHead>
@@ -465,12 +467,16 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
                     </div>
                   </TableCell>
 
-                  <TableCell className="border-x flex items-center gap-2" title="Para trocar de responsável edite o item">
-                    <Avatar>
-                      <AvatarImage src={item.assignedToUser?.image as string} />
-                      <AvatarFallback>{nameFallback(item.assignedToUser?.name as string)}</AvatarFallback>
-                    </Avatar>
-                    <span>{item.assignedToUser?.name?.split(" ")[0] ?? "CATALYST"}</span>
+                  <TableCell className="border-x" title="Para trocar de responsável edite o item">
+                    <div className="flex items-center gap-2 h-full w-full">
+                      <Avatar>
+                        <AvatarImage src={item.assignedToUser?.image as string} />
+                        <AvatarFallback>
+                          {nameFallback(item.assignedToUser?.name as string)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{item.assignedToUser?.name?.split(" ")[0] ?? "CATALYST"}</span>
+                    </div>
                   </TableCell>
 
                   <TableCell className={colorPriority(item.priority)}>

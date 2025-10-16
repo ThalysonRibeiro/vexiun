@@ -14,7 +14,7 @@ import { SettingsFormData, UseSettingsForm } from "./use-settings-form";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { UserWithCounts } from "../types/profile-types";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useUpdateSettings } from "@/hooks/use-user";
 
 export default function AccountSecurity({ detailUser }: { detailUser: UserWithCounts }) {

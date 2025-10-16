@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 import { z } from "zod"
 import { revalidatePath } from "next/cache";
 import { endOfWeek, startOfWeek } from "date-fns";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { NotFoundError, ValidationError } from "@/lib/errors";
-import { handleError, successResponse } from "@/utils/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { NotFoundError, ValidationError } from "@/lib/errors/custom-errors";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
 
 const formSchema = z.object({
   goalId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),

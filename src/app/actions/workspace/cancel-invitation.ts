@@ -4,9 +4,9 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { validateWorkspacePermission } from "@/lib/db/validators";
 import { z } from "zod";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { AuthenticationError, DuplicateError, NotFoundError, RelationError, ValidationError } from "@/lib/errors";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { AuthenticationError, DuplicateError, NotFoundError, RelationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const formSchema = z.object({
   invitationId: z.string()

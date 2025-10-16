@@ -4,7 +4,7 @@ import { Step, Stepper } from "@/components/ui/stepper";
 import { toast } from "sonner";
 import { WorkspaceStepForm } from "./workspace-step-form";
 import { useWorkspace, WorkspaceFormData } from "./use-workspace-form";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
 import { useCreateWorkspace } from "@/hooks/use-workspace";
 

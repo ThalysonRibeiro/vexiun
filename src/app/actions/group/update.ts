@@ -4,9 +4,9 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateGroupExists } from "@/lib/db/validators";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { AuthenticationError, ValidationError } from "@/lib/errors";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const formSchema = z.object({
   groupId: z.string()

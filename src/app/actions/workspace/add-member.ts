@@ -5,9 +5,9 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { validateWorkspacePermission, validateWorkspaceExists } from "@/lib/db/validators";
 import { createAndSendNotification } from "../notification";
-import { ActionResponse, handleError, successResponse } from "@/utils/error-handler";
-import { AuthenticationError, DuplicateError, NotFoundError, ValidationError } from "@/lib/errors";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
+import { AuthenticationError, DuplicateError, NotFoundError, ValidationError } from "@/lib/errors/custom-errors";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 const formSchema = z.object({
   workspaceId: z.string()

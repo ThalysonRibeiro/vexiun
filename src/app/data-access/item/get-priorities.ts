@@ -1,9 +1,9 @@
 "use server";
 import { auth } from "@/lib/auth";
-import { AuthenticationError, PermissionError } from "@/lib/errors";
+import { AuthenticationError, PermissionError } from "@/lib/errors/custom-errors";
 import prisma from "@/lib/prisma";
-import { handleError, successResponse } from "@/utils/error-handler";
-import { ERROR_MESSAGES } from "@/utils/error-messages";
+import { handleError, successResponse } from "@/lib/errors/error-handler";
+import { ERROR_MESSAGES } from "@/lib/errors/messages";
 import { Priority } from "@/generated/prisma";
 import { validateWorkspaceAccess } from "@/lib/db/validators";
 

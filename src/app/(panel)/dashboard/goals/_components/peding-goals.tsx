@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { PendingGoal } from "../_types"
 import { cn } from "@/lib/utils"
 import { deleteGoal, goalCompletion } from "@/app/actions/goals"
-import { isErrorResponse, isSuccessResponse } from "@/utils/error-handler"
+import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler"
 
 export function PedingGoals({ data }: { data: PendingGoal[] }) {
 

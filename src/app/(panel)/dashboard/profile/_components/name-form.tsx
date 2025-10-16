@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { updateName } from "@/app/actions/user";
 import { useUpdateName } from "@/hooks/use-user";
-import { isSuccessResponse } from "@/utils/error-handler";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 
 export function NameForme({ user }: { user: User }) {
   const [isAdding, setIsAdding] = useState<boolean>(false);
