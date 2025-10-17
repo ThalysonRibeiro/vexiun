@@ -184,6 +184,35 @@ export function successResponse<T>(
   };
 }
 
+
+/**
+ * Wrapper para try/catch em actions
+ * 
+ * Uso:
+ * ```typescript
+ * export const myAction = withErrorHandler(
+ *   async (data) => {
+ *     // lógica da action
+ *     return { success: true, data: result };
+ *   },
+ *   "Falha ao executar ação"
+ * );
+
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withErrorHandler<TArgs extends any[], TReturn>(
+  handler: (...args: TArgs) => Promise<ActionResponse<TReturn>>,
+  defaultMessage?: string
+): (...args: TArgs) => Promise<ActionResponse<TReturn>> {
+  return async (...args: TArgs) => {
+    try {
+      return await handler(...args);
+    } catch (error) {
+      return handleError(error, defaultMessage);
+    }
+  };
+}
+
 /**
  * Helper para criar resposta de erro padronizada
  */

@@ -11,7 +11,7 @@ import { PendingGoal, WeekSummaryResponse } from "@/app/data-access/goals"
 
 interface GoalsContentProps {
   data: PendingGoal[];
-  summaryData: WeekSummaryResponse | null;
+  summaryData: WeekSummaryResponse;
   timeZone: string;
   language: string;
 }

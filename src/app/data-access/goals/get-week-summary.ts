@@ -33,8 +33,7 @@ export type GoalCompletionWithGoal = Prisma.GoalCompletionsGetPayload<{
 }>;
 
 export const getWeekSummary = withErrorHandler(async (
-  userId: string
-): Promise<ActionResponse<WeekSummaryResponse | null>> => {
+  userId: string) => {
 
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });

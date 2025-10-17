@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button"
 import { Plus, Trash } from "lucide-react"
 import { toast } from "sonner"
-import { PendingGoal } from "../_types"
 import { cn } from "@/lib/utils"
 import { deleteGoal, goalCompletion } from "@/app/actions/goals"
 import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler"
+import { PendingGoal } from "@/app/data-access/goals"
 
 export function PedingGoals({ data }: { data: PendingGoal[] }) {
 

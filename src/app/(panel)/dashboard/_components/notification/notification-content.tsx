@@ -16,12 +16,12 @@ import { NotificationType } from "@/generated/prisma";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
+  useDeleteNotification,
   useMarkAllAsRead,
   useMarkNotificationAsRead,
   useNotifications
 } from "@/hooks/use-notifications";
 import { toast } from "sonner";
-import { deleteNotification } from "@/app/actions/notification";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import {
   useAcceptWorkspaceInvitation,
@@ -35,6 +35,7 @@ export function NotificationContent() {
   const declineWorkspaceInvitation = useDeclineWorkspaceInvitation();
   const markAllAsRead = useMarkAllAsRead();
   const markNotificationAsRead = useMarkNotificationAsRead();
+  const deleteNotification = useDeleteNotification();
 
   const handleMarkAsRead = async (id: string) => {
     const result = await markNotificationAsRead.mutateAsync({ notificationId: id });
@@ -54,12 +55,12 @@ export function NotificationContent() {
   };
 
   const handleDelete = async (id: string) => {
-    const result = await deleteNotification({ notificationId: id });
-    if (isSuccessResponse(result)) {
-      refetch();
-    } else {
-      toast.error(result.error);
+    const result = await deleteNotification.mutateAsync({ notificationId: id });
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao deletar notificação");
     }
+    refetch();
+
   };
 
   const handleAcceptWorkspaceInvite = async (workspaceId: string,) => {

@@ -8,9 +8,9 @@ import { Progress, ProgressIndicator } from "@/components/ui/progress-bar";
 import { Separator } from "@/components/ui/separator"
 import { PedingGoals } from "./peding-goals";
 import { toast } from "sonner";
-import { PendingGoal, WeekSummaryResponse } from "../_types";
 import { goalUndo } from "@/app/actions/goals";
 import { isErrorResponse } from "@/lib/errors/error-handler";
+import { PendingGoal, WeekSummaryResponse } from "@/app/data-access/goals";
 
 interface SummaryProps {
   data: PendingGoal[];
