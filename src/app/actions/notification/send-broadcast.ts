@@ -1,11 +1,14 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod"
-import { auth } from "@/lib/auth";
+import { z } from "zod";
+import {
+  ActionResponse,
+  ERROR_MESSAGES,
+  successResponse,
+  ValidationError,
+  withAuth
+} from "@/lib/errors";
 import { NotificationType } from "@/generated/prisma";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const broadcastSchema = z.object({
   message: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
@@ -15,33 +18,27 @@ const broadcastSchema = z.object({
 
 export type BroadcastNotificationType = z.infer<typeof broadcastSchema>;
 
-export async function sendBroadcastNotification(
+export const sendBroadcastNotification = withAuth(async (
+  userId,
+  session,
   formData: BroadcastNotificationType
 ): Promise<ActionResponse<{
   success: boolean;
   totalSend: number;
-} | string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+} | string>> => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    const schema = broadcastSchema.safeParse(formData);
-    if (!schema.success) {
-      throw new ValidationError(schema.error.issues[0].message);
-    };
-    const result = await sendNotificationAllUsers({
-      type: formData.type,
-      message: formData.message,
-      referenceId: formData.referenceId
-    });
-    return successResponse(result, "Notificação enviada com sucesso");
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
+  const schema = broadcastSchema.safeParse(formData);
+  if (!schema.success) {
+    throw new ValidationError(schema.error.issues[0].message);
   };
-};
+  const result = await sendNotificationAllUsers({
+    type: formData.type,
+    message: formData.message,
+    referenceId: formData.referenceId
+  });
+  return successResponse(result, "Notificação enviada com sucesso");
+
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
 
 async function sendNotificationAllUsers({
   type, message, referenceId

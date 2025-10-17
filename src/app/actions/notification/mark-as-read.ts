@@ -1,11 +1,14 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
+import {
+  ActionResponse,
+  ERROR_MESSAGES,
+  successResponse,
+  ValidationError,
+  withAuth
+} from "@/lib/errors";
+import { revalidatePath } from "next/cache";
 
 const formSchema = z.object({
   notificationId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
@@ -13,29 +16,25 @@ const formSchema = z.object({
 
 export type MarkNotificationAsReadType = z.infer<typeof formSchema>;
 
-export async function markNotificationAsRead(formData: MarkNotificationAsReadType): Promise<ActionResponse<string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const markNotificationAsRead = withAuth(async (
+  userId,
+  session,
+  formData: MarkNotificationAsReadType
+): Promise<ActionResponse<string>> => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    const schema = formSchema.safeParse(formData);
-    if (!schema.success) {
-      throw new ValidationError(schema.error.issues[0].message);
-    };
-    await prisma.notification.update({
-      where: {
-        id: formData.notificationId,
-        userId,
-      },
-      data: { isRead: true },
-    });
-
-    revalidatePath("/dashboard/notifications");
-    return successResponse("Notificação marcada como lida com sucesso");
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
+  const schema = formSchema.safeParse(formData);
+  if (!schema.success) {
+    throw new ValidationError(schema.error.issues[0].message);
   };
-};
+  await prisma.notification.update({
+    where: {
+      id: formData.notificationId,
+      userId,
+    },
+    data: { isRead: true },
+  });
+
+  revalidatePath("/dashboard/notifications");
+  return successResponse("Notificação marcada como lida com sucesso");
+
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

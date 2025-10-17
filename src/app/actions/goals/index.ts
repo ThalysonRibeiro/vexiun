@@ -1,4 +1,4 @@
-export { createGoal } from "./create";
-export { deleteGoal } from "./delete";
-export { goalCompletion } from "./completion";
-export { goalUndo } from "./undo";
+export * from "./create";
+export * from "./delete";
+export * from "./completion";
+export * from "./undo";

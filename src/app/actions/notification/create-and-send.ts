@@ -4,8 +4,8 @@ import { z } from "zod"
 import { auth } from "@/lib/auth";
 import { NotificationType } from "@/generated/prisma";
 import { validateItemExists, validateUserExists, validateWorkspaceExists } from "@/lib/db/validators";
-import { handleError } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import { ERROR_MESSAGES, handleError } from "@/lib/errors";
+
 
 const formSchema = z.object({
   image: z.string().optional(),
@@ -22,19 +22,19 @@ const formSchema = z.object({
   ]),
 });
 
-export async function createAndSendNotification(formData: z.infer<typeof formSchema>) {
-  const session = await auth();
-  const userId = session?.user?.id;
+export type CreateNotificationInput = z.infer<typeof formSchema>;
 
-  if (!userId) {
-    return { error: ERROR_MESSAGES.AUTH.NOT_AUTHENTICATED };
-  };
-  const schema = formSchema.safeParse(formData);
-  if (!schema.success) {
-    return { error: schema.error.issues[0].message };
-  };
-
+/**
+ * Função helper para criar notificações.
+ * NOTA: Esta função assume que a autenticação já foi validada pela action que a chamou.
+ */
+export async function createAndSendNotification(formData: CreateNotificationInput) {
   try {
+    const schema = formSchema.safeParse(formData);
+    if (!schema.success) {
+      return { error: schema.error.issues[0].message };
+    };
+
     await validateUserExists(formData.userId);
 
     switch (formData.type) {
@@ -62,7 +62,7 @@ export async function createAndSendNotification(formData: z.infer<typeof formSch
     };
   } catch (error) {
     console.error(error);
-    return handleError(error, ERROR_MESSAGES.GENERIC);
+    return handleError(error, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
   };
 };
 

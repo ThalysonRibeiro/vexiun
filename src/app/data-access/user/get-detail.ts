@@ -1,32 +1,20 @@
 "use server";
-import { auth } from "@/lib/auth";
+import { ERROR_MESSAGES, successResponse, withAuth } from "@/lib/errors";
 import prisma from "@/lib/prisma";
-import { AuthenticationError } from "@/lib/errors/custom-errors";
-import { handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
-export async function getDetailUser() {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const getDetailUser = withAuth(async (userId) => {
 
-    if (!userId) {
-      throw new AuthenticationError();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      _count: { select: { sessions: true, } },
+      goals: {
+        include: {
+          goalCompletions: true
+        }
+      },
+      userSettings: true,
     }
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        _count: { select: { sessions: true, } },
-        goals: {
-          include: {
-            goalCompletions: true
-          }
-        },
-        userSettings: true,
-      }
-    });
-    return successResponse(user);
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
-  };
-};
+  });
+  return successResponse(user);
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

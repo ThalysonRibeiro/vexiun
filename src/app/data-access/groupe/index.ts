@@ -1,1 +1,1 @@
-export { getGroups } from "./get-groups";
+export * from "./get-groups";

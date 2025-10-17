@@ -1,11 +1,14 @@
 "use server"
-import { auth } from "@/lib/auth";
-import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 import prisma from "@/lib/prisma";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import {
+  ActionResponse,
+  ERROR_MESSAGES,
+  successResponse,
+  ValidationError,
+  withAuth
+} from "@/lib/errors";
+import { revalidatePath } from "next/cache";
 
 const formSchema = z.object({
   itemId: z.string()
@@ -15,24 +18,18 @@ const formSchema = z.object({
 
 export type DeleteItemType = z.infer<typeof formSchema>;
 
-export async function deleteItem(formData: DeleteItemType): Promise<ActionResponse<string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const deleteItem = withAuth(async (
+  userId,
+  session,
+  formData: DeleteItemType): Promise<ActionResponse<string>> => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    const schema = formSchema.safeParse(formData);
-    if (!schema.success) {
-      throw new ValidationError(schema.error.issues[0].message);
-    };
-    await prisma.item.delete({
-      where: { id: formData.itemId }
-    })
-    revalidatePath("/dashboard/Workspace");
-    return successResponse("Item deletado com sucesso");
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
+  const schema = formSchema.safeParse(formData);
+  if (!schema.success) {
+    throw new ValidationError(schema.error.issues[0].message);
   };
-};
+  await prisma.item.delete({
+    where: { id: formData.itemId }
+  })
+  revalidatePath("/dashboard/Workspace");
+  return successResponse("Item deletado com sucesso");
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

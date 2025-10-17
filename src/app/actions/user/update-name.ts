@@ -1,12 +1,13 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod"
+import { z } from "zod";
+import {
+  ActionResponse, ERROR_MESSAGES, successResponse,
+  ValidationError,
+  withAuth
+} from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
 import { validateUserExists } from "@/lib/db/validators";
-import { auth } from "@/lib/auth";
-import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 
 const formSchema = z.object({
   userId: z.string()
@@ -19,29 +20,25 @@ const formSchema = z.object({
 
 export type UpdateNameType = z.infer<typeof formSchema>;
 
-export async function updateName(formData: UpdateNameType): Promise<ActionResponse<string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const updateName = withAuth(async (
+  userId,
+  session,
+  formData: UpdateNameType
+): Promise<ActionResponse<string>> => {
 
-    if (!userId) {
-      throw new AuthenticationError();
+  const schema = formSchema.safeParse(formData);
+  if (!schema.success) {
+    throw new ValidationError(schema.error.issues[0].message);
+  };
+  await validateUserExists(formData.userId);
+
+  await prisma.user.update({
+    where: { id: formData.userId },
+    data: {
+      name: formData.name,
     }
-    const schema = formSchema.safeParse(formData);
-    if (!schema.success) {
-      throw new ValidationError(schema.error.issues[0].message);
-    };
-    await validateUserExists(formData.userId);
+  });
+  revalidatePath("/dashboard/profile");
+  return successResponse("Nome atualizado com sucesso")
 
-    await prisma.user.update({
-      where: { id: formData.userId },
-      data: {
-        name: formData.name,
-      }
-    });
-    revalidatePath("/dashboard/profile");
-    return successResponse("Nome atualizado com sucesso")
-  } catch (error) {
-    return handleError(ERROR_MESSAGES.GENERIC)
-  }
-}
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

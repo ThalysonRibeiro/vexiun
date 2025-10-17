@@ -12,8 +12,8 @@ export default async function GoalsPage() {
   if (!session) {
     redirect('/')
   }
-  const pedingGoals = await getWeekPendingGoal(session?.user?.id as string);
-  const weekSummaryDate = await getWeekSummary(session?.user?.id as string);
+  const pedingGoals = await getWeekPendingGoal(session?.user?.id as string).then(unwrapServerData);
+  const weekSummaryDate = await getWeekSummary(session?.user?.id as string).then(unwrapServerData);
   const detailUser = await getDetailUser().then(unwrapServerData);
   if (!detailUser) return null;
   const { userSettings } = detailUser;

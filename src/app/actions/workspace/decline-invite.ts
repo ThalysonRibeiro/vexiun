@@ -1,10 +1,15 @@
 "use server"
 import prisma from "@/lib/prisma";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
-import { AuthenticationError, NotFoundError, RelationError, ValidationError } from "@/lib/errors/custom-errors";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
+import {
+  ActionResponse,
+  ERROR_MESSAGES,
+  NotFoundError,
+  RelationError,
+  successResponse,
+  ValidationError,
+  withAuth
+} from "@/lib/errors";
 
 const formSchema = z.object({
   workspaceId: z.string()
@@ -14,39 +19,35 @@ const formSchema = z.object({
 
 export type DeclineWorkspaceInvitationType = z.infer<typeof formSchema>;
 
-export async function declineWorkspaceInvitation(formData: DeclineWorkspaceInvitationType): Promise<ActionResponse<string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const declineWorkspaceInvitation = withAuth(async (
+  userId,
+  session,
+  formData: DeclineWorkspaceInvitationType
+): Promise<ActionResponse<string>> => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    const schema = formSchema.safeParse(formData);
-    if (!schema.success) {
-      throw new ValidationError(schema.error.issues[0].message);
-    };
-    const invitation = await prisma.workspaceInvitation.findUnique({
-      where: {
-        workspaceId_userId: {
-          workspaceId: formData.workspaceId, userId
-        }
-      },
-    });
-    if (!invitation) {
-      throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.INVITATION);
-    };
-    if (invitation.userId !== userId) {
-      throw new RelationError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
-    };
-    // await prisma.workspaceInvitation.delete({ where: { id: invitation.id } });
-    await prisma.workspaceInvitation.update({
-      where: { id: invitation.id },
-      data: { status: "DECLINED" },
-    });
-
-    return successResponse("Convite recusado com sucesso");
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
+  const schema = formSchema.safeParse(formData);
+  if (!schema.success) {
+    throw new ValidationError(schema.error.issues[0].message);
   };
-};
+  const invitation = await prisma.workspaceInvitation.findUnique({
+    where: {
+      workspaceId_userId: {
+        workspaceId: formData.workspaceId, userId
+      }
+    },
+  });
+  if (!invitation) {
+    throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.INVITATION);
+  };
+  if (invitation.userId !== userId) {
+    throw new RelationError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
+  };
+  // await prisma.workspaceInvitation.delete({ where: { id: invitation.id } });
+  await prisma.workspaceInvitation.update({
+    where: { id: invitation.id },
+    data: { status: "DECLINED" },
+  });
+
+  return successResponse("Convite recusado com sucesso");
+
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

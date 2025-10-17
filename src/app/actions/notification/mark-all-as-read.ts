@@ -1,31 +1,27 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import {
+  ActionResponse,
+  ERROR_MESSAGES,
+  successResponse,
+  withAuth
+} from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { AuthenticationError } from "@/lib/errors/custom-errors";
 
-export async function markAllAsRead(): Promise<ActionResponse<string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
+export const markAllAsRead = withAuth(async (
+  userId
+): Promise<ActionResponse<string>> => {
 
-    await prisma.notification.updateMany({
-      where: {
-        userId,
-        isRead: false,
-      },
-      data: { isRead: true },
-    });
+  await prisma.notification.updateMany({
+    where: {
+      userId,
+      isRead: false,
+    },
+    data: { isRead: true },
+  });
 
-    revalidatePath("/dashboard/notifications");
-    return successResponse("Notificações marcadas como lidas com sucesso");
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
-  };
-};
+  revalidatePath("/dashboard/notifications");
+  return successResponse("Notificações marcadas como lidas com sucesso");
+
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

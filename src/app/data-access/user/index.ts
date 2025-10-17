@@ -1,3 +1,3 @@
-export { getDetailUser } from "./get-detail";
-export { getMyPendingInvitations } from "./get-my-pending-invitations";
-export { searchUsers } from "./search-users";
+export * from "./get-detail";
+export * from "./get-my-pending-invitations";
+export * from "./search-users";

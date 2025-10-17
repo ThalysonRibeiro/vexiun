@@ -1,74 +1,63 @@
 "use server";
-import { auth } from "@/lib/auth";
+import { ERROR_MESSAGES, successResponse, withAuth } from "@/lib/errors";
 import prisma from "@/lib/prisma";
-import { AuthenticationError } from "@/lib/errors/custom-errors";
-import { handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
 
 export type WorkspaceSummaryResponse = Awaited<ReturnType<typeof getMyWorkspaces>>;
 export type WorkspaceSummaryData = Extract<WorkspaceSummaryResponse, { success: true }>['data']
 
-export async function getMyWorkspaces(cursor?: string, take = 50) {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const getMyWorkspaces = withAuth(async (
+  userId,
+  session,
+  cursor?: string, take = 50) => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-
-    const workspaces = await prisma.workspace.findMany({
-      where: { userId },
-      include: {
-        _count: {
-          select: {
-            groups: true,
-            members: true,
-          },
+  const workspaces = await prisma.workspace.findMany({
+    where: { userId },
+    include: {
+      _count: {
+        select: {
+          groups: true,
+          members: true,
         },
-        members: {
-          select: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-              }
+      },
+      members: {
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
             }
           }
         }
-      },
-      orderBy: { createdAt: "desc" },
-      take,
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
-    });
-
-    const groupsWithCount = await prisma.group.findMany({
-      where: { workspaceId: { in: workspaces.map(d => d.id) } },
-      select: {
-        workspaceId: true,
-        _count: { select: { item: true } }
       }
-    });
+    },
+    orderBy: { createdAt: "desc" },
+    take,
+    ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+  });
 
-    const workspaceSummaries = workspaces.map(workspace => {
-      const totalItems = groupsWithCount
-        .filter(g => g.workspaceId === workspace.id)
-        .reduce((acc, g) => acc + g._count.item, 0);
+  const groupsWithCount = await prisma.group.findMany({
+    where: { workspaceId: { in: workspaces.map(d => d.id) } },
+    select: {
+      workspaceId: true,
+      _count: { select: { item: true } }
+    }
+  });
 
-      return {
-        id: workspace.id,
-        title: workspace.title,
-        groupsCount: workspace._count.groups,
-        itemsCount: totalItems,
-        members: workspace.members.map(m => m.user)
-      };
-    });
+  const workspaceSummaries = workspaces.map(workspace => {
+    const totalItems = groupsWithCount
+      .filter(g => g.workspaceId === workspace.id)
+      .reduce((acc, g) => acc + g._count.item, 0);
 
-    return successResponse(workspaceSummaries);
+    return {
+      id: workspace.id,
+      title: workspace.title,
+      groupsCount: workspace._count.groups,
+      itemsCount: totalItems,
+      members: workspace.members.map(m => m.user)
+    };
+  });
 
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
-  };
-};
+  return successResponse(workspaceSummaries);
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

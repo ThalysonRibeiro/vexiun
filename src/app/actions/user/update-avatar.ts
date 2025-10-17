@@ -1,11 +1,12 @@
 "use server"
-import { auth } from "@/lib/auth";
-import { AuthenticationError, ValidationError } from "@/lib/errors/custom-errors";
 import prisma from "@/lib/prisma";
-import { ActionResponse, handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import {
+  ActionResponse, ERROR_MESSAGES, successResponse,
+  ValidationError,
+  withAuth
+} from "@/lib/errors";
+import { revalidatePath } from "next/cache";
 
 const formSchema = z.object({
   avatarUrl: z.string().min(3, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
@@ -14,32 +15,27 @@ const formSchema = z.object({
 
 export type UpdateAvatarType = z.infer<typeof formSchema>;
 
-export async function updateAvatar(formData: UpdateAvatarType): Promise<ActionResponse<string>> {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const updateAvatar = withAuth(async (
+  userId,
+  session,
+  formData: UpdateAvatarType
+): Promise<ActionResponse<string>> => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    const schema = formSchema.safeParse(formData);
-    if (!schema.success) {
-      throw new ValidationError(schema.error.issues[0].message);
-    };
-
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        image: formData.avatarUrl,
-      }
-    });
-
-    revalidatePath("/dashboard/profile");
-
-    return successResponse("Imagem alterada com sucesso!");
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
+  const schema = formSchema.safeParse(formData);
+  if (!schema.success) {
+    throw new ValidationError(schema.error.issues[0].message);
   };
-};
+
+  await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      image: formData.avatarUrl,
+    }
+  });
+
+  revalidatePath("/dashboard/profile");
+
+  return successResponse("Imagem alterada com sucesso!");
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

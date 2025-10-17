@@ -1,89 +1,71 @@
 "use server";
-import { auth } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { AuthenticationError } from "@/lib/errors/custom-errors";
-import { handleError, successResponse } from "@/lib/errors/error-handler";
-import { ERROR_MESSAGES } from "@/lib/errors/messages";
 import { validateWorkspacePermission } from "@/lib/db/validators";
+import { ERROR_MESSAGES, successResponse, withAuth } from "@/lib/errors";
+import prisma from "@/lib/prisma";
 
-export async function getMyPendingInvitations() {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const getMyPendingInvitations = withAuth(async (userId) => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    const invitations = await prisma.workspaceInvitation.findMany({
-      where: {
-        userId: userId,
-        status: "PENDING",
-        // ✅ Filtrar expirados se tiver expiresAt
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } },
-        ],
-      },
-      include: {
-        workspace: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        inviter: {
-          select: {
-            name: true,
-            image: true,
-          },
+  const invitations = await prisma.workspaceInvitation.findMany({
+    where: {
+      userId: userId,
+      status: "PENDING",
+      // ✅ Filtrar expirados se tiver expiresAt
+      OR: [
+        { expiresAt: null },
+        { expiresAt: { gt: new Date() } },
+      ],
+    },
+    include: {
+      workspace: {
+        select: {
+          id: true,
+          title: true,
         },
       },
-      orderBy: { createdAt: "desc" },
-    });
+      inviter: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
-    return successResponse(invitations);
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
-  };
-};
+  return successResponse(invitations);
+
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
 
 // Convites enviados (pelo workspace)
-export async function getWorkspacePendingInvitations(workspaceId: string) {
-  try {
-    const session = await auth();
-    const userId = session?.user?.id;
+export const getWorkspacePendingInvitations = withAuth(async (
+  userId,
+  session,
+  workspaceId: string) => {
 
-    if (!userId) {
-      throw new AuthenticationError();
-    }
-    // ✅ Verificar permissão
-    await validateWorkspacePermission(workspaceId, userId, "ADMIN");
+  await validateWorkspacePermission(workspaceId, userId, "ADMIN");
 
-    const invitations = await prisma.workspaceInvitation.findMany({
-      where: {
-        workspaceId,
-        status: "PENDING",
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
-        inviter: {
-          select: {
-            name: true,
-          },
+  const invitations = await prisma.workspaceInvitation.findMany({
+    where: {
+      workspaceId,
+      status: "PENDING",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
         },
       },
-      orderBy: { createdAt: "desc" },
-    });
+      inviter: {
+        select: {
+          name: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
-    return successResponse(invitations);
-  } catch (error) {
-    return handleError(error, ERROR_MESSAGES.GENERIC);
-  };
-};
+  return successResponse(invitations);
+}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
