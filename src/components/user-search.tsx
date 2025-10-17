@@ -114,7 +114,7 @@ export const UserSearch = forwardRef<UserSearchRef, UserSearchProps>(
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-96 overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-96 overflow-y-auto">
           {isLoading && (
             <div className="p-4 text-center text-gray-500">
               Buscando...
