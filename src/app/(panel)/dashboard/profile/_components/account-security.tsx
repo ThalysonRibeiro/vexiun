@@ -79,23 +79,19 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
     if (!detailUser.id) {
       return;
     }
-    try {
-      const response = await updateSettings.mutateAsync({
-        userId: detailUser.id,
-        emailNotifications: formData.emailNotifications,
-        pushNotifications: formData.pushNotifications,
-        language: formData.language,
-        timezone: formData.timezone,
-      });
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao atualizar configurações de segurança");
-        return;
-      }
-      toast.success(response.message || "Configurações de segurança atualizadas com sucesso!");
 
-    } catch {
+    const response = await updateSettings.mutateAsync({
+      userId: detailUser.id,
+      emailNotifications: formData.emailNotifications,
+      pushNotifications: formData.pushNotifications,
+      language: formData.language,
+      timezone: formData.timezone,
+    });
+    if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar configurações de segurança");
+      return;
     }
+    toast.success(response.message || "Configurações de segurança atualizadas com sucesso!");
   }
 
   return (

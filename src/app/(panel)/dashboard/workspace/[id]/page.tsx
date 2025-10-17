@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { WorkspaceContent } from "./_components/workspace-content";
 import { getGroups } from "@/app/data-access/groupe";
 import { getPriorities, getStatus } from "@/app/data-access/item";
-import { getTeam } from "@/app/data-access/team";
 import { unwrapServerData } from "@/utils/server-helpers";
 
 

@@ -30,7 +30,7 @@ import { DetailsEditor } from "./details-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
 import { useSession } from "next-auth/react";
-import { useCreateItem, useInvalidateItems } from "@/hooks/use-items";
+import { useCreateItem } from "@/hooks/use-items";
 
 interface CreateItemFormProps {
   closeForm: (value: boolean) => void;
@@ -59,53 +59,52 @@ export function CreateOrEditItemForm({
 
   async function onSubmit(formData: ItemFormData) {
     setIsLoading(true);
-    try {
-      if (editingItem && itemId) {
-        const result = await updateItem({
-          itemId: itemId,
-          title: formData?.title,
-          status: formData?.status,
-          term: formData?.term,
-          priority: formData?.priority,
-          notes: formData?.notes,
-          description: formData?.description,
-          assignedTo: formData?.assignedTo ?? session?.user?.id,
-          details: formData?.details,
-        });
 
-        if (isErrorResponse(result)) {
-          toast.error("Erro ao atualizar item");
-        } else {
-          ;
-          toast.success("Item atualizado com sucesso!");
-        }
-        closeForm(false);
-        form.reset();
+    if (editingItem && itemId) {
+      const response = await updateItem({
+        itemId: itemId,
+        title: formData?.title,
+        status: formData?.status,
+        term: formData?.term,
+        priority: formData?.priority,
+        notes: formData?.notes,
+        description: formData?.description,
+        assignedTo: formData?.assignedTo ?? session?.user?.id,
+        details: formData?.details,
+      });
 
+      if (isErrorResponse(response)) {
+        toast.error("Erro ao atualizar item");
       } else {
-        const response = await createItem.mutateAsync({
-          groupId: groupId,
-          title: formData.title,
-          term: formData.term,
-          priority: formData.priority,
-          notes: formData.notes,
-          description: formData.description,
-          status: "NOT_STARTED",
-          assignedTo: formData.assignedTo ?? session?.user?.id,
-          details: formData.details,
-        });
-        if (isSuccessResponse(response)) {
-          toast.error("Erro ao cadastrar item");
-          return;
-        }
-        toast.success("Item cadastrado com sucesso!");
-        closeForm(false);
-        form.reset();
+        ;
+        toast.success("Item atualizado com sucesso!");
       }
-    } catch (error) {
-      toast.error("Erro inesperado");
-    } finally {
+      closeForm(false);
+      form.reset();
       setIsLoading(false);
+      return;
+
+    } else {
+      const response = await createItem.mutateAsync({
+        groupId: groupId,
+        title: formData.title,
+        term: formData.term,
+        priority: formData.priority,
+        notes: formData.notes,
+        description: formData.description,
+        status: "NOT_STARTED",
+        assignedTo: formData.assignedTo ?? session?.user?.id,
+        details: formData.details,
+      });
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao cadastrar item");
+        return;
+      }
+      toast.success("Item cadastrado com sucesso!");
+      closeForm(false);
+      form.reset();
+      setIsLoading(false);
+      return;
     }
   }
 
@@ -181,19 +180,19 @@ export function CreateOrEditItemForm({
             )}
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <FormField
               control={form.control}
               name="priority"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Prioridade</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger className={cn("", colorPriority(field.value))} size="sm">
+                      <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
                         <SelectValue placeholder={priorityMap["STANDARD"]} />
                       </SelectTrigger>
                       <SelectContent>
@@ -268,11 +267,15 @@ export function CreateOrEditItemForm({
                 </FormItem>
               )}
             />
-            {team && (
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
+          </div>
+
+          {team && (
+            <FormField
+              control={form.control}
+              name="assignedTo"
+              render={({ field }) => {
+                const selectedTeam = team.find(t => t.id === field.value) ?? team[0]
+                return (
                   <FormItem>
                     <FormLabel>Responsável</FormLabel>
                     <FormControl>
@@ -280,10 +283,14 @@ export function CreateOrEditItemForm({
                         onValueChange={field.onChange}
                         value={field.value ?? undefined}
                       >
-                        <SelectTrigger
-                          className="bg-transparent dark:bg-transparent cursor-pointer w-full"
-                        >
-                          <SelectValue placeholder={team[0].name?.split(" ")[0] ?? undefined} />
+                        <SelectTrigger className="flex items-center gap-2 w-full">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-6 h-6">
+                              <AvatarImage src={selectedTeam.image ?? undefined} />
+                              <AvatarFallback>{nameFallback(selectedTeam.name ?? undefined)}</AvatarFallback>
+                            </Avatar>
+                            <span>{selectedTeam.name}</span>
+                          </div>
                         </SelectTrigger>
                         <SelectContent>
                           {team.map((user) => (
@@ -299,10 +306,10 @@ export function CreateOrEditItemForm({
                       </Select>
                     </FormControl>
                   </FormItem>
-                )}
-              />
-            )}
-          </div>
+                )
+              }}
+            />
+          )}
         </div>
 
 

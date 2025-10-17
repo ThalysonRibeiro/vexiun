@@ -1,4 +1,5 @@
 import { createItem, CreateItemType, deleteItem, DeleteItemType, updateItem, UpdateItemType } from "@/app/actions/item";
+import { assignTo, AssignToType } from "@/app/actions/item/assign-to";
 import {
   getCompletedItems,
   getItemsAssignedToUser,
@@ -158,6 +159,31 @@ export function useUpdateItem() {
       queryClient.setQueryData(["items", variables.itemId], result.data);
       queryClient.invalidateQueries({
         queryKey: ["items"],
+        exact: false,
+        refetchType: "active"
+      })
+    },
+    retry: 1
+  });
+}
+
+export function useAssignTo() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: AssignToType) => {
+      const result = await assignTo(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.setQueryData(["items", variables.itemId, variables.workspaceId], result.data);
+      queryClient.invalidateQueries({
+        queryKey: ["items", "notifications"],
         exact: false,
         refetchType: "active"
       })

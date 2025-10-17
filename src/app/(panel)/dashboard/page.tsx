@@ -3,7 +3,14 @@ import { redirect } from "next/navigation";
 import { ProgressGoals } from "./goals/_components/summary";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import { LoginAlert } from "@/components/login-alert";
 import { Priorities } from "./_components/priorities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

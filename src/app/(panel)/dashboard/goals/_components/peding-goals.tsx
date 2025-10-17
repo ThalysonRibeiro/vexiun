@@ -15,17 +15,13 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
       toast.error("Falha ao completar meta");
       return;
     }
-    try {
-      const response = await goalCompletion({ goalId });
-      if (isErrorResponse(response)) {
-        toast.error(response.error);
-        return;
-      }
-      if (isSuccessResponse(response)) {
-        toast.success(response.message);
-      }
-    } catch (error) {
-      toast.error("Falha ao completar meta");
+    const response = await goalCompletion({ goalId });
+    if (isErrorResponse(response)) {
+      toast.error(response.error);
+      return;
+    }
+    if (isSuccessResponse(response)) {
+      toast.success(response.message);
     }
   }
 
@@ -34,17 +30,13 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
       toast.error("Falha ao deletar meta");
       return;
     }
-    try {
-      const response = await deleteGoal({ goalId });
-      if (isErrorResponse(response)) {
-        toast.error(response.error);
-        return;
-      }
-      if (isSuccessResponse(response)) {
-        toast.success(response.message);
-      }
-    } catch (error) {
-      toast.error("Falha ao deletar meta");
+    const response = await deleteGoal({ goalId });
+    if (isErrorResponse(response)) {
+      toast.error(response.error);
+      return;
+    }
+    if (isSuccessResponse(response)) {
+      toast.success(response.message);
     }
   }
 

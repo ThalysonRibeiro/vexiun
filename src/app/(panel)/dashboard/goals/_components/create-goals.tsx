@@ -40,25 +40,18 @@ export function CreateGoals({ initialValues }: CreateGoalProps) {
 
   async function onSubmit(formData: CreateGoalForm) {
     setIsLoading(true);
-    try {
-      const response = await createGoal({
-        title: formData.title,
-        desiredWeeklyFrequency: formData.desiredWeeklyFrequency
-      });
-      if (isErrorResponse(response)) {
-        toast.error(response.error)
-      }
-      if (isSuccessResponse(response)) {
-        toast.success(response.message);
-      }
-
-      form.reset();
-    } catch (error) {
+    const response = await createGoal({
+      title: formData.title,
+      desiredWeeklyFrequency: formData.desiredWeeklyFrequency
+    });
+    if (isErrorResponse(response)) {
+      toast.error(response.error)
     }
-    finally {
-      setIsLoading(false);
+    if (isSuccessResponse(response)) {
+      toast.success(response.message);
     }
 
+    form.reset();
   }
 
   return (

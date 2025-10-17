@@ -15,23 +15,22 @@ import { Button } from "@/components/ui/button";
 import { borderColorPriority, borderColorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { InfoItem } from "../main-board/info-item";
-import { updateItem } from "@/app/actions/item";
 import { cn } from "@/lib/utils";
-import { ItemWhitCreatedAssignedUser, useInvalidateItems, useItemsByStatus } from "@/hooks/use-items";
+import { ItemWhitCreatedAssignedUser, useItemsByStatus, useUpdateItem } from "@/hooks/use-items";
 import { useParams } from "next/navigation";
-import { GroupsData } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";
+import { isSuccessResponse } from "@/lib/errors";
+import { toast } from "sonner";
 
 export function KanbanGrid() {
   const params = useParams();
   const workspaceId = params.id as string
   const { data, isLoading, error } = useItemsByStatus(workspaceId);
   const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(workspaceId);
-
-  const invalidateItems = useInvalidateItems();
   const [draggedItem, setDraggedItem] = useState<ItemWhitCreatedAssignedUser | null>(null);
   const [isCloseDialog, setIsCloseDialog] = useState<boolean>(false);
   const [getStatus, setGetStatus] = useState<Status>("NOT_STARTED");
+  const updateItem = useUpdateItem();
 
   function handleDragStart(e: React.DragEvent, item: ItemWhitCreatedAssignedUser) {
     setDraggedItem(item);
@@ -89,7 +88,7 @@ export function KanbanGrid() {
   async function handleDrop(e: React.DragEvent, status: Status) {
     e.preventDefault();
     if (draggedItem && draggedItem.status !== status) {
-      await updateItem({
+      const response = await updateItem.mutateAsync({
         itemId: draggedItem.id,
         status: status,
         description: draggedItem.description,
@@ -97,8 +96,11 @@ export function KanbanGrid() {
         priority: draggedItem.priority,
         title: draggedItem.title
       });;
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao cadastrar item");
+        return;
+      }
     }
-    invalidateItems();
     setDraggedItem(null);
   }
 

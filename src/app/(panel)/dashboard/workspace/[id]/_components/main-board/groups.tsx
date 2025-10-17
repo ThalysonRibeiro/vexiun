@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { GroupProgressBar } from "./group-progress-bar";
-import { deleteGroup } from "@/app/actions/group";
 import { CompletedItems } from "./completed-items";
 import { GroupsData, useDeleteGroup } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";

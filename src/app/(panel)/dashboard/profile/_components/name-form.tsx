@@ -18,20 +18,17 @@ export function NameForme({ user }: { user: User }) {
 
   async function onSubmit(formData: { name: string }) {
     if (!user.id) return;
-    try {
-      const response = await updateName.mutateAsync({
-        userId: user.id,
-        name: formData.name
-      });
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao atualizar nome");
-        return;
-      }
-      toast.success("Nome alterado com sucesso!");
-      setIsAdding(false);
-    } catch (error) {
+
+    const response = await updateName.mutateAsync({
+      userId: user.id,
+      name: formData.name
+    });
+    if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar nome");
+      return;
     }
+    toast.success("Nome alterado com sucesso!");
+    setIsAdding(false);
   }
 
   return (

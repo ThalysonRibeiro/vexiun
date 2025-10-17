@@ -32,7 +32,7 @@ import { useState } from "react";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useGroups } from "@/hooks/use-groups";
 import { useParams } from "next/navigation";
-import { useCreateItem, useInvalidateItems } from "@/hooks/use-items";
+import { useCreateItem } from "@/hooks/use-items";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
@@ -63,32 +63,27 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
   const form = UseItemForm({ initialValues });
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const createItem = useCreateItem();
-  const invalidateItems = useInvalidateItems();
 
   async function onSubmit(formData: ItemFormData) {
-    try {
-      const response = await createItem.mutateAsync({
-        groupId: selectedGroupId || data?.group[0].id as string,
-        title: formData.title,
-        term: formData.term,
-        priority: formData.priority,
-        notes: formData.notes || "",
-        description: formData.description || "",
-        status: "NOT_STARTED",
-        assignedTo: formData.assignedTo ?? session?.user?.id,
-        details: formData.details,
-      });
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao cadastrar item");
-        return;
-      }
-      invalidateItems()
-      toast.success("Item cadastrado com sucesso!");
-      form.reset();
-      closeDialog(false);
-    } catch (error) {
-      toast.error("Erro inesperado");
+
+    const response = await createItem.mutateAsync({
+      groupId: selectedGroupId || data?.group[0].id as string,
+      title: formData.title,
+      term: formData.term,
+      priority: formData.priority,
+      notes: formData.notes || "",
+      description: formData.description || "",
+      status: "NOT_STARTED",
+      assignedTo: formData.assignedTo ?? session?.user?.id,
+      details: formData.details,
+    });
+    if (!isSuccessResponse(response)) {
+      toast.error("Erro ao cadastrar item");
+      return;
     }
+    toast.success("Item cadastrado com sucesso!");
+    form.reset();
+    closeDialog(false);
   }
 
   if (isLoading) {

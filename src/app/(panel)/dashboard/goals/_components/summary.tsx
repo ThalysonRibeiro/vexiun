@@ -32,16 +32,13 @@ export function Summary({ data, summaryData, timeZone, language }: SummaryProps)
       toast.error("Erro ao desfazer meta.");
       return;
     }
-    try {
-      const response = await goalUndo({ id: goalId });
-      if (isErrorResponse(response)) {
-        toast.error(response.error);
-        return;
-      }
-      toast("🙄👀 " + response.data);
-    } catch (error) {
-      toast.error("Erro ao desfazer meta.");
+
+    const response = await goalUndo({ id: goalId });
+    if (isErrorResponse(response)) {
+      toast.error(response.error);
+      return;
     }
+    toast("🙄👀 " + response.data);
   }
 
   return (

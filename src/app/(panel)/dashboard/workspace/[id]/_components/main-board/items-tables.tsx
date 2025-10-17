@@ -54,6 +54,7 @@ import { DetailsEditor } from "./details-editor";
 import { JSONContent } from "@tiptap/core";
 import { nameFallback } from "@/utils/name-fallback";
 import { ItemWhitCreatedAssignedUser, useDeleteItem, useItems, useUpdateItem } from "@/hooks/use-items";
+import { ItemAssign } from "../item-assign";
 
 interface ItemsTablesProps {
   groupId: string
@@ -136,59 +137,49 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
 
     setIsLoading(item.id);
 
-    try {
-      const result = await updateItem.mutateAsync({
-        itemId: item.id,
-        title: item.title,
-        status: item.status,
-        term: item.term,
-        priority: item.priority,
-        notes: item.notes,
-        description: item.description,
-        details: dialogState.content,
-        assignedTo: item.assignedTo
-      });
+    const result = await updateItem.mutateAsync({
+      itemId: item.id,
+      title: item.title,
+      status: item.status,
+      term: item.term,
+      priority: item.priority,
+      notes: item.notes,
+      description: item.description,
+      details: dialogState.content,
+      assignedTo: item.assignedTo
+    });
 
-      if (!isSuccessResponse(result)) {
-        toast.error("Erro ao atualizar detalhes");
-      } else {
-        toast.success("Detalhes atualizados com sucesso!");
-        setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
-      }
-    } catch (error) {
+    if (!isSuccessResponse(result)) {
       toast.error("Erro ao atualizar detalhes");
-    } finally {
-      setIsLoading(null);
     }
-  };
+
+    toast.success("Detalhes atualizados com sucesso!");
+    setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
+    setIsLoading(null);
+  }
 
   const handleSaveField = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
     if (!editingData) return;
 
     setIsLoading(item.id);
 
-    try {
-      const result = await updateItem.mutateAsync({
-        itemId: item.id,
-        title: editingData.title,
-        status: editingData.status,
-        term: editingData.term,
-        priority: editingData.priority,
-        notes: editingData.notes,
-        description: editingData.description
-      });
+    const response = await updateItem.mutateAsync({
+      itemId: item.id,
+      title: editingData.title,
+      status: editingData.status,
+      term: editingData.term,
+      priority: editingData.priority,
+      notes: editingData.notes,
+      description: editingData.description
+    });
 
-      if (!isSuccessResponse(result)) {
-        toast.error("Erro ao atualizar item");
-      } else {
-        toast.success("Item atualizado com sucesso!");
-        cancelEditing();
-      }
-    } catch (error) {
+    if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar item");
-    } finally {
-      setIsLoading(null);
     }
+    toast.success("Item atualizado com sucesso!");
+    cancelEditing();
+    setIsLoading(null);
+
   }, [editingData, cancelEditing, updateItem]);
 
   const handleSelectChange = useCallback(async (
@@ -198,44 +189,39 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
   ) => {
     setIsLoading(item.id);
 
-    try {
-      const result = await updateItem.mutateAsync({
-        itemId: item.id,
-        title: item.title,
-        status: field === 'status' ? value as Status : item.status,
-        term: item.term,
-        priority: field === 'priority' ? value as Priority : item.priority,
-        notes: item.notes,
-        description: item.description,
-        details: item.details as JSONContent
-      });
+    const response = await updateItem.mutateAsync({
+      itemId: item.id,
+      title: item.title,
+      status: field === 'status' ? value as Status : item.status,
+      term: item.term,
+      priority: field === 'priority' ? value as Priority : item.priority,
+      notes: item.notes,
+      description: item.description,
+      details: item.details as JSONContent
+    });
 
-      if (!isSuccessResponse(result)) {
-        toast.error("Erro ao atualizar item");
-      } else {
-        toast.success("Item atualizado!");
-      }
-    } catch (error) {
+    if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar item");
-    } finally {
-      setIsLoading(null);
     }
+    toast.success("Item atualizado!");
+
+
   }, [updateItem]);
 
   const handleDeleteItem = useCallback(async (itemId: string) => {
     setIsLoading(itemId);
 
-    try {
-      if (!confirm('Deseja realmente deletar o item?, todos os dados serão deletados junto')) {
-        return;
-      }
-      await deleteItem.mutateAsync({ itemId });
-      toast.success("Item deletado com sucesso!");
-    } catch (error) {
-      toast.error("Erro ao deletar item");
-    } finally {
-      setIsLoading(null);
+    if (!confirm('Deseja realmente deletar o item?, todos os dados serão deletados junto')) {
+      return;
     }
+    const response = await deleteItem.mutateAsync({ itemId });
+    if (!isSuccessResponse(response)) {
+      toast.error("Erro ao cadastrar item");
+      return;
+    }
+    toast.success("Item deletado com sucesso!");
+    setIsLoading(null);
+
   }, [deleteItem]);
 
   const renderEditableCell = (
@@ -468,15 +454,21 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
                   </TableCell>
 
                   <TableCell className="border-x" title="Para trocar de responsável edite o item">
-                    <div className="flex items-center gap-2 h-full w-full">
-                      <Avatar>
-                        <AvatarImage src={item.assignedToUser?.image as string} />
-                        <AvatarFallback>
-                          {nameFallback(item.assignedToUser?.name as string)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{item.assignedToUser?.name?.split(" ")[0] ?? "CATALYST"}</span>
-                    </div>
+                    <Dialog>
+                      <DialogTrigger className="cursor-pointer" title="Clique pra designar um membro da equipe">
+                        <div className="flex items-center gap-2 h-full w-full ">
+                          <Avatar>
+                            <AvatarImage src={item.assignedToUser?.image as string} />
+                            <AvatarFallback>
+                              {nameFallback(item.assignedToUser?.name as string)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{item.assignedToUser?.name?.split(" ")[0] ?? "CATALYST"}</span>
+                        </div>
+                      </DialogTrigger>
+                      <ItemAssign itemId={item.id} assignedToUser={item.assignedToUser} />
+                    </Dialog>
+
                   </TableCell>
 
                   <TableCell className={colorPriority(item.priority)}>

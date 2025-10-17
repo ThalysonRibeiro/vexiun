@@ -7,6 +7,7 @@ import { useWorkspace, WorkspaceFormData } from "./use-workspace-form";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
 import { useCreateWorkspace } from "@/hooks/use-workspace";
+import { useRouter } from "next/navigation";
 
 export type UserSearchType = {
   id: string,
@@ -22,36 +23,34 @@ export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => vo
   const userSearchRef = useRef<UserSearchRef>(null);
   const form = useWorkspace({});
   const createWorkspace = useCreateWorkspace();
+  const router = useRouter();
 
 
 
   const onSubmit = async () => {
     setLoading(true);
-    try {
-      if (firstStepData?.title === undefined) {
-        return;
-      }
-      const ids = selectedUsers.map(user => user.id);
-      const response = await createWorkspace.mutateAsync({
-        title: firstStepData?.title,
-        invitationUsersId: ids,
-        revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]
-      });
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao cadastrar Workspace");
-        return;
-      }
-      toast.success("Workspace cadastrada com sucesso!");
-      form.reset();
-      setSelectedUsers([]);
-      setFirstStepData(undefined);
-      setClose(false);
-      userSearchRef.current?.reset();
-    } catch (error) {
-      toast.error("Erro inesperado");
-    } finally {
-      setLoading(false);
+
+    if (firstStepData?.title === undefined) {
+      return;
     }
+    const ids = selectedUsers.map(user => user.id);
+    const response = await createWorkspace.mutateAsync({
+      title: firstStepData?.title,
+      invitationUsersId: ids,
+      revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]
+    });
+    if (!isSuccessResponse(response)) {
+      toast.error("Erro ao cadastrar Workspace");
+      return;
+    }
+    toast.success("Workspace cadastrada com sucesso!");
+    form.reset();
+    setSelectedUsers([]);
+    setFirstStepData(undefined);
+    setClose(false);
+    userSearchRef.current?.reset();
+    setLoading(false);
+    router.push(`/dashboard/workspace/${response?.data?.id}`)
   }
 
 

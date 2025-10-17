@@ -57,23 +57,19 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
       return;
     }
 
-    try {
-      const response = await createGroup.mutateAsync({
-        workspaceId: workspaceId,
-        title: formData.title,
-        textColor: formData.textColor,
-      });
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao cadastrar grupo");
-        return;
-      }
-      toast.success("Grupo cadastrado com sucesso!");
-      setAddGroup(false);
-    } catch (error) {
-      toast.error("Erro inesperado");
-    } finally {
-      setIsLoading(false);
+
+    const response = await createGroup.mutateAsync({
+      workspaceId: workspaceId,
+      title: formData.title,
+      textColor: formData.textColor,
+    });
+    if (!isSuccessResponse(response)) {
+      toast.error("Erro ao cadastrar grupo");
+      return;
     }
+    toast.success("Grupo cadastrado com sucesso!");
+    setAddGroup(false);
+    setIsLoading(false);
   }
 
   if (isLoading) {

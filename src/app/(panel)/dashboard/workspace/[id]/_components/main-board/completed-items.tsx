@@ -41,7 +41,7 @@ export function CompletedItems() {
 
   const pagination = usePagination(items ?? [], 10);
 
-  if (!items) {
+  if (!items || items.length === 0) {
     return;
   };
 
@@ -100,12 +100,14 @@ export function CompletedItems() {
                           {item.notes}
                         </p>
                       </TableCell>
-                      <TableCell className="border-x flex items-center justify-around">
-                        <Avatar>
-                          <AvatarImage src="https://lh3.googleusercontent.com/a/ACg8ocK1ykRmdptZ0O2ILjQZPecUAK03e4jIiW51WP_jLC-fti8ZXzab=s96-c" />
-                          <AvatarFallback>F</AvatarFallback>
-                        </Avatar>
-                        <div>{nameFallback("name user")}</div>
+                      <TableCell className="border-x">
+                        <div className="flex items-center gap-2 h-full w-full">
+                          <Avatar>
+                            <AvatarImage src="https://lh3.googleusercontent.com/a/ACg8ocK1ykRmdptZ0O2ILjQZPecUAK03e4jIiW51WP_jLC-fti8ZXzab=s96-c" />
+                            <AvatarFallback>F</AvatarFallback>
+                          </Avatar>
+                          <div>{nameFallback("name user")}</div>
+                        </div>
                       </TableCell>
                       <TableCell className={colorPriority(item.priority)}>
                         {item.priority}

@@ -39,6 +39,7 @@ import { WorkspaceForm } from "./workspace-form"
 import { CatalystLogo } from "@/components/catalyst-logo"
 import { WorkspaceSummaryData } from "@/app/data-access/workspace"
 import { useDeleteWorkspace } from "@/hooks/use-workspace"
+import { isSuccessResponse } from "@/lib/errors"
 
 
 type NavigationLink =
@@ -126,19 +127,18 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
 
     setDeletingWorkspaceId(workspaceId);
 
-    try {
-      const response = await deleteWorkspace.mutateAsync({ workspaceId });
-      toast.success(response.data);
-
-      // Navegação hard (força reload completo)
-      window.location.href = "/dashboard";
-
-    } catch (error) {
+    const response = await deleteWorkspace.mutateAsync({ workspaceId });
+    if (!isSuccessResponse(response)) {
       toast.error("Erro inesperado ao deletar Workspace");
       window.location.href = "/dashboard";
-    } finally {
-      setDeletingWorkspaceId(null);
+      toast.error("Erro ao deletar workspace");
+      return;
     }
+
+    toast.success(response.data);
+    window.location.href = "/dashboard";
+    setDeletingWorkspaceId(null);
+
   }, [deletingWorkspaceId, deleteWorkspace]);
 
   const isWorkspaceBeingEdited = (workspaceId: string) => {
@@ -152,8 +152,6 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
   if (!workspaces) {
     return null;
   }
-
-  const groupsCount = workspaces.map(workspace => workspace.groupsCount).reduce((acc, count) => acc + count, 0);
 
   return (
     <Sidebar>
