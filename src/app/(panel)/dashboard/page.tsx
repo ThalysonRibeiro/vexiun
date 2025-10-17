@@ -22,7 +22,7 @@ export default async function Dashboard() {
   }
 
   const workspaces = await getMyWorkspaces().then(unwrapServerData);
-  const weekSummaryDate = await getWeekSummary(session?.user?.id as string);
+  const weekSummaryDate = await getWeekSummary(session?.user?.id as string).then(unwrapServerData);
   const detailUser = await getDetailUser().then(unwrapServerData);
   if (!detailUser) { return null };
   if (!weekSummaryDate?.summary) { return null }
@@ -30,7 +30,7 @@ export default async function Dashboard() {
 
   return (
     <>
-      <LoginAlert emailNotifications={detailUser.userSettings?.emailNotifications} />
+      <LoginAlert emailNotifications={detailUser?.userSettings?.emailNotifications} />
       <main className="container mx-auto px-6 pt-10">
         <section className="flex flex-col space-y-4">
           <div>
