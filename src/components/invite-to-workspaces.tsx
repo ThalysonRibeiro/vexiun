@@ -83,7 +83,7 @@ export function InviteToWorkspace({ userId, setClose }: InviteToWorkspaceProps) 
       <DialogHeader>
         <DialogTitle>Enviar convite</DialogTitle>
         <DialogDescription>
-          Selecione a área de trabalho para enviar o convite
+          Selecione a workspace para enviar o convite
         </DialogDescription>
       </DialogHeader>
 
@@ -91,7 +91,7 @@ export function InviteToWorkspace({ userId, setClose }: InviteToWorkspaceProps) 
         <p className="text-center text-muted-foreground">Carregando...</p>
       ) : workspaces.length === 0 ? (
         <p className="text-center text-muted-foreground">
-          Nenhuma área de trabalho disponível
+          Nenhuma workspace disponível
         </p>
       ) : (
         <ul className="overflow-y-scroll max-h-96">

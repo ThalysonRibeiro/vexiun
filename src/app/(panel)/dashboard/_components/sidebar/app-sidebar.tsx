@@ -120,7 +120,7 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
   }, [editingState.workspace]);
 
   const handleDeleteWorkspace = useCallback(async (workspaceId: string) => {
-    if (!confirm('Deseja realmente deletar a área de trabalho? Todos os grupos e items serão deletados juntos.')) {
+    if (!confirm('Deseja realmente deletar a workspace? Todos os grupos e items serão deletados juntos.')) {
       return;
     }
     if (deletingWorkspaceId) return;
@@ -215,7 +215,7 @@ export function AppSidebar({ workspaces, userData }: AppSidebarProps) {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Áreas de Trabalho</SidebarGroupLabel>
+          <SidebarGroupLabel>WorkSpaces</SidebarGroupLabel>
           <SidebarGroupContent>
             {/* Add Workspace Section */}
             <div className="w-full mb-2">

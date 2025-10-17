@@ -28,9 +28,9 @@ interface DialogConfig {
 const DIALOGS: DialogConfig[] = [
   {
     type: 'project',
-    title: 'Criar área de trabalho',
+    title: 'Criar workspace',
     icon: Folder,
-    label: 'Criar área de trabalho',
+    label: 'Criar workspace',
     delay: 75,
     renderContent: (closeDialog) => <CreateWorkspace setClose={closeDialog} />,
   },
