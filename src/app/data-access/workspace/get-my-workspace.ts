@@ -28,7 +28,8 @@ export const getMyWorkspaces = withAuth(async (
               email: true,
               image: true,
             }
-          }
+          },
+          role: true
         }
       }
     },
@@ -55,7 +56,8 @@ export const getMyWorkspaces = withAuth(async (
       title: workspace.title,
       groupsCount: workspace._count.groups,
       itemsCount: totalItems,
-      members: workspace.members.map(m => m.user)
+      members: workspace.members.map(m => m.user),
+      menbersRole: workspace.members.find(m => m.user.id === userId)?.role,
     };
   });
 

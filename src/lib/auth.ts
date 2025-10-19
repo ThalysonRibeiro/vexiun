@@ -13,22 +13,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
-      }
-      const dbUser = await prisma.user.findFirst({
-        where: {
-          id: user.id,
-        },
-        include: {
-          userSettings: true,
-        }
-      });
-
-      if (!dbUser?.userSettings) {
-        await prisma.userSettings.create({
-          data: {
-            userId: user.id,
-          },
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { role: true }
         });
+        if (dbUser) {
+          session.user.role = dbUser.role;
+        }
       }
       return session;
     },

@@ -18,7 +18,7 @@ export const ErrorContent = ({
   error: Error & { digest?: string }
   reset: () => void
 }) => (
-  <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
+  <div className="flex min-h-screen items-center justify-center">
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Oops, algo deu errado!</CardTitle>
@@ -42,7 +42,6 @@ export const ErrorContent = ({
   </div>
 )
 
-// Componente principal para produção
 export default function GlobalError({
   error,
   reset,

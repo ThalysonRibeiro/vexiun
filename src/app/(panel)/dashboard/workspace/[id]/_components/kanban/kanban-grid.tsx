@@ -25,8 +25,8 @@ import { toast } from "sonner";
 export function KanbanGrid() {
   const params = useParams();
   const workspaceId = params.id as string
-  const { data, isLoading, error } = useItemsByStatus(workspaceId);
-  const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(workspaceId);
+  const { data, isLoading } = useItemsByStatus(workspaceId);
+  const { data: team, } = useTeam(workspaceId);
   const [draggedItem, setDraggedItem] = useState<ItemWhitCreatedAssignedUser | null>(null);
   const [isCloseDialog, setIsCloseDialog] = useState<boolean>(false);
   const [getStatus, setGetStatus] = useState<Status>("NOT_STARTED");

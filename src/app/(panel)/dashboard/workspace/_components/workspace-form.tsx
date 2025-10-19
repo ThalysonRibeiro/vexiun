@@ -8,36 +8,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { useEffect, useRef, useState } from "react";
+} from "@/components/ui/form";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useWorkspace, WorkspaceFormData } from "../utility-action-dashboard/use-workspace-form";
 import { useUpdateWorkspace } from "@/hooks/use-workspace";
+import { useWorkspace, WorkspaceFormData } from "../../_components/utility-action-dashboard/use-workspace-form";
+import { Button } from "@/components/ui/button";
+import { LoaderCircle } from "lucide-react";
+import { DialogClose } from "@/components/ui/dialog";
+import { isSuccessResponse } from "@/lib/errors";
 
 interface WorkspaceFormProps {
-  setAddWorkspace: (value: boolean) => boolean;
   workspaceId?: string;
   initialValues?: {
     title: string;
   }
 }
 
-
-export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: WorkspaceFormProps) {
+export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const form = useWorkspace({ initialValues: initialValues });
   const updateWorkspace = useUpdateWorkspace();
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (formRef.current && !formRef.current.contains(event.target as Node)) {
-        setAddWorkspace(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [setAddWorkspace]);
 
   async function onSubmit(formData: WorkspaceFormData) {
     setIsLoading(true);
@@ -47,16 +40,12 @@ export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: W
         workspaceId: workspaceId,
         title: formData.title
       });
+      if (!isSuccessResponse(response)) {
+        return;
+      }
       setIsLoading(false);
-      setAddWorkspace(false);
-
       toast.success(response.data);
-    }
-
-    if (isLoading) {
-      return (
-        <p>carregando...</p>
-      )
+      closeRef.current?.click();
     }
   }
 
@@ -70,10 +59,7 @@ export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: W
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  {workspaceId !== undefined
-                    ? "Atualizar Workspace"
-                    : "Adicionar Workspace"
-                  }
+                  Atualizar Workspace
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -90,6 +76,10 @@ export function WorkspaceForm({ setAddWorkspace, workspaceId, initialValues }: W
               </FormItem>
             )}
           />
+          <Button>
+            {isLoading ? <LoaderCircle className="animate-spin" /> : "Salvar"}
+          </Button>
+          <DialogClose ref={closeRef} className="hidden" />
         </form>
       </Form>
     </div>

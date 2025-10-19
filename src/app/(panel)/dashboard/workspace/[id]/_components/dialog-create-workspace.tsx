@@ -1,12 +1,5 @@
 "use client"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -19,32 +12,20 @@ import { useState } from "react"
 import { CreateWorkspace } from "../../../_components/utility-action-dashboard/create-workspace"
 
 export function DialogCreateWorkspace({
-  sidebar, isNoWorkspace = false,
+  isNoWorkspace = false,
 }: {
-  sidebar: boolean; isNoWorkspace?: boolean;
+  isNoWorkspace?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState<boolean>(isNoWorkspace)
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>
-        {sidebar ? (
-          <div className="cursor-pointer border rounded-md py-2 px-4 hover:bg-accent">
-            <div className="flex items-center justify-betweenr gap-2.5">
-              <div>Adicionar workspace</div>
-              <Plus className="w-5 h-5 opacity-25" />
-            </div>
+      <DialogTrigger className="w-full">
+        <div className="cursor-pointer border rounded-md hover:bg-accent">
+          <div className="w-full flex items-center gap-2.5 py-2 px-4">
+            <div>Nova Workspace</div>
+            <Plus className="w-5 h-5 opacity-25 ml-auto" />
           </div>
-        ) : (
-          <Card className="w-full h-full hover:border-primary/50 hover:bg-primary/20 transition-all duration-300 ease-in-out capitalize cursor-pointer">
-            <CardHeader>
-              <CardTitle>Adicionar workspace</CardTitle>
-              <CardDescription>Criar uma nova workspace</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <Plus className="w-15 h-15 opacity-25" strokeWidth={.5} />
-            </CardContent>
-          </Card>
-        )}
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

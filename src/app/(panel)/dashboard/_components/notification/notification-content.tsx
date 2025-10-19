@@ -86,7 +86,8 @@ export function NotificationContent() {
     "SISTEM_MESSAGE",
     "NOTICES_MESSAGE",
     "WORKSPACE_ACCEPTED",
-    "ITEM_COMPLETED"
+    "ITEM_COMPLETED",
+    "ITEM_ASSIGNED"
   ];
 
   return (

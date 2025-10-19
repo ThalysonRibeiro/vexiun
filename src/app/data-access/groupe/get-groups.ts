@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { PermissionError } from "@/lib/errors/custom-errors";
 import { successResponse } from "@/lib/errors/error-handler";
 import { validateWorkspaceAccess } from "@/lib/db/validators";
-import { Status } from "@/generated/prisma";
+import { Priority, Status } from "@/generated/prisma";
 import { ERROR_MESSAGES, withAuth } from "@/lib/errors";
 
 export const getGroups = withAuth(async (
@@ -53,6 +53,7 @@ export const getGroups = withAuth(async (
       select: {
         id: true,
         status: true,
+        priority: true,
         groupId: true
       }
     }),
@@ -76,9 +77,9 @@ export const getGroups = withAuth(async (
     if (!acc[groupId]) {
       acc[groupId] = [];
     }
-    acc[groupId].push({ id: item.id, status: item.status });
+    acc[groupId].push({ id: item.id, status: item.status, priority: item.priority });
     return acc;
-  }, {} as Record<string, Array<{ id: string; status: Status }>>);
+  }, {} as Record<string, Array<{ id: string; status: Status, priority: Priority }>>);
 
   // Organiza contagens por grupo e status
   const countsMap = statusCounts.reduce((acc, item) => {

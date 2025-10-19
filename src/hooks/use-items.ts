@@ -183,7 +183,7 @@ export function useAssignTo() {
     onSuccess: (result, variables) => {
       queryClient.setQueryData(["items", variables.itemId, variables.workspaceId], result.data);
       queryClient.invalidateQueries({
-        queryKey: ["items", "notifications"],
+        queryKey: ["items"],
         exact: false,
         refetchType: "active"
       })

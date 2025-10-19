@@ -7,7 +7,7 @@ import { useWorkspace, WorkspaceFormData } from "./use-workspace-form";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
 import { useCreateWorkspace } from "@/hooks/use-workspace";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export type UserSearchType = {
   id: string,
@@ -17,6 +17,7 @@ export type UserSearchType = {
 }
 
 export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => void }) {
+  const pathname = usePathname();
   const [selectedUsers, setSelectedUsers] = useState<UserSearchType[]>([]);
   const [firstStepData, setFirstStepData] = useState<WorkspaceFormData>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,7 +51,9 @@ export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => vo
     setClose(false);
     userSearchRef.current?.reset();
     setLoading(false);
-    router.push(`/dashboard/workspace/${response?.data?.id}`)
+    if (pathname !== "/dashboard/workspace") {
+      router.push(`/dashboard/workspace/${response?.data?.id}`)
+    }
   }
 
 

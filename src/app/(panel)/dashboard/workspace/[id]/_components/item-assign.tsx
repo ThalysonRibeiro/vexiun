@@ -2,19 +2,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+import { DialogClose } from "@/components/ui/dialog";
 import { useAssignTo } from "@/hooks/use-items";
 import { useTeam } from "@/hooks/use-team";
 import { isSuccessResponse } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { nameFallback } from "@/utils/name-fallback";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 
@@ -34,8 +29,9 @@ export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
   const params = useParams();
   const workspaceId = params.id as string
   const { data } = useTeam(workspaceId);
-  const [selected, setSelected] = useState<TeamUser>();
+  const [selected, setSelected] = useState<TeamUser | null>();
   const assignTo = useAssignTo();
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   const handleAssign = async () => {
     const result = await assignTo.mutateAsync({
@@ -48,28 +44,19 @@ export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
       toast.error("Erro ao designar item");
     }
     toast.success("Item designado com sucesso!");
+    setSelected(null);
+    closeRef.current?.click();
   }
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>
-          Membros da equipe
-        </DialogTitle>
-        <DialogDescription>
-          Selecione um membro da equipe que será responsável por esteo item
-        </DialogDescription>
-      </DialogHeader>
-
+    <>
       <div className="flex flex-wrap gap-2 overflow-y-scroll max-h-80">
-        {data?.map(menber => (
+        {data?.filter(u => u.id !== assignedToUser?.id).map(menber => (
           <button key={menber.id}
             onClick={() => setSelected(menber)}
             className={cn("bg-accent rounded-full w-fit flex items-center gap-2 pr-3 cursor-pointer",
               "transition-colors duration-300",
-              selected?.id === menber.id
-              || assignedToUser?.id === menber.id
-              && "bg-primary text-white"
+              selected?.id === menber.id && "bg-primary text-white",
             )}
           >
             <Avatar>
@@ -85,6 +72,7 @@ export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
       <Button onClick={handleAssign}>
         Designar
       </Button>
-    </DialogContent>
+      <DialogClose ref={closeRef} className="hidden" />
+    </>
   )
 }

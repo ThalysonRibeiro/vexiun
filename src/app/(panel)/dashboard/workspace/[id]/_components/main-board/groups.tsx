@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { GroupProgressBar } from "./group-progress-bar";
+import { GroupPriorityBar, GroupProgressBar } from "./group-progress-bar";
 import { CompletedItems } from "./completed-items";
 import { GroupsData, useDeleteGroup } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";
@@ -82,7 +82,7 @@ export function Groups({
 
   return (
     <div className="space-y-6 mb-6">
-      {data?.group.length === 0 && <h2>Cadastre um grupo</h2>}
+      {data?.group.length === 0 && <h2 className="text-center">Cadastre um group</h2>}
       {/* Botão/Formulário para adicionar novo grupo */}
       <div className="pt-4 border-t border-gray-200">
         {isAddingGroup ? (
@@ -151,14 +151,21 @@ export function Groups({
                     <button onClick={() => toggleDropdown(group.id)}>
                       <ChevronDown className={cn("cursor-pointer transition-all duration-300", isGroupOpen && "-rotate-90")} />
                     </button>
-                    <div className="w-full max-w-40 ml-auto">
-                      <GroupProgressBar items={group.item} />
+                    <div className="w-full flex flex-col md:flex-row space-x-2 max-w-50 ml-auto">
+                      <div className="w-full">
+                        <span className="text-[10px]">Prioridade</span>
+                        <GroupPriorityBar items={group.item} />
+                      </div>
+                      <div className="w-full">
+                        <span className="text-[10px]">Status</span>
+                        <GroupProgressBar items={group.item} />
+                      </div>
                     </div>
                   </div>
 
                   {/* Conteúdo do grupo */}
                   <Collapsible
-                    className="ml-6 space-y-4 border-l pl-4"
+                    className="ml-1 space-y-4 border-l pl-4"
                     open={isGroupOpen}
                     style={{ borderColor: group.textColor }}
                   >

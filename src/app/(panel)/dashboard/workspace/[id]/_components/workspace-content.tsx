@@ -1,25 +1,19 @@
 "use client"
-import { useState } from "react";
-import { Header } from "../../_components/header";
 import { Team } from "./team";
 import { Groups } from "./main-board/groups";
-import { PrioritiesCount, StatusCount } from "@/app/data-access/item";
 import { KanbanGrid } from "./kanban/kanban-grid";
 import { GroupsData } from "@/hooks/use-groups";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface WorkspaceContentProps {
   groupsData: GroupsData;
   workspaceId: string;
-  prioritiesData: PrioritiesCount[];
-  statusData: StatusCount[];
 }
 
-export type TabKey = "main-board" | "kanban" | "calendar" | "team";
 export function WorkspaceContent({
-  groupsData, workspaceId, prioritiesData, statusData
+  groupsData, workspaceId
 }: WorkspaceContentProps
 ) {
-  const [activeTab, setActiveTab] = useState<TabKey | string>("main-board");
 
   const tabsConfig = [
     {
@@ -30,7 +24,11 @@ export function WorkspaceContent({
     {
       key: "kanban",
       label: "Kanban",
-      component: <KanbanGrid />
+      component: <div>
+        {groupsData?.group.length !== 0
+          ? < KanbanGrid />
+          : <h2 className="text-center">Cadastre um group</h2>}
+      </div>
     },
     {
       key: "team",
@@ -39,9 +37,17 @@ export function WorkspaceContent({
     },
   ];
   return (
-    <section className="space-y-6">
-      <Header tabs={tabsConfig} activeTab={activeTab} onTabChange={setActiveTab} prioritiesData={prioritiesData} statusData={statusData} />
-      {tabsConfig.find(tab => tab.key === activeTab)?.component}
-    </section>
+    <Tabs defaultValue="main-board" className="w-full mt-6 md:ml-4">
+      <TabsList className="">
+        {tabsConfig.map(tab => (
+          <TabsTrigger key={tab.key} value={tab.key}>
+            {tab.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {tabsConfig.map(tab => (
+        <TabsContent key={tab.key} value={tab.key}>{tab.component}</TabsContent>
+      ))}
+    </Tabs>
   )
 }

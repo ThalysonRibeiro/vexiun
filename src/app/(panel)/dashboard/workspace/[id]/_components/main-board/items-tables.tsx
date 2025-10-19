@@ -83,6 +83,7 @@ interface DialogStateProps {
 }
 
 export function ItemsTables({ groupId, team }: ItemsTablesProps) {
+  const [dialogMenber, setDialogMenber] = useState<boolean>(false);
   const [dialogState, setDialogState] = useState<DialogStateProps>({
     isOpen: false,
     itemId: null,
@@ -204,7 +205,7 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
       toast.error("Erro ao atualizar item");
     }
     toast.success("Item atualizado!");
-
+    setIsLoading(null);
 
   }, [updateItem]);
 
@@ -329,36 +330,38 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
               const titleCapitalized = item.title[0].toUpperCase() + item.title.slice(1);
               return (
                 <TableRow key={item.id} className={isLoading === item.id ? 'opacity-50' : ''}>
-                  <TableCell className="flex items-center justify-between min-w-30 w-full">
-                    {renderEditableCell(item, 'title', titleCapitalized)}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="cursor-pointer">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="space-y-1">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <Sheet>
+                  <TableCell>
+                    <div className="flex items-center justify-between min-w-30 w-full">
+                      {renderEditableCell(item, 'title', titleCapitalized)}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="cursor-pointer">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="space-y-1">
+                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <Sheet>
+                            <DropdownMenuItem
+                              asChild
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              <SheetTrigger className="flex items-center gap-2 cursor-pointer w-full">
+                                <Eye className="h-4 w-4" /> Visualizar
+                              </SheetTrigger>
+                            </DropdownMenuItem>
+                            <InfoItem data={item} team={team} />
+                          </Sheet>
                           <DropdownMenuItem
-                            asChild
-                            onSelect={(e) => e.preventDefault()}
+                            variant="destructive"
+                            disabled={isLoading === item.id}
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="cursor-pointer"
                           >
-                            <SheetTrigger className="flex items-center gap-2 cursor-pointer w-full">
-                              <Eye className="h-4 w-4" /> Visualizar
-                            </SheetTrigger>
+                            <Trash className="h-4 w-4" /> Deletar
                           </DropdownMenuItem>
-                          <InfoItem data={item} team={team} />
-                        </Sheet>
-                        <DropdownMenuItem
-                          variant="destructive"
-                          disabled={isLoading === item.id}
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="cursor-pointer"
-                        >
-                          <Trash className="h-4 w-4" /> Deletar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
 
                   <TableCell className="max-w-90 border-l">
@@ -455,8 +458,11 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
 
                   <TableCell className="border-x" title="Para trocar de responsável edite o item">
                     <Dialog>
-                      <DialogTrigger className="cursor-pointer" title="Clique pra designar um membro da equipe">
-                        <div className="flex items-center gap-2 h-full w-full ">
+                      <DialogTrigger
+                        className="cursor-pointer"
+                        title="Clique pra designar um membro da equipe"
+                      >
+                        <div className="flex items-center gap-2 h-full w-full">
                           <Avatar>
                             <AvatarImage src={item.assignedToUser?.image as string} />
                             <AvatarFallback>
@@ -466,8 +472,23 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
                           <span>{item.assignedToUser?.name?.split(" ")[0] ?? "CATALYST"}</span>
                         </div>
                       </DialogTrigger>
-                      <ItemAssign itemId={item.id} assignedToUser={item.assignedToUser} />
+
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            Membros da equipe
+                          </DialogTitle>
+                          <DialogDescription>
+                            Selecione um membro da equipe que será responsável por esteo item
+                          </DialogDescription>
+                        </DialogHeader>
+                        <ItemAssign
+                          itemId={item.id}
+                          assignedToUser={item.assignedToUser}
+                        />
+                      </DialogContent>
                     </Dialog>
+
 
                   </TableCell>
 
@@ -673,76 +694,78 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
                     </div>
                   </TableCell>
 
-                  <TableCell className="border-l flex items-center justify-center">
-                    <Dialog
-                      open={dialogState.isOpen && dialogState.itemId === item.id}
-                      onOpenChange={(open) => {
-                        if (open) {
-                          setDialogState({
-                            isOpen: true,
-                            itemId: item.id,
-                            isEditing: false,
-                            content: (item.details as JSONContent) ?? {}
-                          });
-                        } else {
-                          setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
-                        }
-                      }}
-                    >
-                      <DialogTrigger className="cursor-pointer flex items-center gap-2 hover:bg-accent p-1 rounded transition-colors group">
-                        <Eye className="h-4 w-4" /> Visualizar
-                      </DialogTrigger>
-                      <DialogContent
-                        className="min-h-50 max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-hidden"
+                  <TableCell className="border-l">
+                    <div className="flex items-center justify-center">
+                      <Dialog
+                        open={dialogState.isOpen && dialogState.itemId === item.id}
+                        onOpenChange={(open) => {
+                          if (open) {
+                            setDialogState({
+                              isOpen: true,
+                              itemId: item.id,
+                              isEditing: false,
+                              content: (item.details as JSONContent) ?? {}
+                            });
+                          } else {
+                            setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
+                          }
+                        }}
                       >
-                        <DialogHeader>
-                          <DialogTitle>Detalhes do item</DialogTitle>
-                          <DialogDescription>
-                            {dialogState.isEditing
-                              ? "Editando detalhes - suas alterações não foram salvas"
-                              : `Visualizando detalhes de ${item.title || 'item'}`}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="pb-6 w-full overflow-y-scroll min-h-50 max-h-120">
-                          <DetailsEditor
-                            autofocus={true}
-                            editable={dialogState.isEditing}
-                            content={dialogState.content ?? {}}
-                            onContentChange={(newContent) => {
-                              setDialogState(prev => ({ ...prev, content: newContent }));
-                            }}
-                          />
-                        </div>
-                        <div className="flex justify-end gap-2 border-t pt-4">
-                          {!dialogState.isEditing ? (
-                            <Button onClick={() => setDialogState(prev => ({ ...prev, isEditing: true }))}>
-                              Editar
-                            </Button>
-                          ) : (
-                            <>
-                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                  setDialogState(prev => ({
-                                    ...prev,
-                                    isEditing: false,
-                                    content: (item.details as JSONContent) ?? {}
-                                  }));
-                                }}
-                              >
-                                Cancelar
+                        <DialogTrigger className="cursor-pointer flex items-center gap-2 hover:bg-accent p-1 rounded transition-colors group">
+                          <Eye className="h-4 w-4" /> Visualizar
+                        </DialogTrigger>
+                        <DialogContent
+                          className="min-h-50 max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-hidden"
+                        >
+                          <DialogHeader>
+                            <DialogTitle>Detalhes do item</DialogTitle>
+                            <DialogDescription>
+                              {dialogState.isEditing
+                                ? "Editando detalhes - suas alterações não foram salvas"
+                                : `Visualizando detalhes de ${item.title || 'item'}`}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="pb-6 w-full overflow-y-scroll min-h-50 max-h-120">
+                            <DetailsEditor
+                              autofocus={true}
+                              editable={dialogState.isEditing}
+                              content={dialogState.content ?? {}}
+                              onContentChange={(newContent) => {
+                                setDialogState(prev => ({ ...prev, content: newContent }));
+                              }}
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2 border-t pt-4">
+                            {!dialogState.isEditing ? (
+                              <Button onClick={() => setDialogState(prev => ({ ...prev, isEditing: true }))}>
+                                Editar
                               </Button>
-                              <Button
-                                onClick={() => handleSaveDetails(item)}
-                                disabled={isLoading === item.id}
-                              >
-                                Salvar
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                            ) : (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setDialogState(prev => ({
+                                      ...prev,
+                                      isEditing: false,
+                                      content: (item.details as JSONContent) ?? {}
+                                    }));
+                                  }}
+                                >
+                                  Cancelar
+                                </Button>
+                                <Button
+                                  onClick={() => handleSaveDetails(item)}
+                                  disabled={isLoading === item.id}
+                                >
+                                  Salvar
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </TableCell>
                 </TableRow>
               );

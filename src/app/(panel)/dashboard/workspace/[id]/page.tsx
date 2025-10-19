@@ -2,9 +2,7 @@ import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { WorkspaceContent } from "./_components/workspace-content";
 import { getGroups } from "@/app/data-access/groupe";
-import { getPriorities, getStatus } from "@/app/data-access/item";
 import { unwrapServerData } from "@/utils/server-helpers";
-
 
 export default async function WorkspacePage({
   params,
@@ -20,16 +18,12 @@ export default async function WorkspacePage({
 
   try {
     const groupsData = await getGroups(workspaceId).then(unwrapServerData);
-    const prioritiesData = await getPriorities(workspaceId).then(unwrapServerData);
-    const statusData = await getStatus(workspaceId).then(unwrapServerData);
 
     return (
       <main className="container mx-auto px-6 pt-6">
         <WorkspaceContent
           groupsData={groupsData}
           workspaceId={workspaceId}
-          prioritiesData={prioritiesData}
-          statusData={statusData}
         />
       </main>
     )

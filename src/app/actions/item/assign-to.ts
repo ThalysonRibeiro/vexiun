@@ -44,14 +44,16 @@ export const assignTo = withAuth(
       }
     });
 
-    await createAndSendNotification({
-      userId: formData.assignedTo,
-      type: "ITEM_ASSIGNED",
-      message: notificationMessages.ITEM_ASSIGNED(session?.user?.name as string, result.title),
-      referenceId: formData.itemId,
-      image: session?.user?.image as string,
-      nameReference: session?.user?.name as string,
-    })
+    if (formData.assignedTo && formData.assignedTo !== session?.user?.id) {
+      await createAndSendNotification({
+        userId: formData.assignedTo,
+        type: "ITEM_ASSIGNED",
+        message: notificationMessages.ITEM_ASSIGNED(session?.user?.name as string, result.title),
+        referenceId: formData.itemId,
+        image: session?.user?.image as string,
+        nameReference: session?.user?.name as string,
+      });
+    }
 
     return successResponse(result);
   },
