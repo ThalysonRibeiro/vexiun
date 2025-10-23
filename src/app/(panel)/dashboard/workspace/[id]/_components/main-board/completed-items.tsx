@@ -32,6 +32,7 @@ import { JSONContent } from "@tiptap/core";
 import { nameFallback } from "@/utils/name-fallback";
 import { useCompletedItems, useItems } from "@/hooks/use-items";
 import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function CompletedItems() {
   const params = useParams();
@@ -56,13 +57,17 @@ export function CompletedItems() {
         <h3 className="text-green-500 text-lg font-bold">Concluídos: <span className="text-sm font-normal">
           ({items?.length})</span>
         </h3>
-        <button className="cursor-pointer" onClick={() => setIsOpen(prev => !prev)}>
+        <Button
+          variant="ghost" size="icon"
+          className="cursor-pointer text-green-500"
+          onClick={() => setIsOpen(prev => !prev)}
+        >
           <ChevronDown className={cn("cursor-pointer transition-all duration-300", isOpen && "-rotate-90")} />
-        </button>
+        </Button>
       </div>
       <Collapsible
         open={isOpen}
-        className="ml-6 space-y-4 border-l border-green-500 pl-4">
+        className="ml-1 space-y-4 border-l border-green-500 pl-4">
         <CollapsibleContent>
 
           <div className="w-full overflow-x-auto border rounded-lg">

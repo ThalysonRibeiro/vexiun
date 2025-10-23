@@ -1,8 +1,15 @@
-import { createItem, CreateItemType, deleteItem, DeleteItemType, updateItem, UpdateItemType } from "@/app/actions/item";
+import {
+  createItem,
+  CreateItemType,
+  deleteItem,
+  DeleteItemType,
+  updateItem,
+  UpdateItemType
+} from "@/app/actions/item";
 import { assignTo, AssignToType } from "@/app/actions/item/assign-to";
 import {
+  getAssociatedWithMember,
   getCompletedItems,
-  getItemsAssignedToUser,
   getItemsByStatus,
   getPublicItems
 } from "@/app/data-access/item";
@@ -96,14 +103,14 @@ export function useItemsByStatus(workspaceId: string) {
 }
 
 
-export type ItemAssignedToUserResult = Awaited<ReturnType<typeof getItemsAssignedToUser>>;
-export type ItemAssignedToUserData = Extract<ItemAssignedToUserResult, { success: true }>['data'];
+export type ItemsAssociatedWithMemberResult = Awaited<ReturnType<typeof getAssociatedWithMember>>;
+export type ItemsAssociatedWithMemberData = Extract<ItemsAssociatedWithMemberResult, { success: true }>['data'];
 
-export function useItemsAssignedToUser(assignedTo: string) {
-  return useQuery<ItemAssignedToUserData>({
-    queryKey: ["items", "assigned-to-user", assignedTo] as const,
+export function useItemsAssociatedWithMember(workspaceId: string, memberId: string) {
+  return useQuery<ItemsAssociatedWithMemberData>({
+    queryKey: ["items", "associated-with-member", workspaceId, memberId] as const,
     queryFn: async () => {
-      const result = await getItemsAssignedToUser(assignedTo);
+      const result = await getAssociatedWithMember(workspaceId, memberId);
 
       if (!isSuccessResponse(result)) {
         throw new Error(result.error);
@@ -111,8 +118,31 @@ export function useItemsAssignedToUser(assignedTo: string) {
 
       return result.data;
     },
-    enabled: !!assignedTo,
+    enabled: !!workspaceId && !!memberId,
+    refetchOnWindowFocus: true
   });
+}
+
+export function usePrefetchMemberItems() {
+  const queryClient = useQueryClient();
+
+  const prefetch = (workspaceId: string, memberId: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ["items", "associated-with-member", workspaceId, memberId] as const,
+      queryFn: async () => {
+        const result = await getAssociatedWithMember(workspaceId, memberId);
+
+        if (!isSuccessResponse(result)) {
+          throw new Error(result.error);
+        }
+
+        return result.data;
+      },
+      staleTime: 5 * 60 * 1000, // Cache por 5min
+    });
+  };
+
+  return { prefetch };
 }
 
 export function useInvalidateItems() {

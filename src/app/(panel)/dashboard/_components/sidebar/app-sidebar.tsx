@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { FaTasks } from "react-icons/fa"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { CatalystLogo } from "@/components/catalyst-logo"
-import { WorkspaceSummaryData } from "@/app/data-access/workspace"
+import { SharedWorkspacesData, WorkspaceSummaryData } from "@/app/data-access/workspace"
 import { Prisma } from "@/generated/prisma"
 import { BadgeWorkspace } from "@/components/badge-workspace"
 
@@ -71,7 +71,7 @@ const navigationLinks: NavigationLink[] = [
 
 interface AppSidebarProps {
   workspaces: WorkspaceSummaryData;
-  sharedWorkspaces: WorkspacesMenberWithWorkspace[];
+  sharedWorkspaces: SharedWorkspacesData;
   userData: Session;
 }
 
@@ -123,7 +123,7 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
                             <SidebarMenuItem
                               key={sublink.title}
                               className={cn("",
-                                pathname === sublink.url && "border border-primary rounded-md")}
+                                pathname === sublink.url && "bg-primary rounded-md")}
                             >
                               <SidebarMenuButton asChild>
                                 <Link href={sublink.url}>
@@ -138,7 +138,7 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
                   ) : (
                     <SidebarMenuItem
                       className={cn("",
-                        pathname === link.url && "border border-primary rounded-md")}
+                        pathname === link.url && "bg-primary rounded-md")}
                     >
                       <SidebarMenuButton asChild>
                         <Link href={link.url}>
@@ -160,17 +160,19 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
           <SidebarGroupContent>
 
             <SidebarMenu>
-              {sharedWorkspaces.map((shared) => (
-                <div key={shared.workspace.id}>
+              {sharedWorkspaces?.map((shared) => (
+                <div key={shared.id}>
                   <SidebarMenuItem>
                     <div className={cn("flex items-center w-full",
-                      pathname === `/dashboard/workspace/${shared.workspace.id}` && "border border-primary rounded-md")
+                      pathname === `/dashboard/workspace/${shared.id}` && "bg-primary rounded-md")
                     }>
                       <SidebarMenuButton asChild className="flex-1">
-                        <Link href={`/dashboard/workspace/${shared.workspace.id}`}>
+                        <Link href={`/dashboard/workspace/${shared.id}`}>
                           <Dock className="h-4 w-4" />
-                          <span className="truncate">{shared.workspace.title}</span>
-                          <BadgeWorkspace role={shared.role} className="ml-auto" />
+                          <span className="truncate">{shared.title}</span>
+                          {shared.menbersRole && (
+                            <BadgeWorkspace role={shared.menbersRole} className="ml-auto" />
+                          )}
                         </Link>
                       </SidebarMenuButton>
 

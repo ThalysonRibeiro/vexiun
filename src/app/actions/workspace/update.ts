@@ -10,13 +10,37 @@ import {
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { validateWorkspaceExists } from "@/lib/db/validators";
+import { WorkspaceCategory } from "@/generated/prisma";
 
 const formSchema = z.object({
   workspaceId: z.string()
     .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  title: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  invitationUsersId: z.array(z
+    .string()
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID))
+    .optional(),
+  description: z.string().optional(),
+  categories: z.array(z.enum([
+    WorkspaceCategory.PERSONAL,
+    WorkspaceCategory.WORK,
+    WorkspaceCategory.EDUCATION,
+    WorkspaceCategory.HEALTH,
+    WorkspaceCategory.FINANCE,
+    WorkspaceCategory.CREATIVE,
+    WorkspaceCategory.TECHNOLOGY,
+    WorkspaceCategory.MARKETING,
+    WorkspaceCategory.SALES,
+    WorkspaceCategory.SUPPORT,
+    WorkspaceCategory.OTHER,
+  ]), {
+    required_error: ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD,
+    invalid_type_error: ERROR_MESSAGES.VALIDATION.INVALID_FORMAT
+  }),
 });
+
 
 export type UpdateWorkspaceType = z.infer<typeof formSchema>;
 
@@ -32,7 +56,11 @@ export const updateWorkspace = withAuth(async (
   const existingWorkspace = await validateWorkspaceExists(formData.workspaceId);
   await prisma.workspace.update({
     where: { id: existingWorkspace.id },
-    data: { title: formData.title }
+    data: {
+      title: formData.title,
+      description: formData.description,
+      categories: formData.categories,
+    }
   });
   revalidatePath("/dashboard");
   return successResponse("Workspace atualizada com sucesso!");

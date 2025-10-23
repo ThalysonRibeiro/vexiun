@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Plus, Trash } from "lucide-react";
+import { Archive, ChevronDown, Edit, Ellipsis, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { GroupForm } from "./group-form";
 import { toast } from "sonner";
@@ -17,11 +17,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils";
 import { GroupPriorityBar, GroupProgressBar } from "./group-progress-bar";
 import { CompletedItems } from "./completed-items";
 import { GroupsData, useDeleteGroup } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";
+import { Badge } from "@/components/ui/badge";
 
 export function Groups({
   data, workspaceId,
@@ -94,7 +103,6 @@ export function Groups({
           <Button
             onClick={() => setIsAddingGroup(true)}
             variant="outline"
-            className="border-dashed text-gray-600 hover:text-green-600 hover:border-green-300 cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-2" />
             Novo grupo
@@ -108,117 +116,138 @@ export function Groups({
 
           return (
             <div key={group.id} className="space-y-4">
-              {editingGroupId === group.id ? (
-                <GroupForm
-                  workspaceId={workspaceId}
-                  setAddGroup={closeEditForm}
-                  groupId={group.id}
-                  initialValues={{
-                    title: group.title,
-                    textColor: group.textColor
-                  }}
-                />
-              ) : (
-                <>
-                  {/* Cabeçalho do grupo */}
-                  <div className="flex items-center gap-3 mb-4 w-full">
-                    <h2
-                      className="font-bold cursor-pointer hover:opacity-80 transition-opacity"
-                      style={{ color: group.textColor }}
-                      onClick={() => handleEditGroup(group.id)}
-                      title="Clique para editar"
-                    >
-                      <span className="capitalize">
-                        {group.title[0]}
-                      </span>
-                      {group.title.slice(1)}
-                    </h2>
-                    <span
-                      className="text-sm font-normal"
-                      style={{ color: group.textColor }}
-                    >
-                      ({group.doneCount}/{group.pendingCount})
-                    </span>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="cursor-pointer border-dashed text-gray-600 hover:text-red-600 hover:border-red-300"
-                      onClick={() => handleDeleteGroup(group.id)}
-                      title="Deletar grupo"
-                    >
-                      <Trash className="h-4 w-4" />
+
+              {/* Cabeçalho do grupo */}
+              <div className="flex items-center gap-3 mb-4 w-full">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size={"icon"} variant={"ghost"} className="cursor-pointer">
+                      <Ellipsis />
                     </Button>
-                    <button onClick={() => toggleDropdown(group.id)}>
-                      <ChevronDown className={cn("cursor-pointer transition-all duration-300", isGroupOpen && "-rotate-90")} />
-                    </button>
-                    <div className="w-full flex flex-col md:flex-row space-x-2 max-w-50 ml-auto">
-                      <div className="w-full">
-                        <span className="text-[10px]">Prioridade</span>
-                        <GroupPriorityBar items={group.item} />
-                      </div>
-                      <div className="w-full">
-                        <span className="text-[10px]">Status</span>
-                        <GroupProgressBar items={group.item} />
-                      </div>
-                    </div>
-                  </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel> Opções</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <Archive /> Arquivar
+                    </DropdownMenuItem>
 
-                  {/* Conteúdo do grupo */}
-                  <Collapsible
-                    className="ml-1 space-y-4 border-l pl-4"
-                    open={isGroupOpen}
-                    style={{ borderColor: group.textColor }}
+                    <DropdownMenuItem
+                      onClick={() => handleEditGroup(group.id)}
+                    >
+                      <Edit /> Editar nome
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDeleteGroup(group.id)}
+                      variant="destructive"
+                    >
+                      <Trash /> Deletar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {editingGroupId === group.id ? (
+                  <GroupForm
+                    workspaceId={workspaceId}
+                    setAddGroup={closeEditForm}
+                    groupId={group.id}
+                    initialValues={{
+                      title: group.title,
+                      textColor: group.textColor
+                    }}
+                  />
+                ) : (
+                  <h2
+                    className="font-bold cursor-pointer hover:opacity-80 transition-opacity"
+                    style={{ color: group.textColor }}
+                    onClick={() => handleEditGroup(group.id)}
+                    title="Clique para editar"
                   >
-                    <CollapsibleContent>
-                      <ItemsTables groupId={group.id} team={team ?? []} />
+                    <span className="capitalize">
+                      {group.title[0]}
+                    </span>
+                    {group.title.slice(1)}
+                  </h2>
+                )}
+                <Badge
+                  style={{ background: group.textColor }}
+                >
+                  {group.doneCount}/{group.pendingCount}
+                </Badge>
+                <Button
+                  className="cursor-pointer"
+                  variant="ghost" size="icon"
+                  onClick={() => toggleDropdown(group.id)}
+                  style={{ color: group.textColor }}
+                >
+                  <ChevronDown className={cn("transition-all duration-300 ", isGroupOpen && "-rotate-90")} />
+                </Button>
 
-                      <Dialog
-                        open={openDialogs.has(group.id)}
-                        onOpenChange={(open) => {
+                <div className="w-full flex flex-col md:flex-row space-x-2 max-w-50 ml-auto">
+                  <div className="w-full">
+                    <span className="text-[10px]">Prioridade</span>
+                    <GroupPriorityBar items={group.item} />
+                  </div>
+                  <div className="w-full">
+                    <span className="text-[10px]">Status</span>
+                    <GroupProgressBar items={group.item} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Conteúdo do grupo */}
+              <Collapsible
+                className="ml-1 space-y-4 border-l pl-4"
+                open={isGroupOpen}
+                style={{ borderColor: group.textColor }}
+              >
+                <CollapsibleContent>
+                  <ItemsTables groupId={group.id} team={team ?? []} />
+
+                  <Dialog
+                    open={openDialogs.has(group.id)}
+                    onOpenChange={(open) => {
+                      setOpenDialogs(prev => {
+                        const newSet = new Set(prev);
+                        if (open) {
+                          newSet.add(group.id);
+                        } else {
+                          newSet.delete(group.id);
+                        }
+                        return newSet;
+                      });
+                    }}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Novo item
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="min-h-[400px] max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-y-scroll">
+                      <DialogHeader>
+                        <DialogTitle>Cadastrar novo item</DialogTitle>
+                      </DialogHeader>
+                      <CreateOrEditItemForm
+                        groupId={group.id}
+                        closeForm={() => {
                           setOpenDialogs(prev => {
                             const newSet = new Set(prev);
-                            if (open) {
-                              newSet.add(group.id);
-                            } else {
-                              newSet.delete(group.id);
-                            }
+                            newSet.delete(group.id);
                             return newSet;
                           });
                         }}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="border-dashed text-gray-600 hover:text-blue-600 hover:border-blue-300 cursor-pointer mt-3"
-                            size="sm"
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Novo item
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="min-h-[400px] max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-y-scroll">
-                          <DialogHeader>
-                            <DialogTitle>Cadastrar novo item</DialogTitle>
-                          </DialogHeader>
-                          <CreateOrEditItemForm
-                            groupId={group.id}
-                            closeForm={() => {
-                              setOpenDialogs(prev => {
-                                const newSet = new Set(prev);
-                                newSet.delete(group.id);
-                                return newSet;
-                              });
-                            }}
-                            editingItem={false}
-                            team={team ?? []}
-                          />
-                        </DialogContent>
-                      </Dialog>
+                        editingItem={false}
+                        team={team ?? []}
+                      />
+                    </DialogContent>
+                  </Dialog>
 
-                    </CollapsibleContent>
-                  </Collapsible>
-                </>
-              )}
+                </CollapsibleContent>
+              </Collapsible>
+
             </div>
           );
         })}

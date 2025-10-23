@@ -1,8 +1,45 @@
-import { CheckCircle, ListTodo, Settings } from "lucide-react";
+import { WorkspaceCategory } from "@/generated/prisma";
+import {
+  User, Briefcase, GraduationCap, Heart, DollarSign,
+  Palette, Cpu, Megaphone, TrendingUp, Headphones, MoreHorizontal,
+  LucideIcon
+} from "lucide-react"
 
 export const APP_NAME = "Catalyst";
 export const APP_DESCRIPTION = "Accelerate your team's productivity";
 export const APP_TAGLINE = "Where collaboration meets velocity";
+
+export const CATEGORIES_ARRAY: {
+  id: WorkspaceCategory,
+  label: string,
+  icon: LucideIcon
+}[] = [
+    { id: "PERSONAL", label: "Pessoal", icon: User },
+    { id: "WORK", label: "Trabalho", icon: Briefcase },
+    { id: "EDUCATION", label: "Educação", icon: GraduationCap },
+    { id: "HEALTH", label: "Saúde", icon: Heart },
+    { id: "FINANCE", label: "Finanças", icon: DollarSign },
+    { id: "CREATIVE", label: "Criativo", icon: Palette },
+    { id: "TECHNOLOGY", label: "Tecnologia", icon: Cpu },
+    { id: "MARKETING", label: "Marketing", icon: Megaphone },
+    { id: "SALES", label: "Vendas", icon: TrendingUp },
+    { id: "SUPPORT", label: "Suporte", icon: Headphones },
+    { id: "OTHER", label: "Outros", icon: MoreHorizontal },
+  ];
+
+export const CATEGORIES_MAP = {
+  PERSONAL: "Pessoal",
+  WORK: "Trabalho",
+  EDUCATION: "Educação",
+  HEALTH: "Saúde",
+  FINANCE: "Finanças",
+  CREATIVE: "Criativo",
+  TECHNOLOGY: "Tecnologia",
+  MARKETING: "Marketing",
+  SALES: "Vendas",
+  SUPPORT: "Suporte",
+  OTHER: "Outros",
+}
 
 export const UI_LABELS = {
   ASSIGN: "Atribuir",

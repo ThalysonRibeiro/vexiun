@@ -13,7 +13,7 @@ interface CardUserProps {
 
 export function CardUser({ user }: { user: CardUserProps }) {
   return (
-    <Card key={user.id} className="hover:shadow-lg hover:border-primary/50 hover:bg-primary/20 transition-all duration-300 ease-in-out">
+    <Card key={user.id} className="hover:shadow-lg hover:border-primary/50 hover:bg-primary/20 transition-all duration-300 ease-in-out p-2">
       <CardContent>
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">

@@ -3,11 +3,14 @@ import { useRef, useState } from "react";
 import { Step, Stepper } from "@/components/ui/stepper";
 import { toast } from "sonner";
 import { WorkspaceStepForm } from "./workspace-step-form";
-import { useWorkspace, WorkspaceFormData } from "./use-workspace-form";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
-import { useCreateWorkspace } from "@/hooks/use-workspace";
+import {
+  useCreateWorkspace,
+  useWorkspaceForm,
+} from "@/hooks/use-workspace";
 import { usePathname, useRouter } from "next/navigation";
+import { WorkspaceFormData } from "@/app/actions/workspace";
 
 export type UserSearchType = {
   id: string,
@@ -22,7 +25,7 @@ export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => vo
   const [firstStepData, setFirstStepData] = useState<WorkspaceFormData>();
   const [loading, setLoading] = useState<boolean>(false);
   const userSearchRef = useRef<UserSearchRef>(null);
-  const form = useWorkspace({});
+  const form = useWorkspaceForm({});
   const createWorkspace = useCreateWorkspace();
   const router = useRouter();
 
@@ -37,6 +40,8 @@ export function CreateWorkspace({ setClose }: { setClose: (value: boolean) => vo
     const ids = selectedUsers.map(user => user.id);
     const response = await createWorkspace.mutateAsync({
       title: firstStepData?.title,
+      description: firstStepData?.description,
+      categories: firstStepData?.categories,
       invitationUsersId: ids,
       revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]
     });

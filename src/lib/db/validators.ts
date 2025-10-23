@@ -42,7 +42,7 @@ export async function validateGroupExists(groupId: string) {
 export async function validateWorkspaceExists(workspaceId: string) {
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
-    select: { id: true, title: true },
+    select: { id: true, title: true, status: true, userId: true },
   });
 
   if (!workspace) {

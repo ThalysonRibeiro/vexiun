@@ -1,21 +1,29 @@
 "use server";
+import { EntityStatus } from "@/generated/prisma";
 import { ERROR_MESSAGES, successResponse, withAuth } from "@/lib/errors";
 import prisma from "@/lib/prisma";
 
 export type WorkspaceSummaryResponse = Awaited<ReturnType<typeof getMyWorkspaces>>;
-export type WorkspaceSummaryData = Extract<WorkspaceSummaryResponse, { success: true }>['data']
+export type WorkspaceSummaryData = Extract<WorkspaceSummaryResponse, { success: true }>['data'];
 
 export const getMyWorkspaces = withAuth(async (
   userId,
   session,
-  cursor?: string, take = 50) => {
+  includeStatus?: EntityStatus[],
+  cursor?: string,
+  take = 50
+) => {
+  const statusFilter = includeStatus || ['ACTIVE'];
 
   const workspaces = await prisma.workspace.findMany({
-    where: { userId },
+    where: {
+      userId,
+      status: { in: statusFilter }
+    },
     include: {
       _count: {
         select: {
-          groups: true,
+          groups: { where: { status: 'ACTIVE' } },
           members: true,
         },
       },
@@ -33,7 +41,7 @@ export const getMyWorkspaces = withAuth(async (
         }
       }
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { lastActivityAt: "desc" },
     take,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
   });
@@ -54,8 +62,15 @@ export const getMyWorkspaces = withAuth(async (
     return {
       id: workspace.id,
       title: workspace.title,
+      description: workspace.description,
+      categories: workspace.categories,
+      statusChangedAt: workspace.statusChangedAt,
+      statusChangedBy: workspace.statusChangedBy,
+      lastActivityAt: workspace.lastActivityAt,
+      status: workspace.status,
       groupsCount: workspace._count.groups,
       itemsCount: totalItems,
+      userId: workspace.userId,
       members: workspace.members.map(m => m.user),
       menbersRole: workspace.members.find(m => m.user.id === userId)?.role,
     };

@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+"use client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { acceptWorkspaceInvitation } from "@/app/actions/workspace/accept-invite";
 import { AcceptWorkspaceInvitationType } from "@/app/actions/workspace/accept-invite";
@@ -11,10 +12,46 @@ import {
   declineWorkspaceInvitation,
   DeclineWorkspaceInvitationType,
   updateWorkspace,
-  UpdateWorkspaceType
+  UpdateWorkspaceType,
+  WorkspaceFormData,
+  workspaceSchema
 } from "@/app/actions/workspace";
 import { AddWorkspaceMemberType } from "@/app/actions/workspace/add-member";
-import { deleteWorkspace, DeleteWorkspaceType } from "@/app/actions/workspace/delete";
+import {
+  deleteWorkspace,
+  DeleteWorkspaceType
+} from "@/app/actions/workspace/delete";
+import {
+  EntityStatus,
+  WorkspaceCategory,
+  WorkspaceRole
+} from "@/generated/prisma";
+import { changeWorkspaceStatus } from "@/app/actions/workspace/change-status";
+import { getWorkspacesByStatus } from "@/app/data-access/workspace";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+
+
+export interface UseWorkspaceProps {
+  initialValues?: {
+    title: string;
+    invitationUsersId: string[];
+    description?: string;
+    categories?: WorkspaceCategory[];
+  }
+}
+
+export function useWorkspaceForm({ initialValues }: UseWorkspaceProps) {
+  return useForm<WorkspaceFormData>({
+    resolver: zodResolver(workspaceSchema),
+    defaultValues: initialValues || {
+      title: "",
+      invitationUsersId: []
+    }
+  })
+}
+
 
 export function useCreateWorkspace() {
   const queryClient = useQueryClient();
@@ -55,6 +92,9 @@ export function useUpdateWorkspace() {
   });
 }
 
+/**
+ * deletar permanente
+ */
 export function useDeleteWorkspace() {
   const queryClient = useQueryClient();
 
@@ -83,10 +123,62 @@ export function useDeleteWorkspace() {
         queryKey: ["status", variables.workspaceId]
       });
 
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+
       // NÃO invalida nada - deixa quieto
     },
     retry: 1
   });
+}
+
+export function useChangeWorkspaceStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ workspaceId, newStatus }: { workspaceId: string; newStatus: EntityStatus }) => {
+      const result = await changeWorkspaceStatus({ workspaceId, newStatus });
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    }
+  });
+}
+
+// Helpers específicos
+export function useArchiveWorkspace() {
+  const changeStatus = useChangeWorkspaceStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string) =>
+      changeStatus.mutateAsync({ workspaceId, newStatus: "ARCHIVED" })
+  };
+}
+
+export function useRestoreWorkspace() {
+  const changeStatus = useChangeWorkspaceStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string) =>
+      changeStatus.mutateAsync({ workspaceId, newStatus: "ACTIVE" })
+  };
+}
+
+export function useChangeWorkspace() {
+  const changeStatus = useChangeWorkspaceStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string) =>
+      changeStatus.mutateAsync({ workspaceId, newStatus: "DELETED" })
+  };
 }
 
 export function useAddWorkspaceMember() {
@@ -181,4 +273,106 @@ export function useDeclineWorkspaceInvitation() {
     },
     retry: 1
   });
+}
+
+
+type WorkspacesByStatusResult = Awaited<ReturnType<typeof getWorkspacesByStatus>>;
+type WorkspacesByStatusData = Extract<WorkspacesByStatusResult, { success: true }>['data'];
+
+/**
+ * Busca workspaces com base no status
+ */
+export function useWorkspacesByStatus(status: EntityStatus) {
+  return useQuery<WorkspacesByStatusData>({
+    queryKey: ["workspaces", "by-status", status] as const,
+    queryFn: async () => {
+      const result = await getWorkspacesByStatus(status);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result.data;
+    },
+    enabled: !!status,
+  });
+}
+
+
+interface UseWorkspacePermissionsProps {
+  userRole: WorkspaceRole;
+  workspaceStatus: EntityStatus;
+  isOwner: boolean;
+}
+
+export function useWorkspacePermissions({
+  userRole,
+  workspaceStatus,
+  isOwner
+}: UseWorkspacePermissionsProps) {
+
+  const canArchive = () => {
+    // MEMBER e VIEWER não podem
+    if (["MEMBER", "VIEWER"].includes(userRole)) return false;
+
+    // Só pode arquivar se estiver ACTIVE
+    if (workspaceStatus !== "ACTIVE") return false;
+
+    // ADMIN e OWNER podem
+    return ["ADMIN", "OWNER"].includes(userRole);
+  };
+
+  const canDelete = () => {
+    // Só OWNER pode mover para lixeira
+    if (!isOwner) return false;
+
+    // Só pode deletar se ACTIVE ou ARCHIVED
+    return ["ACTIVE", "ARCHIVED"].includes(workspaceStatus);
+  };
+
+  const canRestore = () => {
+    // Não pode restaurar se já está ACTIVE
+    if (workspaceStatus === "ACTIVE") return false;
+
+    // Restaurar de DELETED só OWNER
+    if (workspaceStatus === "DELETED") {
+      return isOwner;
+    }
+
+    // Restaurar de ARCHIVED: ADMIN ou OWNER
+    if (workspaceStatus === "ARCHIVED") {
+      return ["ADMIN", "OWNER"].includes(userRole);
+    }
+
+    return false;
+  };
+
+  const canEdit = () => {
+    // Só OWNER e ADMIN podem editar
+    return ["ADMIN", "OWNER"].includes(userRole);
+  };
+
+  const canManageMembers = () => {
+    // Só OWNER e ADMIN
+    return ["ADMIN", "OWNER"].includes(userRole);
+  };
+
+  const canDeletePermanently = () => {
+    // Só OWNER pode deletar permanentemente
+    // E só se estiver na LIXEIRA
+    return isOwner && workspaceStatus === "DELETED";
+  };
+
+  return {
+    canArchive: canArchive(),
+    canDelete: canDelete(),
+    canRestore: canRestore(),
+    canEdit: canEdit(),
+    canManageMembers: canManageMembers(),
+    canDeletePermanently: canDeletePermanently(),
+
+    // Helpers
+    isReadOnly: userRole === "VIEWER",
+    isLimitedAccess: ["MEMBER", "VIEWER"].includes(userRole),
+  };
 }

@@ -4,17 +4,19 @@ import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
+  PermissionError,
   successResponse,
   ValidationError,
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { validateWorkspaceExists } from "@/lib/db/validators";
+import { validateWorkspaceExists, validateWorkspacePermission } from "@/lib/db/validators";
 
 const formSchema = z.object({
   workspaceId: z.string()
     .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+  revalidatePaths: z.array(z.string()).optional(),
 });
 
 export type DeleteWorkspaceType = z.infer<typeof formSchema>;
@@ -31,6 +33,23 @@ export const deleteWorkspace = withAuth(async (
 
   const existingWorkspace = await validateWorkspaceExists(formData.workspaceId);
 
+  const permission = await validateWorkspacePermission(
+    formData.workspaceId,
+    userId,
+    "OWNER" // Mínimo ADMIN para deletar
+  );
+
+  const { role } = permission;
+  const { userId: ownerId } = existingWorkspace;
+  if (userId !== ownerId) {
+    throw new PermissionError("Você não tem permissão para deletar esta workspace");
+  }
+
+  if (role !== "OWNER") {
+    throw new PermissionError("Você não tem permissão para deletar esta workspace");
+  }
+
+
   await prisma.$transaction(async (tx) => {
     await tx.notification.deleteMany({
       where: { referenceId: existingWorkspace.id }
@@ -44,7 +63,10 @@ export const deleteWorkspace = withAuth(async (
       where: { id: existingWorkspace.id }
     });
   });
-
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  };
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/workspace");
   return successResponse("Workspace deletada com sucesso!");
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

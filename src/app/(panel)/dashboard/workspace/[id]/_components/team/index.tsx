@@ -9,15 +9,16 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { UserSearchType } from "@/app/(panel)/dashboard/_components/utility-action-dashboard/create-workspace";
 import { toast } from "sonner";
 import { CardUser } from "@/components/card-user";
-import { UserItemsAssignedDialogContent } from "./user-items-assigned-dialog-content";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { UserSearch, UserSearchRef } from "@/components/user-search";
 import { useTeam } from "@/hooks/use-team";
 import { useAddWorkspaceMember } from "@/hooks/use-workspace";
+import { ItemsAssociatedWithMember } from "./items-associated-with-member";
+import { usePrefetchMemberItems } from "@/hooks/use-items";
 
 
 export function Team({ workspaceId }: { workspaceId: string }) {
@@ -26,8 +27,14 @@ export function Team({ workspaceId }: { workspaceId: string }) {
   const userSearchRef = useRef<UserSearchRef>(null);
   const { data, isLoading, error } = useTeam(workspaceId);
   const addWorkspaceMember = useAddWorkspaceMember();
+  const { prefetch } = usePrefetchMemberItems();
+  const [prefetchedIds, setPrefetchedIds] = useState<Set<string>>(new Set());
 
-  // Obter IDs de usuários que já são membros para excluí-los da busca
+  const handlePrefetch = (userId: string) => {
+    prefetch(workspaceId, userId);
+    setPrefetchedIds(prev => new Set(prev).add(userId));
+  };
+
   const existingMemberIds = data?.map(member => member.id) || [];
 
   const onSubmit = async () => {
@@ -39,33 +46,28 @@ export function Team({ workspaceId }: { workspaceId: string }) {
     }
 
     setLoading(true);
-    try {
-      const response = await addWorkspaceMember.mutateAsync({
-        workspaceId,
-        invitationUsersId: ids,
-        revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]
-      });
+    const response = await addWorkspaceMember.mutateAsync({
+      workspaceId,
+      invitationUsersId: ids,
+      revalidatePaths: ["/dashboard", "/dashboard/Workspaces"]
+    });
 
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao cadastrar Workspace");
-        return;
-      }
-
-      toast.success(response.message);
-      setSelectedUsers([]);
-      userSearchRef.current?.reset();
-    } catch (error) {
-      toast.error("Erro inesperado");
-    } finally {
-      setLoading(false);
+    if (!isSuccessResponse(response)) {
+      toast.error("Erro ao cadastrar Workspace");
+      return;
     }
+
+    toast.success(response.message);
+    setSelectedUsers([]);
+    userSearchRef.current?.reset();
+    setLoading(false);
   }
 
   return (
-    <div className="space-y-6 mb-6">
+    <div className="mt-6 mb-6 flex flex-col">
       <Dialog>
-        <DialogTrigger asChild>
-          <Button>
+        <DialogTrigger asChild className="mr-auto">
+          <Button variant={"outline"}>
             Convidar
           </Button>
         </DialogTrigger>
@@ -104,13 +106,25 @@ export function Team({ workspaceId }: { workspaceId: string }) {
       {data?.length === 0 ? (
         <p>Nenhum membro no time</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
           {data?.map((user) => (
-            <Dialog key={user.id}>
-              <DialogTrigger className="text-left cursor-pointer">
-                <CardUser user={user} />
+            <Dialog key={user.id} >
+              <DialogTrigger
+                className="text-left cursor-pointer"
+                onMouseEnter={() => handlePrefetch(user.id)}
+              >
+                <div className="relative">
+                  <CardUser user={user} />
+                  {prefetchedIds.has(user.id) && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-green-500 rounded-full" />
+                  )}
+                </div>
               </DialogTrigger>
-              <UserItemsAssignedDialogContent userId={user.id} />
+              <ItemsAssociatedWithMember
+                member={user?.name}
+                workspaceId={workspaceId}
+                memberId={user.id}
+              />
             </Dialog>
           ))}
         </div>

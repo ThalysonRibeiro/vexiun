@@ -1,4 +1,4 @@
-export * from "./get-items-assigned-to-user";
+export * from "./get-associated-with-member";
 export * from "./get-priorities";
 export * from "./get-status";
 export * from "./get-public-items";

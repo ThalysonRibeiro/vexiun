@@ -24,6 +24,7 @@ import { getSharedWorkspaces } from "@/app/data-access/workspace/get-shared-work
 import { BadgeWorkspace } from "@/components/badge-workspace";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { WorkspaceRole } from "@/generated/prisma";
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -68,25 +69,25 @@ export default async function Dashboard() {
             </div>
             {sharedWorkspaces.map(shared => (
               <Link
-                href={`/dashboard/workspace/${shared.workspaceId}`}
-                key={shared.workspaceId}
+                href={`/dashboard/workspace/${shared.id}`}
+                key={shared.id}
               >
-                <Card className="hover:border-primary/50 hover:bg-primary/20 transition-all duration-300 ease-in-out">
+                <Card className="hover:border-primary/50 hover:bg-primary/20 hover:-translate-y-1 transition-all duration-300 ease-in-out">
                   <CardHeader className="p-2">
-                    <CardTitle>{shared.workspace.title}</CardTitle>
+                    <CardTitle>{shared.title}</CardTitle>
                     <CardDescription className="flex flex-col gap-2">
                       Última atividade {formatDistanceToNow(
-                        new Date(shared.workspace.lastActivityAt),
+                        new Date(shared.lastActivityAt),
                         { addSuffix: true, locale: ptBR }
                       )}
-                      <BadgeWorkspace role={shared.role} />
+                      <BadgeWorkspace role={shared.menbersRole as WorkspaceRole} />
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="mt-auto w-full p-2">
-                    {shared.workspace.members.length > 0 && (
+                    {shared.members.length > 0 && (
                       <div className="flex relative">
-                        {shared.workspace.members.slice(0, 6).map((member, index) => (
-                          <Avatar key={member.user.id} className={cn("absolute",
+                        {shared.members.slice(0, 6).map((member, index) => (
+                          <Avatar key={member.id} className={cn("absolute",
                             index === 0 && "left-0",
                             index === 1 && "left-5",
                             index === 2 && "left-10",
@@ -94,22 +95,22 @@ export default async function Dashboard() {
                             index === 4 && "left-20",
                             index === 5 && "left-25",
                           )}>
-                            <AvatarImage src={member.user.image as string} />
+                            <AvatarImage src={member.image as string} />
                             <AvatarFallback>
-                              {member.user.name?.charAt(0) ?? "N"}
+                              {member.name?.charAt(0) ?? "N"}
                             </AvatarFallback>
                           </Avatar>
                         ))}
-                        {shared.workspace.members.length > 6 && (
+                        {shared.members.length > 6 && (
                           <span className="ml-2 flex gap-1">
-                            +{shared.workspace.members.length}
+                            +{shared.members.length}
                           </span>
                         )}
                       </div>
                     )}
                   </CardContent>
                   <CardFooter className="mt-auto w-full p-2">
-                    <Priorities workspaceId={shared.workspace.id} />
+                    <Priorities workspaceId={shared.id} />
                   </CardFooter>
                 </Card>
               </Link>

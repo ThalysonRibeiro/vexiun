@@ -55,6 +55,26 @@ enum WorkspaceRole {
   VIEWER
 }
 
+enum EntityStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum WorkspaceCategory {
+  PERSONAL // Pessoal
+  WORK // Trabalho
+  EDUCATION // Educação
+  HEALTH // Saúde
+  FINANCE // Finanças
+  CREATIVE // Criativo
+  TECHNOLOGY // Tecnologia
+  MARKETING // Marketing
+  SALES // Vendas
+  SUPPORT // Suporte
+  OTHER // Outro
+}
+
 model Goals {
   id                     String            @id @default(cuid())
   title                  String
@@ -79,12 +99,18 @@ model GoalCompletions {
 model Workspace {
   id                  String                @id @default(cuid())
   title               String
+  categories          WorkspaceCategory[]
+  description         String?
   userId              String
+  status              EntityStatus          @default(ACTIVE)
+  statusChangedAt     DateTime?
+  statusChangedBy     String?
   user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   groups              Group[]
   members             WorkspaceMember[]
   workspaceInvitation WorkspaceInvitation[]
   chat                Chat[]
+  statusChanger       User?                 @relation("WorkspaceStatusChanger", fields: [statusChangedBy], references: [id])
   lastActivityAt      DateTime              @default(now())
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
@@ -123,14 +149,15 @@ model WorkspaceInvitation {
 }
 
 model Group {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String
   textColor   String
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  status      EntityStatus @default(ACTIVE)
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   item        Item[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Item {
@@ -144,8 +171,9 @@ model Item {
   details     Json? // Conteúdo rico do editor (código, formatação, etc)
   groupId     String?
 
-  createdBy  String? // ID do usuário que criou
-  assignedTo String? // ID do usuário que recebeu a tarefa
+  createdBy    String? // ID do usuário que criou
+  assignedTo   String? // ID do usuário que recebeu a tarefa
+  entityStatus EntityStatus @default(ACTIVE) // - Status de arquivamento
 
   group          Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
   createdByUser  User?  @relation("CreatedItems", fields: [createdBy], references: [id])
@@ -242,12 +270,13 @@ model User {
   userSettings    UserSettings?
 
   // Relações de atribuição
-  assignedItems       Item[]                @relation("AssignedItems")
-  createdItems        Item[]                @relation("CreatedItems")
-  workspaceInvitation WorkspaceInvitation[]
-  inviter             WorkspaceInvitation[] @relation("InvitedBy")
-  Notification        Notification[]
-  assessments         Assessments?
+  assignedItems          Item[]                @relation("AssignedItems")
+  createdItems           Item[]                @relation("CreatedItems")
+  workspaceInvitation    WorkspaceInvitation[]
+  inviter                WorkspaceInvitation[] @relation("InvitedBy")
+  workspaceStatusChanges Workspace[]           @relation("WorkspaceStatusChanger")
+  Notification           Notification[]
+  assessments            Assessments?
 
   message    Message[]
   chatMember ChatMember[]

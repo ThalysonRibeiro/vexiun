@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ERROR_MESSAGES,
   NotFoundError,
@@ -11,16 +10,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
-
-
-const formSchema = z.object({
-  title: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  invitationUsersId: z.array(z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)).optional(),
-  revalidatePaths: z.array(z.string()).optional(),
-});
-
-export type CreateWorkspaceType = z.infer<typeof formSchema>;
+import { CreateWorkspaceSchema, CreateWorkspaceType } from "./workspace-schema";
 
 export const createWorkspace = withAuth(async (
   userId,
@@ -28,7 +18,7 @@ export const createWorkspace = withAuth(async (
   formData: CreateWorkspaceType
 ) => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = CreateWorkspaceSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -38,6 +28,8 @@ export const createWorkspace = withAuth(async (
       data: {
         userId,
         title: formData.title,
+        description: formData.description || null,
+        categories: formData.categories || [],
         members: {
           create: {
             userId,

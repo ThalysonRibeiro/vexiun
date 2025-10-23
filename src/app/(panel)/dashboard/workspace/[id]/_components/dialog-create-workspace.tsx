@@ -27,7 +27,7 @@ export function DialogCreateWorkspace({
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="overflow-y-scroll max-h-[calc(100vh-6rem)]">
         <DialogHeader>
           <DialogTitle>Adicionar workspace</DialogTitle>
           <DialogDescription>

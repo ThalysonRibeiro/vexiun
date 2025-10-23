@@ -20,6 +20,7 @@ interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   onFinalStepCompleted?: () => void;
   backButtonText?: string;
   nextButtonText?: string;
+  className?: string;
 }
 
 export function Stepper({
@@ -29,6 +30,7 @@ export function Stepper({
   onFinalStepCompleted,
   backButtonText = "Voltar",
   nextButtonText = "Próximo",
+  className,
 }: StepperProps) {
   const stepsArray = Children.toArray(children)
   const totalSteps = stepsArray.length
@@ -57,8 +59,8 @@ export function Stepper({
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <div className={cn("w-full space-y-4", className)}>
+      <div>
         <div className="flex items-center gap-2">
           {stepsArray.map((_, index) => {
             const step = index + 1;
@@ -95,9 +97,9 @@ export function Stepper({
             );
           })}
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent>
+      <div>
         {stepsArray.map((child, index) => {
           if (index + 1 !== currentStep) return null
 
@@ -124,8 +126,8 @@ export function Stepper({
             {currentStep < totalSteps ? nextButtonText : "Concluir"}
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

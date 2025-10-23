@@ -13,7 +13,11 @@
   "crons": [
     {
       "path": "/api/cron/clean-notifications",
-      "schedule": "0 0 * * 0"
+      "schedule": "0 0 * * 0" // Domingo 00:00 - limpa lidas (30d) e antigas (90d)
+    },
+    {
+      "path": "/api/cron/clean-workspaces",
+      "schedule": "0 2 * * 0" // Domingo 02:00 - limpa workspaces + suas notificações
     }
   ]
 }
