@@ -1,21 +1,57 @@
 import {
+  AssignToType,
   createItem,
   CreateItemType,
   deleteItem,
   DeleteItemType,
+  ItemFormData,
+  itemFormSchema,
   updateItem,
   UpdateItemType
 } from "@/app/actions/item";
-import { assignTo, AssignToType } from "@/app/actions/item/assign-to";
+import { assignTo } from "@/app/actions/item/assign-to";
 import {
   getAssociatedWithMember,
   getCompletedItems,
   getItemsByStatus,
   getPublicItems
 } from "@/app/data-access/item";
-import { Prisma } from "@/generated/prisma";
+import { Priority, Prisma, Status } from "@/generated/prisma";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { JSONContent } from "@tiptap/core";
+import { useForm } from "react-hook-form";
+
+
+export interface UseItemFormProps {
+  initialValues?: {
+    title: string;
+    term: Date;
+    priority: Priority;
+    status: Status;
+    notes?: string;
+    description?: string;
+    details?: JSONContent | null;
+    assignedTo?: string | null;
+  }
+}
+
+export function UseItemForm({ initialValues }: UseItemFormProps) {
+  return useForm<ItemFormData>({
+    resolver: zodResolver(itemFormSchema),
+    defaultValues: initialValues || {
+      title: "",
+      term: new Date(),
+      priority: "STANDARD",
+      status: "NOT_STARTED",
+      notes: "",
+      description: "",
+      details: null,
+      assignedTo: null,
+    }
+  })
+}
 
 export type ItemData = Awaited<ReturnType<typeof getPublicItems>>;
 

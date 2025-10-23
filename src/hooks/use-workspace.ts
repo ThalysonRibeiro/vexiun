@@ -2,24 +2,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { acceptWorkspaceInvitation } from "@/app/actions/workspace/accept-invite";
-import { AcceptWorkspaceInvitationType } from "@/app/actions/workspace/accept-invite";
 import {
+  AcceptWorkspaceInvitationType,
   addWorkspaceMember,
+  AddWorkspaceMemberType,
   cancelWorkspaceInvitation,
   CancelWorkspaceInvitationType,
+  ChangeStatusInput,
   createWorkspace,
   CreateWorkspaceType,
   declineWorkspaceInvitation,
   DeclineWorkspaceInvitationType,
+  DeleteWorkspaceType,
   updateWorkspace,
   UpdateWorkspaceType,
   WorkspaceFormData,
   workspaceSchema
 } from "@/app/actions/workspace";
-import { AddWorkspaceMemberType } from "@/app/actions/workspace/add-member";
 import {
   deleteWorkspace,
-  DeleteWorkspaceType
 } from "@/app/actions/workspace/delete";
 import {
   EntityStatus,
@@ -135,8 +136,8 @@ export function useChangeWorkspaceStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ workspaceId, newStatus }: { workspaceId: string; newStatus: EntityStatus }) => {
-      const result = await changeWorkspaceStatus({ workspaceId, newStatus });
+    mutationFn: async (data: ChangeStatusInput) => {
+      const result = await changeWorkspaceStatus(data);
 
       if (!isSuccessResponse(result)) {
         throw new Error(result.error);

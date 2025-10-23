@@ -50,7 +50,10 @@ export default function NotificationsPage() {
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true);
-    const result = await deleteNotification.mutateAsync({ notificationId: id });
+    const result = await deleteNotification.mutateAsync({
+      notificationId: id,
+      revalidatePaths: ["/dashboard/notifications"]
+    });
 
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao deletar notificação");
@@ -63,7 +66,10 @@ export default function NotificationsPage() {
     if (selectedIds.length === 0) return;
 
     setIsDeleting(true);
-    const result = await deleteMultipleNotifications.mutateAsync({ notificationIds: selectedIds });
+    const result = await deleteMultipleNotifications.mutateAsync({
+      notificationIds: selectedIds,
+      revalidatePaths: ["/dashboard/notifications"]
+    });
 
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao deletar notificações");
@@ -135,7 +141,10 @@ export default function NotificationsPage() {
   };
 
   const handleMarkAsRead = async (id: string) => {
-    const result = await markNotificationAsRead.mutateAsync({ notificationId: id });
+    const result = await markNotificationAsRead.mutateAsync({
+      notificationId: id,
+      revalidatePaths: ["/dashboard/notifications"]
+    });
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao marcar como lida");
     }

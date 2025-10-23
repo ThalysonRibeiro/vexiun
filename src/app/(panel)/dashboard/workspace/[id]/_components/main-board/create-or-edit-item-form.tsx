@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ItemFormData, UseItemForm, UseItemFormProps } from "./use-item-form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,13 +23,13 @@ import { CalendarTerm } from "./calendar-term";
 import { Textarea } from "@/components/ui/textarea";
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
-import { updateItem } from "@/app/actions/item";
+import { ItemFormData, updateItem } from "@/app/actions/item";
 import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler";
 import { DetailsEditor } from "./details-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
 import { useSession } from "next-auth/react";
-import { useCreateItem } from "@/hooks/use-items";
+import { useCreateItem, UseItemForm, UseItemFormProps } from "@/hooks/use-items";
 
 interface CreateItemFormProps {
   closeForm: (value: boolean) => void;
@@ -71,6 +70,7 @@ export function CreateOrEditItemForm({
         description: formData?.description,
         assignedTo: formData?.assignedTo ?? session?.user?.id,
         details: formData?.details,
+        revalidatePaths: ["/dashboard/workspace"],
       });
 
       if (isErrorResponse(response)) {
@@ -95,6 +95,7 @@ export function CreateOrEditItemForm({
         status: "NOT_STARTED",
         assignedTo: formData.assignedTo ?? session?.user?.id,
         details: formData.details,
+        revalidatePaths: ["/dashboard/workspace"],
       });
       if (!isSuccessResponse(response)) {
         toast.error("Erro ao cadastrar item");

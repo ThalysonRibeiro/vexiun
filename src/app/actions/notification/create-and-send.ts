@@ -1,28 +1,13 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod"
-import { auth } from "@/lib/auth";
-import { NotificationType } from "@/generated/prisma";
-import { validateItemExists, validateUserExists, validateWorkspaceExists } from "@/lib/db/validators";
+import {
+  validateItemExists,
+  validateUserExists,
+  validateWorkspaceExists
+} from "@/lib/db/validators";
 import { ERROR_MESSAGES, handleError } from "@/lib/errors";
+import { CreateNotificationInput, notificationFormSchema } from "./notification-schema";
 
-
-const formSchema = z.object({
-  image: z.string().optional(),
-  nameReference: z.string().optional(),
-  userId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  referenceId: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  message: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  type: z.enum([
-    NotificationType.WORKSPACE_INVITE,
-    NotificationType.WORKSPACE_ACCEPTED,
-    NotificationType.ITEM_ASSIGNED,
-    NotificationType.ITEM_COMPLETED,
-    NotificationType.CHAT_MESSAGE
-  ]),
-});
-
-export type CreateNotificationInput = z.infer<typeof formSchema>;
 
 /**
  * Função helper para criar notificações.
@@ -30,7 +15,7 @@ export type CreateNotificationInput = z.infer<typeof formSchema>;
  */
 export async function createAndSendNotification(formData: CreateNotificationInput) {
   try {
-    const schema = formSchema.safeParse(formData);
+    const schema = notificationFormSchema.safeParse(formData);
     if (!schema.success) {
       return { error: schema.error.issues[0].message };
     };
@@ -66,7 +51,7 @@ export async function createAndSendNotification(formData: CreateNotificationInpu
   };
 };
 
-async function createNotification(formData: z.infer<typeof formSchema>) {
+async function createNotification(formData: CreateNotificationInput) {
   return await prisma.notification.create({
     data: {
       image: formData.image,

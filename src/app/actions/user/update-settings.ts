@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse, ERROR_MESSAGES, successResponse,
   ValidationError,
@@ -8,18 +7,9 @@ import {
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { validateUserExists } from "@/lib/db/validators";
+import { settingsSchema, UpdateSettingsType } from "./user-schema";
 
-const settingsFormSchema = z.object({
-  userId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  pushNotifications: z.boolean(),
-  emailNotifications: z.boolean(),
-  language: z.string(),
-  timezone: z.string(),
-});
 
-export type UpdateSettingsType = z.infer<typeof settingsFormSchema>;
 
 export const updateSettings = withAuth(async (
   userId,
@@ -27,7 +17,7 @@ export const updateSettings = withAuth(async (
   formData: UpdateSettingsType
 ): Promise<ActionResponse<string>> => {
 
-  const schema = settingsFormSchema.safeParse(formData);
+  const schema = settingsSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -43,7 +33,10 @@ export const updateSettings = withAuth(async (
       timezone: formData.timezone
     }
   });
-  revalidatePath("/dashboard/profile");
+
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
   return successResponse("Configurações atualizadas com sucesso");
 
 }, ERROR_MESSAGES.GENERIC.SERVER_ERROR);

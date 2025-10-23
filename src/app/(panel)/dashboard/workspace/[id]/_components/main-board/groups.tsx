@@ -77,7 +77,10 @@ export function Groups({
       if (!confirm('Deseja realmente deletar o grupo? todos os itens serão deletados junto')) {
         return;
       }
-      await deleteGroup.mutateAsync({ groupId: id });
+      await deleteGroup.mutateAsync({
+        groupId: id,
+        revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
+      });
       toast.success("Grupo deletado com sucesso!");
       setOpenGroups(prev => {
         const newSet = new Set(prev);

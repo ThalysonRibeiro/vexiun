@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -11,22 +10,14 @@ import {
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { validateWorkspaceExists, validateWorkspacePermission } from "@/lib/db/validators";
-
-const formSchema = z.object({
-  workspaceId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  revalidatePaths: z.array(z.string()).optional(),
-});
-
-export type DeleteWorkspaceType = z.infer<typeof formSchema>;
+import { DeleteWorkspaceType, workspaceIdSchema } from "./workspace-schema";
 
 export const deleteWorkspace = withAuth(async (
   userId,
   session,
   formData: DeleteWorkspaceType
 ): Promise<ActionResponse<string>> => {
-  const schema = formSchema.safeParse(formData);
+  const schema = workspaceIdSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -49,7 +40,6 @@ export const deleteWorkspace = withAuth(async (
     throw new PermissionError("Você não tem permissão para deletar esta workspace");
   }
 
-
   await prisma.$transaction(async (tx) => {
     await tx.notification.deleteMany({
       where: { referenceId: existingWorkspace.id }
@@ -66,7 +56,5 @@ export const deleteWorkspace = withAuth(async (
   if (formData.revalidatePaths?.length) {
     formData.revalidatePaths.forEach((path) => revalidatePath(path));
   };
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/workspace");
   return successResponse("Workspace deletada com sucesso!");
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

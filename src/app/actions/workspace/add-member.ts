@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   DuplicateError,
@@ -13,19 +12,8 @@ import {
 import { revalidatePath } from "next/cache";
 import { validateWorkspaceExists, validateWorkspacePermission } from "@/lib/db/validators";
 import { createAndSendNotification } from "../notification";
+import { addMemnberSchema, AddWorkspaceMemberType } from "./workspace-schema";
 
-
-const formSchema = z.object({
-  workspaceId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  invitationUsersId: z
-    .array(z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID))
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  revalidatePaths: z.array(z.string()).optional(),
-});
-
-export type AddWorkspaceMemberType = z.infer<typeof formSchema>;
 export type AddWorkspaceMemberResponse = {
   invitedCount: number;
   skippedCount: number;
@@ -37,7 +25,7 @@ export const addWorkspaceMember = withAuth(async (
   formData: AddWorkspaceMemberType
 ): Promise<ActionResponse<AddWorkspaceMemberResponse>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = addMemnberSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };

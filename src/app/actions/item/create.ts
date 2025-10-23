@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -14,32 +13,14 @@ import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { JSONContent } from "@tiptap/core";
 import { validateGroupExists, validateUserExists } from "@/lib/db/validators";
-
-const formSchema = z.object({
-  groupId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  term: z.date().optional(),
-  priority: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW", "STANDARD"]),
-  status: z.enum(["DONE", "IN_PROGRESS", "STOPPED", "NOT_STARTED"]),
-  notes: z.string().optional(),
-  description: z.string().optional(),
-  details: z.custom<JSONContent>().nullable().optional(),
-  assignedTo: z.string()
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)
-    .nullable()
-    .optional()
-});
-
-export type CreateItemType = z.infer<typeof formSchema>;
+import { createItemFormSchema, CreateItemType } from "./item-schema";
 
 export const createItem = withAuth(async (
   userId,
   session,
   formData: CreateItemType): Promise<ActionResponse<Item | string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = createItemFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -75,7 +56,9 @@ export const createItem = withAuth(async (
     });
   };
 
-  revalidatePath("/dashboard/workspace");
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
   return successResponse(newItem, "Item criado com sucesso");
 
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

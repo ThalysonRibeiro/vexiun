@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -9,12 +8,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-
-const formSchema = z.object({
-  notificationId: z.string().min(1, "O id é obrigatório"),
-});
-
-export type DeleteNotificationType = z.infer<typeof formSchema>;
+import { DeleteNotificationType, notificationIdsFormSchema } from "./notification-schema";
 
 export const deleteNotification = withAuth(async (
   userId,
@@ -22,7 +16,7 @@ export const deleteNotification = withAuth(async (
   formData: DeleteNotificationType
 ): Promise<ActionResponse<string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = notificationIdsFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -42,7 +36,10 @@ export const deleteNotification = withAuth(async (
     where: { id: formData.notificationId },
   });
 
-  revalidatePath("/dashboard/notifications");
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
+
   return successResponse("Notificação deletada com sucesso");
 
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

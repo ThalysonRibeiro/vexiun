@@ -7,26 +7,12 @@ import { ERROR_MESSAGES } from "@/lib/errors";
 import { validateWorkspaceAccess } from "@/lib/db/validators";
 import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
-import { z } from "zod";
-
-const formSchema = z.object({
-  workspaceId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  itemId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  assignedTo: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-});
-
-export type AssignToType = z.infer<typeof formSchema>;
+import { assignToFormSchema, AssignToType } from "./item-schema";
 
 export const assignTo = withAuth(
   async (userId, session, formData: AssignToType) => {
 
-    const schema = formSchema.safeParse(formData);
+    const schema = assignToFormSchema.safeParse(formData);
     if (!schema.success) {
       throw new ValidationError(schema.error.issues[0].message);
     };

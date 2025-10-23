@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -9,13 +8,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-
-
-const formSchema = z.object({
-  notificationIds: z.array(z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)),
-});
-
-export type DeleteMultipleNotificationsType = z.infer<typeof formSchema>;
+import { DeleteMultipleNotificationsType, notificationIdsFormSchema } from "./notification-schema";
 
 export const deleteMultipleNotifications = withAuth(async (
   userId,
@@ -23,7 +16,7 @@ export const deleteMultipleNotifications = withAuth(async (
   formData: DeleteMultipleNotificationsType
 ): Promise<ActionResponse<number | string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = notificationIdsFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -33,8 +26,9 @@ export const deleteMultipleNotifications = withAuth(async (
       userId,
     },
   });
-
-  revalidatePath("/dashboard/notifications");
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
   return successResponse(formData.notificationIds.length, "Notificações deletadas com sucesso")
 
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

@@ -215,7 +215,10 @@ export function ItemsTables({ groupId, team }: ItemsTablesProps) {
     if (!confirm('Deseja realmente deletar o item?, todos os dados serão deletados junto')) {
       return;
     }
-    const response = await deleteItem.mutateAsync({ itemId });
+    const response = await deleteItem.mutateAsync({
+      itemId,
+      revalidatePaths: ["/dashboard/workspace"]
+    });
     if (!isSuccessResponse(response)) {
       toast.error("Erro ao cadastrar item");
       return;

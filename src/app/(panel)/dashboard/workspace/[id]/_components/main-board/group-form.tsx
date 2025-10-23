@@ -8,11 +8,11 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { GroupFormData, UseGroupForm } from "./use-group-form";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
-import { useCreateGroup, useUpdateGroup } from "@/hooks/use-groups";
+import { useCreateGroup, UseGroupForm, useUpdateGroup } from "@/hooks/use-groups";
+import { GroupFormData } from "@/app/actions/group";
 
 
 interface CreateGroupFormProps {
@@ -49,7 +49,8 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
       await updateGroup.mutateAsync({
         groupId,
         title: formData.title,
-        textColor: formData.textColor
+        textColor: formData.textColor,
+        revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
       });
       setIsLoading(false);
       setAddGroup(false)
@@ -59,9 +60,10 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
 
 
     const response = await createGroup.mutateAsync({
-      workspaceId: workspaceId,
+      workspaceId,
       title: formData.title,
       textColor: formData.textColor,
+      revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
     });
     if (!isSuccessResponse(response)) {
       toast.error("Erro ao cadastrar grupo");

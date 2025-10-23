@@ -65,7 +65,10 @@ export function NotificationContent() {
 
   const handleAcceptWorkspaceInvite = async (workspaceId: string,) => {
     try {
-      await acceptWorkspaceInvitation.mutateAsync({ workspaceId, });
+      await acceptWorkspaceInvitation.mutateAsync({
+        workspaceId,
+        revalidatePaths: ["/dashboard"]
+      });
     } catch (error) {
       toast.error("Falha ao aceitar convite");
     }

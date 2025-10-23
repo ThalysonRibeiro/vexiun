@@ -10,7 +10,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
-import { CreateWorkspaceSchema, CreateWorkspaceType } from "./workspace-schema";
+import { createWorkspaceSchema, CreateWorkspaceType } from "./workspace-schema";
 
 export const createWorkspace = withAuth(async (
   userId,
@@ -18,7 +18,7 @@ export const createWorkspace = withAuth(async (
   formData: CreateWorkspaceType
 ) => {
 
-  const schema = CreateWorkspaceSchema.safeParse(formData);
+  const schema = createWorkspaceSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };

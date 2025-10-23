@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   DuplicateError,
@@ -15,14 +14,7 @@ import { revalidatePath } from "next/cache";
 import { WorkspaceRole } from "@/generated/prisma";
 import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
-
-const formSchema = z.object({
-  workspaceId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-});
-
-export type AcceptWorkspaceInvitationType = z.infer<typeof formSchema>;
+import { AcceptWorkspaceInvitationType, workspaceIdSchema } from "./workspace-schema";
 
 export const acceptWorkspaceInvitation = withAuth(async (
   userId,
@@ -30,7 +22,7 @@ export const acceptWorkspaceInvitation = withAuth(async (
   formData: AcceptWorkspaceInvitationType
 ): Promise<ActionResponse<string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = workspaceIdSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -102,7 +94,9 @@ export const acceptWorkspaceInvitation = withAuth(async (
     return { workspace: invitation.workspace, member, res };
   });
 
-  revalidatePath("/dashboard");
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
   return successResponse("Convite aceito com sucesso");
 
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

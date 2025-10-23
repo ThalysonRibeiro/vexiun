@@ -10,16 +10,19 @@ import {
 } from "@/components/ui/select";
 import { AlertCircle, CheckCircle, Mail, Shield } from "lucide-react";
 import { toast } from "sonner";
-import { SettingsFormData, UseSettingsForm } from "./use-settings-form";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { UserWithCounts } from "../types/profile-types";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
-import { useUpdateSettings } from "@/hooks/use-user";
+import { UseSettingsForm, useUpdateSettings } from "@/hooks/use-user";
+import { SettingsFormData } from "@/app/actions/user";
+import { useMutation } from "@tanstack/react-query";
+import { useSendVerificationEmail } from "@/hooks/use-email";
 
 export default function AccountSecurity({ detailUser }: { detailUser: UserWithCounts }) {
   const isVerified = detailUser.emailVerified !== null;
   const updateSettings = useUpdateSettings();
+  const sendVerificationEmail = useSendVerificationEmail();
 
   if (!detailUser.userSettings) {
     return null
@@ -47,33 +50,12 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
 
   const languages = ["pt-BR", "en-US"];
 
-  const sendVerificationEmail = async () => {
-    try {
-      const responsePromise = fetch('/api/auth/send-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: detailUser.email }),
-      });
-
-      await toast.promise(responsePromise, {
-        loading: 'Enviando e-mail de verificação...',
-        success: 'E-mail de verificação enviado com sucesso!', // This will be called if response.ok is true
-        error: 'Falha ao enviar o e-mail de verificação.', // This will be called if response.ok is false or an error occurs
-      });
-
-      // Opcional: verificar se a resposta foi ok
-      const response = await responsePromise;
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send verification email');
-      }
-
-    } catch (error) {
-      console.error('Error sending verification email:', error);
-    }
+  const handleSendVerification = () => {
+    sendVerificationEmail.mutate(detailUser.email);
   };
+
+  // Acesso ao estado da mutation
+  const { isPending, isError, isSuccess } = sendVerificationEmail;
 
   const onSubmit = async (formData: SettingsFormData) => {
     if (!detailUser.id) {
@@ -86,6 +68,7 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
       pushNotifications: formData.pushNotifications,
       language: formData.language,
       timezone: formData.timezone,
+      revalidatePaths: ["/dashboard/profile"]
     });
     if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar configurações de segurança");
@@ -118,7 +101,7 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
             }
           </p>
           {!isVerified && (
-            <Button className="cursor-pointer" size="sm" onClick={sendVerificationEmail}>
+            <Button className="cursor-pointer" size="sm" onClick={handleSendVerification}>
               Reenviar e-mail de verificação
             </Button>
           )}

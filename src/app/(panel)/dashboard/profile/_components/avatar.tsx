@@ -33,7 +33,10 @@ export default function Avatar({ avatarUrl, userId }: { avatarUrl: string | null
         return;
       }
       setPreview(urlImage);
-      await updateAvatar.mutateAsync({ avatarUrl: urlImage });
+      await updateAvatar.mutateAsync({
+        avatarUrl: urlImage,
+        revalidatePaths: ["/dashboard/profile"]
+      });
       await update({
         image: urlImage
       })

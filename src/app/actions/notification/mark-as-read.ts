@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -9,12 +8,8 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
+import { MarkNotificationAsReadType, notificationIdsFormSchema } from "./notification-schema";
 
-const formSchema = z.object({
-  notificationId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-});
-
-export type MarkNotificationAsReadType = z.infer<typeof formSchema>;
 
 export const markNotificationAsRead = withAuth(async (
   userId,
@@ -22,7 +17,7 @@ export const markNotificationAsRead = withAuth(async (
   formData: MarkNotificationAsReadType
 ): Promise<ActionResponse<string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = notificationIdsFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -33,8 +28,9 @@ export const markNotificationAsRead = withAuth(async (
     },
     data: { isRead: true },
   });
-
-  revalidatePath("/dashboard/notifications");
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
   return successResponse("Notificação marcada como lida com sucesso");
 
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

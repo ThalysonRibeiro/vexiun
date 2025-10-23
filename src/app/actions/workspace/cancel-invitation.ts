@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   DuplicateError,
@@ -13,14 +12,7 @@ import {
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { validateWorkspacePermission } from "@/lib/db/validators";
-
-const formSchema = z.object({
-  invitationId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-});
-
-export type CancelWorkspaceInvitationType = z.infer<typeof formSchema>;
+import { cancelInvitationSchema, CancelWorkspaceInvitationType } from "./workspace-schema";
 
 export const cancelWorkspaceInvitation = withAuth(async (
   userId,
@@ -28,7 +20,7 @@ export const cancelWorkspaceInvitation = withAuth(async (
   formData: CancelWorkspaceInvitationType
 ): Promise<ActionResponse<string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = cancelInvitationSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -67,7 +59,10 @@ export const cancelWorkspaceInvitation = withAuth(async (
     where: { id: invitation.id },
     data: { status: "CANCELLED" }
   });
-  revalidatePath(`/workspace`);
+
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  }
 
   return successResponse(`Convite para ${invitation.user.name} cancelado`);
 

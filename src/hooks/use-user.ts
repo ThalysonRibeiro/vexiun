@@ -5,10 +5,49 @@ import {
   updateAvatar,
   UpdateAvatarType,
   updateName,
-  UpdateNameType,
   updateSettings,
   UpdateSettingsType
 } from "@/app/actions/user";
+import { NameFormData, nameFormSchema, SettingsFormData, settingsFormSchema, UpdateNameType } from "@/app/actions/user/user-schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+
+export interface UseNameFormProps {
+  initialValues?: {
+    name: string;
+  }
+}
+
+export function UseNameForm({ initialValues }: UseNameFormProps) {
+  return useForm<NameFormData>({
+    resolver: zodResolver(nameFormSchema),
+    defaultValues: initialValues || {
+      name: "",
+    }
+  })
+}
+
+export interface UseSettingsFormProps {
+  initialValues?: {
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+    language: string;
+    timezone: string;
+  }
+}
+
+export function UseSettingsForm({ initialValues }: UseSettingsFormProps) {
+  return useForm<SettingsFormData>({
+    resolver: zodResolver(settingsFormSchema),
+    defaultValues: initialValues || {
+      emailNotifications: true,
+      pushNotifications: true,
+      language: "pt-BR",
+      timezone: "America/Sao_Paulo",
+    }
+  })
+}
 
 type UserResult = Awaited<ReturnType<typeof searchUsers>>;
 type UserData = Extract<UserResult, { success: true }>['data'];

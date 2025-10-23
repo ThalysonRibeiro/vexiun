@@ -1,7 +1,6 @@
 "use server";
-
 import prisma from "@/lib/prisma";
-import { NotFoundError, PermissionError, ValidationError, withAuth } from "@/lib/errors";
+import { PermissionError, ValidationError, withAuth } from "@/lib/errors";
 import { successResponse } from "@/lib/errors/error-handler";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
@@ -10,35 +9,22 @@ import {
   validateWorkspaceExists,
   validateWorkspacePermission
 } from "@/lib/db/validators";
-import { z } from "zod";
-
-const schema = z.object({
-  workspaceId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  newStatus: z.enum([
-    EntityStatus.ARCHIVED,
-    EntityStatus.ACTIVE,
-    EntityStatus.DELETED
-  ]),
-});
-
-type ChangeStatusInput = z.infer<typeof schema>;
+import { ChangeStatusInput, changeWorkspaceStatusSchema } from "./workspace-schema";
 
 export const changeWorkspaceStatus = withAuth(
-  async (userId, session, data: ChangeStatusInput) => {
+  async (userId, session, formData: ChangeStatusInput) => {
     // ✅ 1. Valida input
-    const result = schema.safeParse(data);
+    const result = changeWorkspaceStatusSchema.safeParse(formData);
     if (!result.success) {
       throw new ValidationError(result.error.issues[0].message);
     }
 
     // ✅ 2. Verifica se workspace existe
-    const workspace = await validateWorkspaceExists(data.workspaceId);
+    const workspace = await validateWorkspaceExists(formData.workspaceId);
 
     // ✅ 3. Valida permissão do usuário
     const permission = await validateWorkspacePermission(
-      data.workspaceId,
+      formData.workspaceId,
       userId,
       "ADMIN" // Mínimo ADMIN para mudar status
     );
@@ -55,14 +41,14 @@ export const changeWorkspaceStatus = withAuth(
     }
 
     // Só OWNER e ADMIN podem arquivar/deletar
-    if (["MEMBER", "VIEWER"].includes(role) && data.newStatus !== "ACTIVE") {
+    if (["MEMBER", "VIEWER"].includes(role) && formData.newStatus !== "ACTIVE") {
       throw new PermissionError(
         "Você não tem permissão para arquivar ou deletar esta workspace"
       );
     }
 
     // Só OWNER pode deletar permanentemente (se implementar)
-    if (data.newStatus === "DELETED" && role !== "OWNER") {
+    if (formData.newStatus === "DELETED" && role !== "OWNER") {
       throw new PermissionError(
         "Apenas o proprietário pode mover para lixeira"
       );
@@ -72,9 +58,9 @@ export const changeWorkspaceStatus = withAuth(
     await prisma.$transaction(async (tx) => {
       // Atualiza workspace
       await tx.workspace.update({
-        where: { id: data.workspaceId },
+        where: { id: formData.workspaceId },
         data: {
-          status: data.newStatus,
+          status: formData.newStatus,
           statusChangedAt: new Date(),
           statusChangedBy: userId
         }
@@ -82,13 +68,13 @@ export const changeWorkspaceStatus = withAuth(
 
       // Atualiza grupos
       await tx.group.updateMany({
-        where: { workspaceId: data.workspaceId },
-        data: { status: data.newStatus }
+        where: { workspaceId: formData.workspaceId },
+        data: { status: formData.newStatus }
       });
 
       // Atualiza items
       const groups = await tx.group.findMany({
-        where: { workspaceId: data.workspaceId },
+        where: { workspaceId: formData.workspaceId },
         select: { id: true }
       });
 
@@ -97,14 +83,17 @@ export const changeWorkspaceStatus = withAuth(
           where: {
             groupId: { in: groups.map(g => g.id) }
           },
-          data: { entityStatus: data.newStatus }
+          data: { entityStatus: formData.newStatus }
         });
       }
     });
 
+    if (formData.revalidatePaths?.length) {
+      formData.revalidatePaths.forEach((path) => revalidatePath(path));
+    }
     // ✅ 6. Revalidação de cache
     revalidatePath("/dashboard/workspaces");
-    revalidatePath(`/dashboard/workspace/${data.workspaceId}`);
+    revalidatePath(`/dashboard/workspace/${formData.workspaceId}`);
 
     // ✅ 7. Mensagem de sucesso
     const messages: Record<EntityStatus, string> = {
@@ -114,8 +103,8 @@ export const changeWorkspaceStatus = withAuth(
     };
 
     return successResponse(
-      { workspaceId: data.workspaceId, status: data.newStatus },
-      messages[data.newStatus]
+      { workspaceId: formData.workspaceId, status: formData.newStatus },
+      messages[formData.newStatus]
     );
   },
   ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR

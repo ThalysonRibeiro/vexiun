@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ItemFormData, UseItemForm } from "../main-board/use-item-form";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,7 +31,7 @@ import { useState } from "react";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useGroups } from "@/hooks/use-groups";
 import { useParams } from "next/navigation";
-import { useCreateItem } from "@/hooks/use-items";
+import { useCreateItem, UseItemForm } from "@/hooks/use-items";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
@@ -40,6 +39,7 @@ import { DetailsEditor } from "../main-board/details-editor";
 import { useTeam } from "@/hooks/use-team";
 import { colorPriority, priorityMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
+import { ItemFormData } from "@/app/actions/item";
 
 interface DialogContentNewItemProps {
   closeDialog: (value: boolean) => void;

@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -9,14 +8,8 @@ import {
   withAuth
 } from "@/lib/errors";
 import { NotificationType } from "@/generated/prisma";
-
-const broadcastSchema = z.object({
-  message: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  type: z.enum(["SISTEM_MESSAGE", "NOTICES_MESSAGE"]),
-  referenceId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID).optional(),
-});
-
-export type BroadcastNotificationType = z.infer<typeof broadcastSchema>;
+import { BroadcastNotificationType, broadcastSchema } from "./notification-schema";
+import { revalidatePath } from "next/cache";
 
 export const sendBroadcastNotification = withAuth(async (
   userId,
@@ -36,6 +29,7 @@ export const sendBroadcastNotification = withAuth(async (
     message: formData.message,
     referenceId: formData.referenceId
   });
+  revalidatePath("/dashboard");
   return successResponse(result, "Notificação enviada com sucesso");
 
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

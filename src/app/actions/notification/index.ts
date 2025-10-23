@@ -1,3 +1,4 @@
+export * from "./notification-schema";
 export * from "./create-and-send";
 export * from "./delete-all";
 export * from "./delete-multiple";

@@ -1,6 +1,5 @@
 "use server"
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import {
   ActionResponse,
   ERROR_MESSAGES,
@@ -9,21 +8,14 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-
-const formSchema = z.object({
-  groupId: z.string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-});
-
-export type DeleteGroupType = z.infer<typeof formSchema>;
+import { DeleteGroupType, groupIdFormSchema } from "./group-schema";
 
 export const deleteGroup = withAuth(async (
   userId,
   session,
   formData: DeleteGroupType): Promise<ActionResponse<string>> => {
 
-  const schema = formSchema.safeParse(formData);
+  const schema = groupIdFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -32,6 +24,8 @@ export const deleteGroup = withAuth(async (
       id: formData.groupId,
     }
   });
-  revalidatePath("/dashboard/Workspace");
+  if (formData.revalidatePaths?.length) {
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
+  };
   return successResponse("Grupo deletado com sucesso");
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

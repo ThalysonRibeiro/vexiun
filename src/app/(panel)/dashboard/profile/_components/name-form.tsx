@@ -4,11 +4,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { User } from "next-auth";
 import { useState } from "react";
-import { UseNameForm } from "./use-settings-form";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { updateName } from "@/app/actions/user";
-import { useUpdateName } from "@/hooks/use-user";
+import { UseNameForm, useUpdateName } from "@/hooks/use-user";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 
 export function NameForme({ user }: { user: User }) {
@@ -21,7 +19,8 @@ export function NameForme({ user }: { user: User }) {
 
     const response = await updateName.mutateAsync({
       userId: user.id,
-      name: formData.name
+      name: formData.name,
+      revalidatePaths: ["/dashboard/profile"]
     });
     if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar nome");

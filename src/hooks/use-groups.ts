@@ -1,7 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { getGroups } from "@/app/data-access/groupe";
-import { createGroup, CreateGroupType, deleteGroup, DeleteGroupType, updateGroup, UpdateGroupType } from "@/app/actions/group";
+import {
+  createGroup,
+  CreateGroupType,
+  deleteGroup,
+  DeleteGroupType,
+  GroupFormData,
+  groupFormSchema,
+  updateGroup,
+  UpdateGroupType
+} from "@/app/actions/group";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+
+export interface UseGroupFormProps {
+  initialValues?: {
+    title: string;
+    textColor: string;
+  }
+}
+
+export function UseGroupForm({ initialValues }: UseGroupFormProps) {
+  return useForm<GroupFormData>({
+    resolver: zodResolver(groupFormSchema),
+    defaultValues: initialValues || {
+      title: "",
+      textColor: "#FF3445"
+    }
+  })
+}
 
 export type GroupsResponse = Awaited<ReturnType<typeof getGroups>>;
 export type GroupsData = Extract<GroupsResponse, { success: true }>['data'];
