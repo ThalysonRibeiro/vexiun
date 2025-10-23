@@ -65,8 +65,8 @@ export function WorkspacesPageClient({
       </header>
 
       <Tabs defaultValue="my-workspaces">
-        <TabsList className="grid grid-cols-5 w-full">
-          <TabsTrigger value="my-workspaces" className="gap-2">
+        <TabsList className="flex gap-2 w-full">
+          <TabsTrigger value="my-workspaces" className="gap-2 cursor-pointer hover:border-primary">
             <FolderOpen className="w-4 h-4" />
             <p className="hidden lg:block">Minhas</p>
             {workspaces.length > 0 && (
@@ -74,7 +74,7 @@ export function WorkspacesPageClient({
             )}
           </TabsTrigger>
 
-          <TabsTrigger value="shared-workspaces" className="gap-2">
+          <TabsTrigger value="shared-workspaces" className="gap-2 cursor-pointer hover:border-primary">
             <Users className="w-4 h-4" />
             <p className="hidden lg:block">Compartilhadas</p>
             {sharedWorkspaces.length > 0 && (
@@ -82,7 +82,7 @@ export function WorkspacesPageClient({
             )}
           </TabsTrigger>
 
-          <TabsTrigger value="archived" className="gap-2">
+          <TabsTrigger value="archived" className="gap-2 cursor-pointer hover:border-primary">
             <Archive className="w-4 h-4" />
             <p className="hidden lg:block">Arquivadas</p>
             {(archivedWorkspaces?.data?.length || 0) > 0 && (
@@ -90,7 +90,7 @@ export function WorkspacesPageClient({
             )}
           </TabsTrigger>
 
-          <TabsTrigger value="bin" className="gap-2">
+          <TabsTrigger value="bin" className="gap-2 cursor-pointer hover:border-primary">
             <Trash2 className="w-4 h-4" />
             <p className="hidden lg:block">Lixeira</p>
             {(deletedWorkspaces?.data?.length || 0) > 0 && (
@@ -98,7 +98,7 @@ export function WorkspacesPageClient({
             )}
           </TabsTrigger>
 
-          <TabsTrigger value="permissions" className="gap-2">
+          <TabsTrigger value="permissions" className="gap-2 cursor-pointer hover:border-primary">
             <Shield className="w-4 h-4" />
             <p className="hidden lg:block">Permissões</p>
           </TabsTrigger>
