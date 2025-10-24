@@ -1,4 +1,9 @@
 import {
+  EditingField,
+  DialogStateProps,
+  EditingState
+} from "@/app/(panel)/dashboard/workspace/[id]/_components/main-board/items/types";
+import {
   AssignToType,
   createItem,
   CreateItemType,
@@ -21,7 +26,9 @@ import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { JSONContent } from "@tiptap/core";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 
 export interface UseItemFormProps {
@@ -283,7 +290,163 @@ export function useDeleteItem() {
   });
 }
 
+export function useItemActions() {
+  const [dialogState, setDialogState] = useState<DialogStateProps>({
+    isOpen: false,
+    itemId: null,
+    isEditing: false,
+    content: null
+  });
+  const [editing, setEditing] = useState<EditingState>({ itemId: null, field: null });
+  const [editingData, setEditingData] = useState<ItemWhitCreatedAssignedUser | null>(null);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
 
+  const updateItem = useUpdateItem();
+  const deleteItem = useDeleteItem();
+
+  const startEditing = useCallback((item: ItemWhitCreatedAssignedUser, field: EditingField) => {
+    setEditing({ itemId: item.id, field });
+    setEditingData({ ...item });
+  }, []);
+
+  const cancelEditing = useCallback(() => {
+    setEditing({ itemId: null, field: null });
+    setEditingData(null);
+  }, []);
+
+  const handleSaveDetails = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
+    if (!dialogState.content) return;
+
+    setIsLoading(item.id);
+
+    try {
+      const result = await updateItem.mutateAsync({
+        itemId: item.id,
+        title: item.title,
+        status: item.status,
+        term: item.term,
+        priority: item.priority,
+        notes: item.notes,
+        description: item.description,
+        details: dialogState.content,
+        assignedTo: item.assignedTo
+      });
+
+      if (!isSuccessResponse(result)) {
+        toast.error("Erro ao atualizar detalhes");
+        return;
+      }
+
+      toast.success("Detalhes atualizados com sucesso!");
+      setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
+    } finally {
+      setIsLoading(null);
+    }
+  }, [dialogState.content, updateItem]);
+
+  const handleSaveField = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
+    if (!editingData) return;
+
+    setIsLoading(item.id);
+
+    try {
+      const response = await updateItem.mutateAsync({
+        itemId: item.id,
+        title: editingData.title,
+        status: editingData.status,
+        term: editingData.term,
+        priority: editingData.priority,
+        notes: editingData.notes,
+        description: editingData.description
+      });
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao atualizar item");
+        return;
+      }
+
+      toast.success("Item atualizado com sucesso!");
+      cancelEditing();
+    } finally {
+      setIsLoading(null);
+    }
+  }, [editingData, cancelEditing, updateItem]);
+
+  const handleSelectChange = useCallback(async (
+    item: ItemWhitCreatedAssignedUser,
+    field: 'priority' | 'status',
+    value: Priority | Status
+  ) => {
+    setIsLoading(item.id);
+
+    try {
+      const response = await updateItem.mutateAsync({
+        itemId: item.id,
+        title: item.title,
+        status: field === 'status' ? value as Status : item.status,
+        term: item.term,
+        priority: field === 'priority' ? value as Priority : item.priority,
+        notes: item.notes,
+        description: item.description,
+        details: item.details as JSONContent
+      });
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao atualizar item");
+        return;
+      }
+
+      toast.success("Item atualizado!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [updateItem]);
+
+  const handleDeleteItem = useCallback(async (itemId: string) => {
+    if (!confirm('Deseja realmente deletar o item? Todos os dados serão deletados.')) {
+      return;
+    }
+
+    setIsLoading(itemId);
+
+    try {
+      const response = await deleteItem.mutateAsync({
+        itemId,
+        revalidatePaths: ["/dashboard/workspace"]
+      });
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao deletar item");
+        return;
+      }
+
+      toast.success("Item deletado com sucesso!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [deleteItem]);
+
+  const handleArchive = useCallback(() => { }, []);
+
+  return {
+    // Estado
+    dialogState,
+    editing,
+    editingData,
+    isLoading,
+    // Setters
+    setDialogState,
+    setEditingData,
+    // Ações
+    startEditing,
+    cancelEditing,
+    handleSaveDetails,
+    handleSaveField,
+    handleSelectChange,
+    handleDeleteItem,
+    handleArchive
+  };
+}
 
 // / ❌ CREATE - SEM retry (pode duplicar)
 // export function useCreateItem() {

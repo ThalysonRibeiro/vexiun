@@ -1,11 +1,11 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { Archive, ChevronDown, Edit, Ellipsis, Plus, Trash } from "lucide-react";
+import { Archive, ChevronDown, Edit, Ellipsis, LayoutGrid, Logs, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { GroupForm } from "./group-form";
 import { toast } from "sonner";
 import { CreateOrEditItemForm } from "./create-or-edit-item-form";
-import { ItemsTables } from "./items-tables";
+import { ListItems } from "./list-items";
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,6 +37,7 @@ export function Groups({
 }: {
   data: GroupsData, workspaceId: string;
 }) {
+  const [changeLayout, setChangeLayout] = useState<boolean>(false);
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
@@ -103,13 +104,26 @@ export function Groups({
             setAddGroup={closeAddGroupForm}
           />
         ) : (
-          <Button
-            onClick={() => setIsAddingGroup(true)}
-            variant="outline"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Novo grupo
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              onClick={() => setIsAddingGroup(true)}
+              variant="outline"
+              className="cursor-pointer"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Novo grupo
+            </Button>
+
+            <Button
+              onClick={() => setChangeLayout(prev => !prev)}
+              variant="outline"
+              className="cursor-pointer"
+            >
+              {changeLayout ? <Logs /> : <LayoutGrid />}
+              <span>Layout</span>
+              {changeLayout ? "lista" : "grid"}
+            </Button>
+          </div>
         )}
       </div>
       {/* Lista de grupos */}
@@ -185,16 +199,18 @@ export function Groups({
                   <ChevronDown className={cn("transition-all duration-300 ", isGroupOpen && "-rotate-90")} />
                 </Button>
 
-                <div className="w-full flex flex-col md:flex-row space-x-2 max-w-50 ml-auto">
-                  <div className="w-full">
-                    <span className="text-[10px]">Prioridade</span>
-                    <GroupPriorityBar items={group.item} />
+                {group?.item.length > 1 && (
+                  <div className="w-full flex flex-col md:flex-row space-x-2 max-w-50 ml-auto">
+                    <div className="w-full">
+                      <span className="text-[10px]">Prioridade</span>
+                      <GroupPriorityBar items={group.item} />
+                    </div>
+                    <div className="w-full">
+                      <span className="text-[10px]">Status</span>
+                      <GroupProgressBar items={group.item} />
+                    </div>
                   </div>
-                  <div className="w-full">
-                    <span className="text-[10px]">Status</span>
-                    <GroupProgressBar items={group.item} />
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Conteúdo do grupo */}
@@ -203,8 +219,8 @@ export function Groups({
                 open={isGroupOpen}
                 style={{ borderColor: group.textColor }}
               >
-                <CollapsibleContent>
-                  <ItemsTables groupId={group.id} team={team ?? []} />
+                <CollapsibleContent className="relative">
+                  <ListItems groupId={group.id} team={team ?? []} changeLayout={changeLayout} />
 
                   <Dialog
                     open={openDialogs.has(group.id)}
@@ -224,6 +240,7 @@ export function Groups({
                       <Button
                         variant="outline"
                         size="sm"
+                        className={cn("mt-4",)}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Novo item
