@@ -5,6 +5,7 @@ import {
 } from "@/app/(panel)/dashboard/workspace/[id]/_components/main-board/items/types";
 import {
   AssignToType,
+  ChangeStatusInputType,
   createItem,
   CreateItemType,
   deleteItem,
@@ -15,16 +16,18 @@ import {
   UpdateItemType
 } from "@/app/actions/item";
 import { assignTo } from "@/app/actions/item/assign-to";
+import { changeItemStatus } from "@/app/actions/item/change-status";
 import {
   getAssociatedWithMember,
-  getCompletedItems,
   getItemsByStatus,
+  getItemsCountByStatus,
   getPublicItems
 } from "@/app/data-access/item";
-import { Priority, Prisma, Status } from "@/generated/prisma";
+import { getItemsByEntityStatus } from "@/app/data-access/item/get-by-entity-status";
+import { EntityStatus, Priority, Prisma, Status } from "@/generated/prisma";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, dataTagErrorSymbol } from "@tanstack/react-query";
 import { JSONContent } from "@tiptap/core";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -105,25 +108,6 @@ export function useItems(groupId: string) {
   });
 };
 
-export type CompletedItemsResults = Awaited<ReturnType<typeof getCompletedItems>>;
-export type CompletedItemsData = Extract<CompletedItemsResults, { success: true }>['data'];
-
-export function useCompletedItems(workspaceId: string) {
-  return useQuery<CompletedItemsData>({
-    queryKey: ["items", "completed", workspaceId] as const,
-    queryFn: async () => {
-      const result = await getCompletedItems(workspaceId);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
-    },
-    enabled: !!workspaceId,
-    refetchOnWindowFocus: true,
-  });
-};
 
 export type ItemsByStatusResult = Awaited<ReturnType<typeof getItemsByStatus>>;
 export type ItemsByStatusData = Extract<ItemsByStatusResult, { success: true }>['data'];
@@ -188,6 +172,45 @@ export function usePrefetchMemberItems() {
   return { prefetch };
 }
 
+export type ItemsByEntityStatusResult = Awaited<ReturnType<typeof getItemsByEntityStatus>>;
+export type ItemsByEntityStatusData = Extract<ItemsByEntityStatusResult, { success: true }>['data'];
+
+export function useItemsByEntityStatus(groupId: string, status: EntityStatus) {
+  return useQuery<ItemsByEntityStatusData>({
+    queryKey: ["items", "by-entity-status", status] as const,
+    queryFn: async () => {
+      const result = await getItemsByEntityStatus(groupId, status);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result.data;
+    },
+    enabled: !!groupId && !!status,
+    refetchOnWindowFocus: true
+  });
+}
+
+
+export function useItemsCountByStatus(
+  workspaceId: string,
+  entityStatus: EntityStatus
+) {
+  return useQuery<number | undefined>({
+    queryKey: ["items", "items-count", workspaceId, entityStatus],
+    queryFn: async () => {
+      const result = await getItemsCountByStatus(workspaceId, entityStatus);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result.data?.count;
+    },
+    enabled: !!workspaceId,
+  });
+}
+
 export function useInvalidateItems() {
   const queryClient = useQueryClient();
 
@@ -234,7 +257,8 @@ export function useUpdateItem() {
         queryKey: ["items"],
         exact: false,
         refetchType: "active"
-      })
+      });
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
     },
     retry: 1
   });
@@ -290,7 +314,56 @@ export function useDeleteItem() {
   });
 }
 
-export function useItemActions() {
+export function useChangeItemStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: ChangeStatusInputType) => {
+      const result = await changeItemStatus(data);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      queryClient.removeQueries({ queryKey: ["items", variables.itemId] });
+    }
+  });
+}
+
+// Helpers específicos
+export function useArchiveItem() {
+  const changeStatus = useChangeItemStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string, itemId: string) =>
+      changeStatus.mutateAsync({ workspaceId, itemId, newStatus: "ARCHIVED" })
+  };
+}
+
+export function useRestoreItem() {
+  const changeStatus = useChangeItemStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string, itemId: string) =>
+      changeStatus.mutateAsync({ workspaceId, itemId, newStatus: "ACTIVE" })
+  };
+}
+
+export function useMoveItemToTrash() {
+  const changeStatus = useChangeItemStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string, itemId: string) =>
+      changeStatus.mutateAsync({ workspaceId, itemId, newStatus: "DELETED" })
+  };
+}
+
+export function useItemActions(workspaceId: string) {
   const [dialogState, setDialogState] = useState<DialogStateProps>({
     isOpen: false,
     itemId: null,
@@ -303,6 +376,9 @@ export function useItemActions() {
 
   const updateItem = useUpdateItem();
   const deleteItem = useDeleteItem();
+  const archivedItem = useArchiveItem();
+  const restoreItem = useRestoreItem();
+  const moveToTrash = useMoveItemToTrash();
 
   const startEditing = useCallback((item: ItemWhitCreatedAssignedUser, field: EditingField) => {
     setEditing({ itemId: item.id, field });
@@ -329,7 +405,7 @@ export function useItemActions() {
         notes: item.notes,
         description: item.description,
         details: dialogState.content,
-        assignedTo: item.assignedTo
+        assignedTo: item.assignedTo,
       });
 
       if (!isSuccessResponse(result)) {
@@ -403,7 +479,7 @@ export function useItemActions() {
   }, [updateItem]);
 
   const handleDeleteItem = useCallback(async (itemId: string) => {
-    if (!confirm('Deseja realmente deletar o item? Todos os dados serão deletados.')) {
+    if (!confirm('Deseja realmente deletar o item permanentemente?')) {
       return;
     }
 
@@ -412,7 +488,6 @@ export function useItemActions() {
     try {
       const response = await deleteItem.mutateAsync({
         itemId,
-        revalidatePaths: ["/dashboard/workspace"]
       });
 
       if (!isSuccessResponse(response)) {
@@ -420,13 +495,74 @@ export function useItemActions() {
         return;
       }
 
-      toast.success("Item deletado com sucesso!");
+      toast.success("Item movido para lixeira com sucess!");
     } finally {
       setIsLoading(null);
     }
   }, [deleteItem]);
 
-  const handleArchive = useCallback(() => { }, []);
+  const handleMoveToTrash = useCallback(async (itemId: string) => {
+    if (!confirm('Deseja realmente mover para lixeira?')) {
+      return;
+    }
+
+    setIsLoading(itemId);
+
+    try {
+      const response = await moveToTrash.mutateAsync(
+        workspaceId, itemId,
+      );
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao deletar item");
+        return;
+      }
+
+      toast.success("Item movido para lixeira com sucess!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [moveToTrash, workspaceId,]);
+
+  const handleArchiveItem = useCallback(async (itemId: string) => {
+    setIsLoading(itemId);
+
+    try {
+      const response = await archivedItem.mutateAsync(
+        workspaceId, itemId,
+      );
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao arquivar item");
+        return;
+      }
+
+      toast.success("Item arquiovado!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [workspaceId, archivedItem]);
+
+  const handleRestoreItem = useCallback(async (itemId: string) => {
+    setIsLoading(itemId);
+
+    try {
+      const response = await restoreItem.mutateAsync(
+        workspaceId, itemId,
+      );
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao restaurar item");
+        return;
+      }
+
+      toast.success("Item restaurado!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [workspaceId, restoreItem]);
+
+
 
   return {
     // Estado
@@ -444,7 +580,9 @@ export function useItemActions() {
     handleSaveField,
     handleSelectChange,
     handleDeleteItem,
-    handleArchive
+    handleMoveToTrash,
+    handleArchiveItem,
+    handleRestoreItem
   };
 }
 

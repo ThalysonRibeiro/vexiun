@@ -62,8 +62,32 @@ export const createWorkspace = withAuth(async (
       });
     };
 
+    const group = await tx.group.create({
+      data: {
+        workspaceId: workspace.id,
+        title: "🎯 Meu primeiro grupo",
+        textColor: "#ff3445",
+      }
+    });
+
+    await tx.item.create({
+      data: {
+        groupId: group.id,
+        title: "👋 Bem-vindo! Clique aqui para editar",
+        priority: "MEDIUM",
+        status: "NOT_STARTED",
+        assignedTo: userId,
+        createdBy: userId,
+        term: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // +7 dias
+        description: "Este é um item de exemplo. Explore as funcionalidades e depois delete ou edite!",
+        notes: "💡 Dica: Use as notas para informações importantes",
+      }
+    });
+
     return workspace;
   });
+
+
 
   // Envia notificações APÓS a transação ser commitada
   if (formData.invitationUsersId && formData.invitationUsersId.length > 0) {

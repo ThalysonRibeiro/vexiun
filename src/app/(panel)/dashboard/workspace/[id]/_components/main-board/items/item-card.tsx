@@ -36,9 +36,12 @@ interface ItemCardProps {
   onSaveField: (item: ItemWhitCreatedAssignedUser) => void;
   onSelectChange: (item: ItemWhitCreatedAssignedUser, field: 'priority' | 'status', value: Priority | Status) => void;
   onDeleteItem: (itemId: string) => void;
+  onMoveToTrash: (itemId: string) => void;
   onSaveDetails: (item: ItemWhitCreatedAssignedUser) => void;
   setEditingData: (data: ItemWhitCreatedAssignedUser | null) => void;
   setDialogState: (state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)) => void;
+  onArchiveItem: (itemId: string) => void;
+  onRestoreItem: (itemId: string) => void;
 }
 
 export const ItemCard = memo(function ItemCard({
@@ -53,9 +56,12 @@ export const ItemCard = memo(function ItemCard({
   onSaveField,
   onSelectChange,
   onDeleteItem,
+  onMoveToTrash,
   onSaveDetails,
   setEditingData,
-  setDialogState
+  setDialogState,
+  onArchiveItem,
+  onRestoreItem
 }: ItemCardProps
 ) {
   const titleCapitalized = item.title[0].toUpperCase() + item.title.slice(1);
@@ -88,8 +94,11 @@ export const ItemCard = memo(function ItemCard({
             item={item}
             team={team}
             isLoading={isLoading}
+            entityStatus="ACTIVE"
             onDeleteItem={onDeleteItem}
-            onArchiveItem={() => { }}
+            onMoveToTrash={onMoveToTrash}
+            onArchiveItem={() => onArchiveItem(item.id)}
+            onRestoreItem={() => onRestoreItem(item.id)}
           />
         </CardAction>
 

@@ -12,15 +12,16 @@ import { useState } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { DialogContentNewItem } from "./dialog-new-item";
 import { Button } from "@/components/ui/button";
-import { borderColorPriority, borderColorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
+import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
-import { InfoItem } from "../main-board/info-item";
+import { InfoItem } from "../main-board/items/info-item";
 import { cn } from "@/lib/utils";
 import { ItemWhitCreatedAssignedUser, useItemsByStatus, useUpdateItem } from "@/hooks/use-items";
 import { useParams } from "next/navigation";
 import { useTeam } from "@/hooks/use-team";
 import { isSuccessResponse } from "@/lib/errors";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 export function KanbanGrid() {
   const params = useParams();
@@ -38,8 +39,8 @@ export function KanbanGrid() {
 
     // Criar preview customizado
     const dragPreview = document.createElement('div');
-    const statusClass = `text-xs border-l-4 pl-1 ${borderColorStatus(item.status)}`;
-    const priorityClass = `text-xs border-l-4 pl-1 ${borderColorPriority(item.priority)}`;
+    const statusClass = `text-xs px-1 py-0.5 rounded-md ${colorStatus(item.status)}`;
+    const priorityClass = `text-xs px-1 py-0.5 rounded-md ${colorPriority(item.priority)}`;
     dragPreview.className = 'h-35 w-60 bg-background border-1 border-primary/50 rounded-lg p-3 shadow-lg opacity-90 space-y-1';
     dragPreview.innerHTML = `
       <div class="font-medium truncate">${item.title}</div>
@@ -47,12 +48,12 @@ export function KanbanGrid() {
         ${format(new Date(item.term), "dd/MM/yyyy")}
       </div>
       <div class="flex gap-4 text-muted-foreground">
-        <p class="${statusClass}">
-          ${statusMap[item.status]}
-        </p>
-        <p class="${priorityClass}">
-          ${priorityMap[item.priority]}
-        </p>
+        <span class="${statusClass}">
+          ${statusMap.filter(status => status.key === item.status)[0].label}
+        </span>
+        <span class="${priorityClass}">
+          ${priorityMap.filter(priority => priority.key === item.priority)[0].label}
+        </span>
       </div>
       <div class="text-sm truncate">${item.notes}</div>
     `;
@@ -138,7 +139,7 @@ export function KanbanGrid() {
 
 
   return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 pb-4 min-h-[calc(100vh-10rem)]">
+    <section className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 pb-4 min-h-[calc(100vh-10rem)]">
       {statusConfig.map((config) => (
         <Card
           key={config.status}
@@ -198,8 +199,12 @@ export function KanbanGrid() {
                 >
                   <h3 className="font-medium truncate">{item.title}</h3>
                   <div className="flex gap-4 text-muted-foreground">
-                    <p className={`text-xs border-l-4 pl-1 ${borderColorStatus(item.status)}`}>{statusMap[item.status]}</p>
-                    <p className={`text-xs border-l-4 pl-1 ${borderColorPriority(item.priority)}`}>{priorityMap[item.priority]}</p>
+                    <Badge className={`text-xs ${colorStatus(item.status)}`}>
+                      {statusMap.filter(status => status.key === item.status)[0].label}
+                    </Badge>
+                    <Badge className={`text-xs ${colorPriority(item.priority)}`}>
+                      {priorityMap.filter(priority => priority.key === item.priority)[0].label}
+                    </Badge>
                   </div>
                   <p className="text-xs">{format(new Date(item.term), "dd/MM/yyyy")}</p>
                   {<h4 className="text-sm mt-2 truncate">{item.notes}</h4>}
@@ -220,7 +225,7 @@ export function KanbanGrid() {
           </CardContent>
         </Card>
       ))}
-    </div>
+    </section>
   )
 }
 

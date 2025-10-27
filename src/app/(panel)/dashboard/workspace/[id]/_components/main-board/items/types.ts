@@ -25,4 +25,5 @@ export interface ItemsTablesProps {
   groupId: string;
   team: TeamUser[];
   changeLayout: boolean;
+  workspaceId: string
 }

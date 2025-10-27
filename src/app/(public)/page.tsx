@@ -1,6 +1,3 @@
-import { CardSignIn } from "@/components/card-signIn";
-import Image from "next/image";
-import logo_img from "@/assets/logo-goallist.png";
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -12,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowRight, BarChart3, Briefcase, CheckCircle, Clock, Code, Command, FileText, FolderGit2, Globe, Layers, LayoutDashboard, MessageSquare, Rocket, Settings, Share2, Shield, Users, Calendar, Zap, HelpCircle, Twitter, Linkedin, Github, Instagram } from "lucide-react";
+import { ArrowRight, BarChart3, Briefcase, CheckCircle, Clock, Code, Command, FileText, FolderGit2, Globe, Layers, LayoutDashboard, MessageSquare, Rocket, Settings, Share2, Shield, Users, Calendar, Zap, HelpCircle, Twitter, Linkedin, Github, Instagram, Target, TrendingUp, Workflow, BookOpen } from "lucide-react";
 
 export default async function Home() {
   const session = await getSession();
@@ -39,36 +36,38 @@ export default async function Home() {
             </Badge>
 
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-left bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto] mb-4 md:mb-6">
-              Gerencie múltiplos projetos e equipes em um só lugar
+              Acompanhe suas metas pessoais e gerencie projetos em equipe
             </h2>
 
             <p className="text-lg md:text-xl text-muted-foreground text-left mb-6 md:mb-8 max-w-2xl">
-              O Catalyst é uma plataforma profissional para gerenciar projetos em equipe, permitindo que você organize diferentes equipes para cada projeto, acompanhe o progresso e aumente a produtividade da sua empresa.
+              O Catalyst é uma plataforma para definir metas pessoais semanais, organizar projetos em workspaces colaborativos e acompanhar seu progresso de forma visual e motivadora.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6 md:mb-8">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm md:text-base">Múltiplos projetos</span>
+                <span className="text-sm md:text-base">Metas pessoais semanais</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm md:text-base">Equipes personalizadas</span>
+                <span className="text-sm md:text-base">Projetos em workspaces</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm md:text-base">Controle de permissões</span>
+                <span className="text-sm md:text-base">Colaboração em equipe</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm md:text-base">Métricas em tempo real</span>
+                <span className="text-sm md:text-base">Progresso visual</span>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Button size="lg" className="gap-2 w-full sm:w-auto">
-                Começar agora <ArrowRight className="h-4 w-4" />
-              </Button>
+              <Link href="/login">
+                <Button size="lg" className="gap-2 w-full sm:w-auto">
+                  Começar agora <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 Agendar demonstração
               </Button>
@@ -81,62 +80,75 @@ export default async function Home() {
               <div className="flex justify-between items-center mb-4 md:mb-6">
                 <div className="flex items-center gap-2">
                   <div className="h-10 w-10 rounded-md bg-primary/20 flex items-center justify-center">
-                    <Briefcase className="h-5 w-5 text-primary" />
+                    <Target className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Workspace Principal</h3>
-                    <p className="text-xs text-muted-foreground">3 projetos ativos</p>
+                    <h3 className="font-medium">Suas Metas</h3>
+                    <p className="text-xs text-muted-foreground">3 metas ativas</p>
                   </div>
                 </div>
-                <Badge>Administrador</Badge>
+                <Badge className="bg-green-500/20 text-green-700 border-green-300">Esta semana</Badge>
               </div>
 
               <div className="space-y-3 md:space-y-4">
-                <div className="bg-background border rounded-md p-3">
+                <div className="bg-background border rounded-md p-3 hover:bg-primary/5 transition-colors">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-md bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold text-sm">P1</div>
-                      <h4 className="font-medium">Projeto Alpha</h4>
+                      <div className="h-8 w-8 rounded-md bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold text-sm">📚</div>
+                      <h4 className="font-medium">Estudar React</h4>
                     </div>
-                    <Badge variant="outline" className="text-xs">8 membros</Badge>
+                    <Badge variant="outline" className="text-xs">3x/semana</Badge>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>24 tarefas</span>
-                    <span>75% concluído</span>
+                  <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                    <span>2/3 completas</span>
+                    <span>67% da semana</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '67%' }}></div>
                   </div>
                 </div>
 
-                <div className="bg-background border rounded-md p-3">
+                <div className="bg-background border rounded-md p-3 hover:bg-primary/5 transition-colors">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-md bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold text-sm">P2</div>
-                      <h4 className="font-medium">Projeto Beta</h4>
+                      <div className="h-8 w-8 rounded-md bg-green-500/20 flex items-center justify-center text-green-500 font-bold text-sm">🏃</div>
+                      <h4 className="font-medium">Exercitar-se</h4>
                     </div>
-                    <Badge variant="outline" className="text-xs">5 membros</Badge>
+                    <Badge variant="outline" className="text-xs">5x/semana</Badge>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>16 tarefas</span>
-                    <span>45% concluído</span>
+                  <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                    <span>4/5 completas</span>
+                    <span>80% da semana</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '80%' }}></div>
                   </div>
                 </div>
 
-                <div className="bg-background border rounded-md p-3">
+                <div className="bg-background border rounded-md p-3 hover:bg-primary/5 transition-colors">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-md bg-green-500/20 flex items-center justify-center text-green-500 font-bold text-sm">P3</div>
-                      <h4 className="font-medium">Projeto Gamma</h4>
+                      <div className="h-8 w-8 rounded-md bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold text-sm">📖</div>
+                      <h4 className="font-medium">Ler Livros</h4>
                     </div>
-                    <Badge variant="outline" className="text-xs">3 membros</Badge>
+                    <Badge variant="outline" className="text-xs">2x/semana</Badge>
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>9 tarefas</span>
-                    <span>30% concluído</span>
+                  <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                    <span>1/2 completas</span>
+                    <span>50% da semana</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: '50%' }}></div>
                   </div>
                 </div>
               </div>
 
               <div className="mt-4 md:mt-6">
-                <CardSignIn />
+                <Link href="/login">
+                  <Button className="w-full bg-primary hover:bg-primary/90">
+                    Acessar Dashboard
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -145,11 +157,11 @@ export default async function Home() {
         <div className="flex flex-wrap justify-center gap-8 mt-16">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-              <Users className="h-4 w-4" />
+              <Target className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold">1000+</span>
-              <span className="text-sm text-muted-foreground">Equipes ativas</span>
+              <span className="text-2xl font-bold">500+</span>
+              <span className="text-sm text-muted-foreground">Metas criadas</span>
             </div>
           </div>
 
@@ -158,28 +170,28 @@ export default async function Home() {
               <Briefcase className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold">5000+</span>
-              <span className="text-sm text-muted-foreground">Projetos gerenciados</span>
+              <span className="text-2xl font-bold">200+</span>
+              <span className="text-sm text-muted-foreground">Projetos ativos</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-              <CheckCircle className="h-4 w-4" />
+              <TrendingUp className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold">98%</span>
-              <span className="text-sm text-muted-foreground">Satisfação dos clientes</span>
+              <span className="text-2xl font-bold">85%</span>
+              <span className="text-sm text-muted-foreground">Taxa de conclusão</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-              <Globe className="h-4 w-4" />
+              <Users className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold">20+</span>
-              <span className="text-sm text-muted-foreground">Países</span>
+              <span className="text-2xl font-bold">150+</span>
+              <span className="text-sm text-muted-foreground">Usuários ativos</span>
             </div>
           </div>
         </div>
@@ -187,9 +199,9 @@ export default async function Home() {
 
       {/* Features Section */}
       <section id="features" className="container mx-auto px-4 py-20">
-        <h2 className="text-3xl font-bold text-center mb-4">Funcionalidades Principais</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">Como o Catalyst Funciona</h2>
         <p className="text-xl text-muted-foreground text-center max-w-3xl mx-auto mb-16">
-          Descubra como o Catalyst pode transformar seu fluxo de trabalho e aumentar a produtividade da sua equipe
+          Uma plataforma focada em metas pessoais semanais e gerenciamento de projetos em workspaces colaborativos
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -197,18 +209,18 @@ export default async function Home() {
           <Card className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-primary" />
+                <Target className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Gestão de Equipes</CardTitle>
-              <CardDescription>Organize equipes e atribua permissões facilmente</CardDescription>
+              <CardTitle>Metas Pessoais</CardTitle>
+              <CardDescription>Defina e acompanhe suas metas semanais</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Crie e gerencie equipes, convide membros e defina níveis de acesso personalizados para cada projeto.
+                Crie metas pessoais com frequência semanal, acompanhe seu progresso e mantenha a motivação para alcançar seus objetivos.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Colaboração</Badge>
+              <Badge variant="outline" className="text-xs">Crescimento</Badge>
             </CardFooter>
           </Card>
 
@@ -218,16 +230,16 @@ export default async function Home() {
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Briefcase className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Workspaces</CardTitle>
-              <CardDescription>Ambientes de trabalho personalizados</CardDescription>
+              <CardTitle>Projetos em Workspaces</CardTitle>
+              <CardDescription>Cada workspace é um projeto</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Crie workspaces dedicados para diferentes projetos ou departamentos, mantendo tudo organizado.
+                Crie workspaces para cada projeto, convide membros da equipe e organize tarefas em grupos para colaboração eficiente.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Organização</Badge>
+              <Badge variant="outline" className="text-xs">Projetos</Badge>
             </CardFooter>
           </Card>
 
@@ -235,18 +247,18 @@ export default async function Home() {
           <Card className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <CheckCircle className="h-6 w-6 text-primary" />
+                <Layers className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Gestão de Tarefas</CardTitle>
-              <CardDescription>Acompanhe o progresso de forma visual</CardDescription>
+              <CardTitle>Organização em Grupos</CardTitle>
+              <CardDescription>Organize tarefas em grupos personalizados</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Crie, atribua e acompanhe tarefas com status personalizados e visualização em kanban.
+                Crie grupos dentro dos workspaces para organizar tarefas por categoria, prioridade ou equipe responsável.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Produtividade</Badge>
+              <Badge variant="outline" className="text-xs">Organização</Badge>
             </CardFooter>
           </Card>
 
@@ -254,18 +266,18 @@ export default async function Home() {
           <Card className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <Calendar className="h-6 w-6 text-primary" />
+                <TrendingUp className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Calendário Integrado</CardTitle>
-              <CardDescription>Visualize prazos e eventos importantes</CardDescription>
+              <CardTitle>Acompanhamento Visual</CardTitle>
+              <CardDescription>Veja seu progresso de forma motivadora</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Acompanhe datas de entrega, reuniões e marcos importantes em um calendário integrado.
+                Acompanhe seu progresso semanal nas metas com gráficos e estatísticas que te motivam a continuar.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Planejamento</Badge>
+              <Badge variant="outline" className="text-xs">Motivação</Badge>
             </CardFooter>
           </Card>
 
@@ -273,18 +285,18 @@ export default async function Home() {
           <Card className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <BarChart3 className="h-6 w-6 text-primary" />
+                <Users className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Análise de Desempenho</CardTitle>
-              <CardDescription>Métricas e insights valiosos</CardDescription>
+              <CardTitle>Colaboração em Equipe</CardTitle>
+              <CardDescription>Convide membros e gerencie permissões</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Visualize o desempenho da equipe com gráficos e relatórios detalhados sobre produtividade.
+                Convide membros para seus workspaces, defina níveis de acesso e trabalhe em equipe de forma eficiente.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Analytics</Badge>
+              <Badge variant="outline" className="text-xs">Colaboração</Badge>
             </CardFooter>
           </Card>
 
@@ -292,18 +304,18 @@ export default async function Home() {
           <Card className="border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <Globe className="h-6 w-6 text-primary" />
+                <BarChart3 className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Acesso Remoto</CardTitle>
-              <CardDescription>Trabalhe de qualquer lugar</CardDescription>
+              <CardTitle>Métricas e Relatórios</CardTitle>
+              <CardDescription>Analise seu desempenho e evolução</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Acesse seus projetos e tarefas de qualquer dispositivo, ideal para equipes remotas e híbridas.
+                Visualize gráficos de progresso, relatórios semanais e métricas que mostram sua evolução ao longo do tempo.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Flexibilidade</Badge>
+              <Badge variant="outline" className="text-xs">Analytics</Badge>
             </CardFooter>
           </Card>
         </div>
@@ -313,27 +325,27 @@ export default async function Home() {
       <section id="demo" className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <Badge variant="outline" className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20">
-            Demonstração Interativa
+            Como Funciona
           </Badge>
-          <h2 className="text-3xl font-bold mb-4">Gerencie múltiplos projetos e equipes em uma única plataforma</h2>
+          <h2 className="text-3xl font-bold mb-4">Defina metas pessoais e gerencie projetos em equipe</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Explore como o Catalyst permite gerenciar diferentes projetos com equipes personalizadas, tudo em um só lugar.
+            Veja como o Catalyst combina metas pessoais semanais com gerenciamento de projetos em workspaces colaborativos.
           </p>
         </div>
 
         <Tabs defaultValue="workspaces" className="max-w-5xl mx-auto">
           <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="workspaces">Workspaces</TabsTrigger>
-            <TabsTrigger value="projects">Projetos</TabsTrigger>
-            <TabsTrigger value="teams">Equipes</TabsTrigger>
+            <TabsTrigger value="workspaces">Projetos</TabsTrigger>
+            <TabsTrigger value="groups">Grupos</TabsTrigger>
+            <TabsTrigger value="goals">Metas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="workspaces" className="border rounded-lg p-6 bg-card">
             <div className="flex flex-col space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-medium">Seus Workspaces</h3>
+                <h3 className="text-xl font-medium">Seus Projetos</h3>
                 <Button variant="outline" size="sm" className="gap-1">
-                  <FolderGit2 className="h-4 w-4" /> Novo Workspace
+                  <FolderGit2 className="h-4 w-4" /> Novo Projeto
                 </Button>
               </div>
 
@@ -347,12 +359,12 @@ export default async function Home() {
                         </div>
                         <CardTitle>Desenvolvimento Web</CardTitle>
                       </div>
-                      <Badge>8 projetos</Badge>
+                      <Badge>8 grupos</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Workspace para projetos de desenvolvimento web e frontend.
+                      Projeto para desenvolvimento web e frontend com equipe colaborativa.
                     </p>
                     <div className="flex justify-between text-sm">
                       <span>12 membros</span>
@@ -360,7 +372,7 @@ export default async function Home() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Workspace</Button>
+                    <Button variant="ghost" size="sm">Gerenciar Projeto</Button>
                   </CardFooter>
                 </Card>
 
@@ -373,12 +385,12 @@ export default async function Home() {
                         </div>
                         <CardTitle>Backend API</CardTitle>
                       </div>
-                      <Badge>5 projetos</Badge>
+                      <Badge>5 grupos</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Workspace dedicado ao desenvolvimento de APIs e serviços backend.
+                      Projeto dedicado ao desenvolvimento de APIs e serviços backend.
                     </p>
                     <div className="flex justify-between text-sm">
                       <span>9 membros</span>
@@ -386,7 +398,7 @@ export default async function Home() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Workspace</Button>
+                    <Button variant="ghost" size="sm">Gerenciar Projeto</Button>
                   </CardFooter>
                 </Card>
 
@@ -399,12 +411,12 @@ export default async function Home() {
                         </div>
                         <CardTitle>Marketing Digital</CardTitle>
                       </div>
-                      <Badge>3 projetos</Badge>
+                      <Badge>3 grupos</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Workspace para campanhas de marketing e análise de dados.
+                      Projeto para campanhas de marketing e análise de dados.
                     </p>
                     <div className="flex justify-between text-sm">
                       <span>6 membros</span>
@@ -412,24 +424,24 @@ export default async function Home() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Workspace</Button>
+                    <Button variant="ghost" size="sm">Gerenciar Projeto</Button>
                   </CardFooter>
                 </Card>
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="projects" className="border rounded-lg p-6 bg-card">
+          <TabsContent value="groups" className="border rounded-lg p-6 bg-card">
             <div className="flex flex-col space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="h-10 w-10 rounded-md bg-blue-500/20 flex items-center justify-center">
-                    <Briefcase className="h-5 w-5 text-blue-500" />
+                    <Layers className="h-5 w-5 text-blue-500" />
                   </div>
-                  <h3 className="text-xl font-medium">Workspace: Desenvolvimento Web</h3>
+                  <h3 className="text-xl font-medium">Grupos do Workspace</h3>
                 </div>
                 <Button size="sm" className="gap-1">
-                  <Layers className="h-4 w-4" /> Novo Projeto
+                  <Layers className="h-4 w-4" /> Novo Grupo
                 </Button>
               </div>
 
@@ -437,13 +449,13 @@ export default async function Home() {
                 <Card>
                   <CardHeader>
                     <div className="flex justify-between items-center">
-                      <CardTitle>Redesign do Portal</CardTitle>
-                      <Badge variant="outline" className="bg-green-500/20 text-green-700 border-green-300">Em andamento</Badge>
+                      <CardTitle>Desenvolvimento Frontend</CardTitle>
+                      <Badge variant="outline" className="bg-green-500/20 text-green-700 border-green-300">Ativo</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Redesign completo do portal corporativo com novo sistema de design.
+                      Grupo para tarefas relacionadas ao desenvolvimento da interface do usuário.
                     </p>
                     <div className="flex justify-between items-center">
                       <div className="flex -space-x-2">
@@ -460,28 +472,28 @@ export default async function Home() {
                           <span className="text-xs">+2</span>
                         </div>
                       </div>
-                      <span className="text-sm">Prazo: 15/07/2023</span>
+                      <span className="text-sm">12 tarefas</span>
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between">
                     <div className="text-sm">
-                      <span className="text-muted-foreground">Progresso: </span>
-                      <span className="font-medium">65%</span>
+                      <span className="text-muted-foreground">Tarefas: </span>
+                      <span className="font-medium">8 concluídas</span>
                     </div>
-                    <Button variant="ghost" size="sm">Ver detalhes</Button>
+                    <Button variant="ghost" size="sm">Ver grupo</Button>
                   </CardFooter>
                 </Card>
 
                 <Card>
                   <CardHeader>
                     <div className="flex justify-between items-center">
-                      <CardTitle>App Mobile</CardTitle>
-                      <Badge variant="outline" className="bg-yellow-500/20 text-yellow-700 border-yellow-300">Planejamento</Badge>
+                      <CardTitle>Testes e QA</CardTitle>
+                      <Badge variant="outline" className="bg-yellow-500/20 text-yellow-700 border-yellow-300">Em andamento</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Desenvolvimento do aplicativo mobile para iOS e Android.
+                      Grupo para tarefas de testes, qualidade e validação de funcionalidades.
                     </p>
                     <div className="flex justify-between items-center">
                       <div className="flex -space-x-2">
@@ -495,27 +507,27 @@ export default async function Home() {
                           <span className="text-xs">+1</span>
                         </div>
                       </div>
-                      <span className="text-sm">Prazo: 30/08/2023</span>
+                      <span className="text-sm">8 tarefas</span>
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between">
                     <div className="text-sm">
-                      <span className="text-muted-foreground">Progresso: </span>
-                      <span className="font-medium">15%</span>
+                      <span className="text-muted-foreground">Tarefas: </span>
+                      <span className="font-medium">3 concluídas</span>
                     </div>
-                    <Button variant="ghost" size="sm">Ver detalhes</Button>
+                    <Button variant="ghost" size="sm">Ver grupo</Button>
                   </CardFooter>
                 </Card>
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="teams" className="border rounded-lg p-6 bg-card">
+          <TabsContent value="goals" className="border rounded-lg p-6 bg-card">
             <div className="flex flex-col space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-medium">Equipes Personalizadas</h3>
+                <h3 className="text-xl font-medium">Suas Metas Pessoais</h3>
                 <Button size="sm" className="gap-1">
-                  <Users className="h-4 w-4" /> Nova Equipe
+                  <Target className="h-4 w-4" /> Nova Meta
                 </Button>
               </div>
 
@@ -525,38 +537,32 @@ export default async function Home() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <div className="h-10 w-10 rounded-md bg-blue-500/20 flex items-center justify-center">
-                          <Code className="h-5 w-5 text-blue-500" />
+                          <Target className="h-5 w-5 text-blue-500" />
                         </div>
-                        <CardTitle>Desenvolvedores Frontend</CardTitle>
+                        <CardTitle>Estudar React</CardTitle>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <Badge variant="outline">React</Badge>
-                      <Badge variant="outline">UI/UX</Badge>
-                      <Badge variant="outline">TypeScript</Badge>
+                      <Badge variant="outline">3x/semana</Badge>
+                      <Badge variant="outline">Tecnologia</Badge>
                     </div>
-                    <div className="flex -space-x-2 mb-4">
-                      <div className="h-8 w-8 rounded-full bg-blue-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">MS</span>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Progresso semanal</span>
+                        <span>2/3</span>
                       </div>
-                      <div className="h-8 w-8 rounded-full bg-purple-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">JR</span>
-                      </div>
-                      <div className="h-8 w-8 rounded-full bg-green-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">AC</span>
-                      </div>
-                      <div className="h-8 w-8 rounded-full bg-background border-2 border-background flex items-center justify-center">
-                        <span className="text-xs">+2</span>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '67%' }}></div>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Atribuída a 3 projetos ativos
+                      Meta: Estudar React 3 vezes por semana
                     </p>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Equipe</Button>
+                    <Button variant="ghost" size="sm">Ver detalhes</Button>
                   </CardFooter>
                 </Card>
 
@@ -565,35 +571,32 @@ export default async function Home() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <div className="h-10 w-10 rounded-md bg-purple-500/20 flex items-center justify-center">
-                          <Settings className="h-5 w-5 text-purple-500" />
+                          <TrendingUp className="h-5 w-5 text-purple-500" />
                         </div>
-                        <CardTitle>Desenvolvedores Backend</CardTitle>
+                        <CardTitle>Exercitar-se</CardTitle>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <Badge variant="outline">Node.js</Badge>
-                      <Badge variant="outline">API</Badge>
-                      <Badge variant="outline">Database</Badge>
+                      <Badge variant="outline">5x/semana</Badge>
+                      <Badge variant="outline">Saúde</Badge>
                     </div>
-                    <div className="flex -space-x-2 mb-4">
-                      <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">PA</span>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Progresso semanal</span>
+                        <span>4/5</span>
                       </div>
-                      <div className="h-8 w-8 rounded-full bg-orange-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">LM</span>
-                      </div>
-                      <div className="h-8 w-8 rounded-full bg-yellow-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">CM</span>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '80%' }}></div>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Atribuída a 2 projetos ativos
+                      Meta: Exercitar-se 5 vezes por semana
                     </p>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Equipe</Button>
+                    <Button variant="ghost" size="sm">Ver detalhes</Button>
                   </CardFooter>
                 </Card>
 
@@ -602,32 +605,32 @@ export default async function Home() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <div className="h-10 w-10 rounded-md bg-green-500/20 flex items-center justify-center">
-                          <BarChart3 className="h-5 w-5 text-green-500" />
+                          <BookOpen className="h-5 w-5 text-green-500" />
                         </div>
-                        <CardTitle>Marketing & Design</CardTitle>
+                        <CardTitle>Ler Livros</CardTitle>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <Badge variant="outline">Design</Badge>
-                      <Badge variant="outline">Branding</Badge>
-                      <Badge variant="outline">Analytics</Badge>
+                      <Badge variant="outline">2x/semana</Badge>
+                      <Badge variant="outline">Educação</Badge>
                     </div>
-                    <div className="flex -space-x-2 mb-4">
-                      <div className="h-8 w-8 rounded-full bg-green-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">AC</span>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Progresso semanal</span>
+                        <span>1/2</span>
                       </div>
-                      <div className="h-8 w-8 rounded-full bg-teal-500/20 flex items-center justify-center border-2 border-background">
-                        <span className="text-xs">RM</span>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full" style={{ width: '50%' }}></div>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Atribuída a 1 projeto ativo
+                      Meta: Ler livros 2 vezes por semana
                     </p>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Equipe</Button>
+                    <Button variant="ghost" size="sm">Ver detalhes</Button>
                   </CardFooter>
                 </Card>
               </div>
@@ -831,12 +834,17 @@ export default async function Home() {
           <Badge variant="outline" className="mb-6 px-4 py-1 text-sm bg-primary/10 border-primary/20">
             Comece Hoje
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Transforme a gestão de projetos da sua equipe</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Comece a acompanhar suas metas e colaborar em equipe</h2>
           <p className="text-muted-foreground mb-10 text-lg max-w-2xl mx-auto">
-            Junte-se a centenas de equipes que já aumentaram sua produtividade e organização com o Catalyst.
+            Junte-se a usuários que já transformaram seus hábitos com metas semanais e organizaram projetos em equipe.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <CardSignIn />
+            <Link href="/login">
+              <Button size="lg" className="text-base px-8 py-6 gap-2">
+                <ArrowRight className="h-5 w-5" />
+                Começar agora
+              </Button>
+            </Link>
             <Button size="lg" variant="outline" className="text-base px-8 py-6 gap-2">
               <Calendar className="h-5 w-5" />
               Agendar demonstração
@@ -891,11 +899,11 @@ export default async function Home() {
             <div>
               <h3 className="font-semibold mb-6 text-lg">Recursos</h3>
               <ul className="space-y-4">
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Documentação</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Tutoriais</Link></li>
+                <li><Link href="/docs" className="text-muted-foreground hover:text-primary transition-colors">Documentação</Link></li>
+                <li><Link href="/docs/tutoriais" className="text-muted-foreground hover:text-primary transition-colors">Tutoriais</Link></li>
+                <li><Link href="/docs/faq" className="text-muted-foreground hover:text-primary transition-colors">FAQ</Link></li>
                 <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
                 <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Comunidade</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Webinars</Link></li>
               </ul>
             </div>
 

@@ -24,24 +24,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { GroupPriorityBar, GroupProgressBar } from "./group-progress-bar";
-import { CompletedItems } from "./completed-items";
-import { GroupsData, useDeleteGroup } from "@/hooks/use-groups";
+import { useDeleteGroup, useGroups } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";
 import { Badge } from "@/components/ui/badge";
 
 export function Groups({
-  data, workspaceId,
+  workspaceId,
 }: {
-  data: GroupsData, workspaceId: string;
+  workspaceId: string;
 }) {
   const [changeLayout, setChangeLayout] = useState<boolean>(false);
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
   const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
+  const { data: groups } = useGroups(workspaceId);
   const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(workspaceId);
   const deleteGroup = useDeleteGroup();
 
@@ -94,8 +94,8 @@ export function Groups({
   }
 
   return (
-    <div className="space-y-6 mb-6">
-      {data?.group.length === 0 && <h2 className="text-center">Cadastre um group</h2>}
+    <section className="space-y-6 mb-6">
+      {groups?.group.length === 0 && <h2 className="text-center">Cadastre um group</h2>}
       {/* Botão/Formulário para adicionar novo grupo */}
       <div className="pt-4 border-t border-gray-200">
         {isAddingGroup ? (
@@ -128,7 +128,7 @@ export function Groups({
       </div>
       {/* Lista de grupos */}
       <div className="space-y-6">
-        {data?.group.map(group => {
+        {groups?.group.map(group => {
           const isGroupOpen = openGroups.has(group.id);
 
           return (
@@ -220,7 +220,12 @@ export function Groups({
                 style={{ borderColor: group.textColor }}
               >
                 <CollapsibleContent className="relative">
-                  <ListItems groupId={group.id} team={team ?? []} changeLayout={changeLayout} />
+                  <ListItems
+                    groupId={group.id}
+                    team={team ?? []}
+                    changeLayout={changeLayout}
+                    workspaceId={workspaceId}
+                  />
 
                   <Dialog
                     open={openDialogs.has(group.id)}
@@ -272,7 +277,6 @@ export function Groups({
           );
         })}
       </div>
-      <CompletedItems />
-    </div >
+    </section >
   );
 }

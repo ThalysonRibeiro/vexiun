@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils"
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus"
 import { Edit, X } from "lucide-react"
 import { useRef, useState } from "react"
-import { CreateOrEditItemForm } from "./create-or-edit-item-form"
+import { CreateOrEditItemForm } from "../create-or-edit-item-form"
 import { JSONContent } from "@tiptap/core"
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items"
-import { DetailsEditor } from "./details-editor"
+import { DetailsEditor } from "../details-editor"
+import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
 
 type TeamUser = {
   id: string;
@@ -33,7 +35,8 @@ export function InfoItem({
   const shetRef = useRef<HTMLDivElement>(null);
 
   return (
-    <SheetContent ref={shetRef} className="overflow-y-scroll ">
+    <SheetContent ref={shetRef} className="overflow-y-scroll min-w-[calc(80vw-25rem)]">
+      {/* <SheetContent ref={shetRef} className="overflow-y-scroll h-[calc(100vh-10rem)]" side="bottom"> */}
       {editable && (
         <Button className="w-fit ml-4 mt-4 border-dashed" variant={"outline"}
           onClick={() => setIsEditing(prev => !prev)}
@@ -42,29 +45,27 @@ export function InfoItem({
         </Button>
       )}
       {isEditing && editable ? (
-        <>
-          <div className="p-4 space-y-4">
-            <CreateOrEditItemForm
-              closeForm={() => setIsEditing(false)}
-              initialValues={{
-                title: data.title,
-                term: data.term,
-                priority: data.priority,
-                status: data.status,
-                notes: data.notes,
-                description: data.description,
-                assignedTo: data.assignedTo,
-                details: data.details as JSONContent
-              }}
-              team={team}
-              groupId={""}
-              itemId={data.id}
-              editingItem={true}
-            />
-          </div>
-        </>
+        <div className="p-4 space-y-4">
+          <CreateOrEditItemForm
+            closeForm={() => setIsEditing(false)}
+            initialValues={{
+              title: data.title,
+              term: data.term,
+              priority: data.priority,
+              status: data.status,
+              notes: data.notes,
+              description: data.description,
+              assignedTo: data.assignedTo,
+              details: data.details as JSONContent
+            }}
+            team={team}
+            groupId={""}
+            itemId={data.id}
+            editingItem={true}
+          />
+        </div>
       ) : (
-        <>
+        <div>
           <SheetHeader>
             <SheetTitle>
               {data.title[0].toUpperCase()}
@@ -75,26 +76,26 @@ export function InfoItem({
           <div className="p-4 space-y-4">
 
             <div className="flex flex-wrap gap-2 items-center justify-between">
-              <div className="flex flex-col text-sm">
-                <span>
+              <div className="flex flex-col gap-2 text-sm">
+                <Label>
                   Prioridade:
-                </span>
-                <span className={cn("px-2 py-1 w-fit rounded", colorPriority(data.priority))}>
-                  {priorityMap[data.priority]}
-                </span>
+                </Label>
+                <Badge className={`text-xs ${colorPriority(data.priority)}`}>
+                  {priorityMap.filter(priority => priority.key === data.priority)[0].label}
+                </Badge>
               </div>
-              <div className="flex flex-col text-sm">
-                <span>
+              <div className="flex flex-col gap-2 text-sm">
+                <Label>
                   Status:
-                </span>
-                <span className={cn("px-2 py-1 w-fit rounded", colorStatus(data.status))}>
-                  {statusMap[data.status]}
-                </span>
+                </Label>
+                <Badge className={`text-xs ${colorStatus(data.status)}`}>
+                  {statusMap.filter(status => status.key === data.status)[0].label}
+                </Badge>
               </div>
-              <div className="flex flex-col text-sm">
-                <span>
+              <div className="flex flex-col gap-2 text-sm">
+                <Label>
                   Prazo:
-                </span>
+                </Label>
                 <span className={cn(
                   "px-2 py-1 w-fit rounded",
                   new Date(data.term).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
@@ -122,7 +123,7 @@ export function InfoItem({
             />
 
           </div>
-        </>
+        </div>
       )}
     </SheetContent>
   )

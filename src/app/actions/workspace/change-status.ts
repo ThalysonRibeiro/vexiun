@@ -10,6 +10,7 @@ import {
   validateWorkspacePermission
 } from "@/lib/db/validators";
 import { ChangeStatusInput, changeWorkspaceStatusSchema } from "./workspace-schema";
+import { entityStatusMessages } from "@/lib/entityStatus/messages";
 
 export const changeWorkspaceStatus = withAuth(
   async (userId, session, formData: ChangeStatusInput) => {
@@ -36,21 +37,14 @@ export const changeWorkspaceStatus = withAuth(
     // DELETED só pode ser alterado pelo OWNER
     if (currentStatus === "DELETED" && role !== "OWNER") {
       throw new PermissionError(
-        "Apenas o proprietário pode restaurar workspaces deletadas"
+        ERROR_MESSAGES.PERMISSION.OWNER_ONLY
       );
     }
 
     // Só OWNER e ADMIN podem arquivar/deletar
     if (["MEMBER", "VIEWER"].includes(role) && formData.newStatus !== "ACTIVE") {
       throw new PermissionError(
-        "Você não tem permissão para arquivar ou deletar esta workspace"
-      );
-    }
-
-    // Só OWNER pode deletar permanentemente (se implementar)
-    if (formData.newStatus === "DELETED" && role !== "OWNER") {
-      throw new PermissionError(
-        "Apenas o proprietário pode mover para lixeira"
+        ERROR_MESSAGES.PERMISSION.OWNER_ONLY
       );
     }
 
@@ -90,10 +84,9 @@ export const changeWorkspaceStatus = withAuth(
 
     if (formData.revalidatePaths?.length) {
       formData.revalidatePaths.forEach((path) => revalidatePath(path));
+    } else {
+      revalidatePath(`/dashboard/workspace/${formData.workspaceId}`);
     }
-    // ✅ 6. Revalidação de cache
-    revalidatePath("/dashboard/workspaces");
-    revalidatePath(`/dashboard/workspace/${formData.workspaceId}`);
 
     // ✅ 7. Mensagem de sucesso
     const messages: Record<EntityStatus, string> = {
@@ -104,7 +97,7 @@ export const changeWorkspaceStatus = withAuth(
 
     return successResponse(
       { workspaceId: formData.workspaceId, status: formData.newStatus },
-      messages[formData.newStatus]
+      entityStatusMessages.WORKSPACE(formData.newStatus)
     );
   },
   ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR

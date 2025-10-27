@@ -66,13 +66,14 @@ export function DetailsEditor({
   }, [editable]);
   const handleUpdate = ({ editor }: { editor: Editor }) => {
     const json = editor.getJSON();
-    onContentChange(json);
+    const serialized = JSON.parse(JSON.stringify(json));
+    onContentChange(serialized);
   };
 
   return (
     <EditorProvider
       key={key}
-      className="h-full w-full overflow-y-auto rounded-lg border bg-background p-4"
+      className="h-full w-full overflow-y-auto rounded-lg border bg-background p-4 relative"
       content={content}
       onUpdate={handleUpdate}
       placeholder="Click aqui e comece a digitar..."
@@ -84,7 +85,7 @@ export function DetailsEditor({
         <EditorNodeBulletList hideName />
         <EditorNodeQuote hideName />
         <EditorNodeCode hideName />
-        <EditorNodeTable hideName />
+        {/* <EditorNodeTable hideName /> */}
       </EditorFloatingMenu>
       <EditorBubbleMenu>
         <EditorSelector title="Text">

@@ -13,7 +13,7 @@ export const getAssociatedWithMember = withAuth(
         workspaceId_userId: {
           workspaceId,
           userId: memberId,
-        }
+        },
       },
       select: { joinedAt: true, }
     });
@@ -28,6 +28,7 @@ export const getAssociatedWithMember = withAuth(
         group: {
           workspaceId
         },
+        entityStatus: "ACTIVE"
       },
       select: {
         id: true,

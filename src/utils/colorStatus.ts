@@ -1,4 +1,5 @@
 import { NotificationType } from "@/generated/prisma";
+import { AlertCircle, ArrowDown, ArrowUp, CheckCircle2, Circle, Loader2, Minus, PauseCircle } from "lucide-react";
 
 export function colorStatus(status: string): string {
   switch (status) {
@@ -25,54 +26,73 @@ export function borderColorStatus(status: string): string {
   }
 }
 
-export const statusMap = {
-  DONE: "CONCLUÍDO",
-  IN_PROGRESS: "EM ANDAMENTO",
-  STOPPED: "INTERROMPIDO",
-  NOT_STARTED: "NÃO INICIADO",
-}
-
-export const statusKeys = ["DONE", "IN_PROGRESS", "STOPPED", "NOT_STARTED"];
+export const statusMap = [
+  {
+    key: "DONE",
+    label: "CONCLUÍDO",
+    icon: CheckCircle2,
+    color: "text-green-600",
+    animate: false
+  },
+  {
+    key: "IN_PROGRESS",
+    label: "EM ANDAMENTO",
+    icon: Loader2,
+    color: "text-blue-600",
+    animate: true
+  },
+  {
+    key: "STOPPED",
+    label: "INTERROMPIDO",
+    icon: PauseCircle,
+    color: "text-orange-600",
+    animate: false
+  },
+  {
+    key: "NOT_STARTED",
+    label: "NÃO INICIADO",
+    icon: Circle,
+    color: "text-gray-600",
+    animate: false
+  },
+] as const;
 
 export function colorPriority(status: string): string {
   switch (status) {
     case "CRITICAL":
-      return "bg-red-500 dark:bg-red-500 text-white";
+      return "bg-zinc-700 dark:bg-zinc-700 text-white";
     case "HIGH":
-      return "bg-orange-500 dark:bg-orange-500 text-white";
+      return "bg-red-700 dark:bg-red-700 text-white";
     case "MEDIUM":
-      return "bg-yellow-500 dark:bg-yellow-500 text-white";
+      return "bg-red-500 dark:bg-red-500 text-white";
     case "LOW":
-      return "bg-green-500 dark:bg-green-500 text-white";
+      return "bg-red-400 dark:bg-red-400 text-white";
     default:
-      return "bg-zinc-400 dark:bg-zinc-400 text-white";
+      return "bg-red-300 dark:bg-red-300 text-white";
   }
 }
 export function borderColorPriority(status: string): string {
   switch (status) {
     case "CRITICAL":
-      return "border-red-500 dark:border-red-500";
+      return "bg-zinc-700 dark:bg-zinc-700";
     case "HIGH":
-      return "border-orange-500 dark:border-orange-500";
+      return "bg-red-700 dark:bg-red-7000";
     case "MEDIUM":
-      return "border-yellow-500 dark:border-yellow-500";
+      return "bg-red-500 dark:bg-red-500";
     case "LOW":
-      return "border-green-500 dark:border-green-500";
+      return "bg-red-400 dark:bg-red-400";
     default:
-      return "border-zinc-400 dark:border-zinc-400";
+      return "bg-red-300 dark:bg-red-300";
   }
 }
 
-export const priorityMap = {
-  CRITICAL: "CRÍTICO",
-  HIGH: "ALTO",
-  MEDIUM: "MÉDIO",
-  LOW: "BAIXO",
-  STANDARD: "PADRÃO",
-}
-
-export const priorityKeys = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "STANDARD"];
-
+export const priorityMap = [
+  { key: "CRITICAL", label: "CRÍTICO", icon: AlertCircle, color: "text-red-600" },
+  { key: "HIGH", label: "ALTO", icon: ArrowUp, color: "text-orange-600" },
+  { key: "MEDIUM", label: "MÉDIO", icon: Minus, color: "text-yellow-600" },
+  { key: "LOW", label: "BAIXO", icon: ArrowDown, color: "text-green-600" },
+  { key: "STANDARD", label: "PADRÃO", icon: Circle, color: "text-gray-600" },
+];
 
 export const notificationMap = {
   WORKSPACE_INVITE: "CONVITE DE PROJETO",

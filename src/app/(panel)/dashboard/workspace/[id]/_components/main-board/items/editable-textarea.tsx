@@ -56,7 +56,7 @@ export const EditableTextarea = memo(function EditableTextarea({
               }}
               autoFocus
               disabled={isLoading === item.id}
-              className="max-h-[120px] w-full"
+              className="max-h-[120px] min-w-80"
               placeholder={placeholder}
               maxLength={1000}
             />

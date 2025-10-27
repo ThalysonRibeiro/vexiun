@@ -194,14 +194,31 @@ export function CreateOrEditItemForm({
                       value={field.value}
                     >
                       <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
-                        <SelectValue placeholder={priorityMap["STANDARD"]} />
+                        <SelectValue>
+                          {(() => {
+                            const p = priorityMap.find(p => p.key === field.value);
+                            return p ? (
+                              <div className="flex items-center gap-1.5">
+                                <p.icon className="h-3.5 w-3.5 text-white" />
+                                <span>{p.label}</span>
+                              </div>
+                            ) : null;
+                          })()}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CRITICAL" className={colorPriority("CRITICAL")}>Crítico</SelectItem>
-                        <SelectItem value="HIGH" className={colorPriority("HIGH")}>Alto</SelectItem>
-                        <SelectItem value="MEDIUM" className={colorPriority("MEDIUM")}>Medio</SelectItem>
-                        <SelectItem value="LOW" className={colorPriority("LOW")}>Baixo</SelectItem>
-                        <SelectItem value="STANDARD" className={colorPriority("STANDARD")}>Padrão</SelectItem>
+                        {priorityMap.map((p) => (
+                          <SelectItem
+                            key={p.key}
+                            value={p.key}
+                            className={cn("cursor-pointer", colorPriority(p.key))}
+                          >
+                            <div className="flex items-center gap-2">
+                              <p.icon className="h-4 w-4 text-white" />
+                              <span>{p.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -224,21 +241,31 @@ export function CreateOrEditItemForm({
                         value={field.value}
                       >
                         <SelectTrigger className={colorStatus(field.value)} size="sm" >
-                          <SelectValue placeholder={statusMap[field.value]} />
+                          <SelectValue>
+                            {(() => {
+                              const s = statusMap.find(s => s.key === field.value);
+                              return s ? (
+                                <div className="flex items-center gap-1.5">
+                                  <s.icon className={cn("h-3.5 w-3.5 text-white", s.animate && "animate-spin")} />
+                                  <span className="text-white">{s.label}</span>
+                                </div>
+                              ) : null;
+                            })()}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="DONE" className={colorStatus("DONE")}>
-                            CONCLUÍDO
-                          </SelectItem>
-                          <SelectItem value="IN_PROGRESS" className={colorStatus("IN_PROGRESS")}>
-                            EM ANDAMENTO
-                          </SelectItem>
-                          <SelectItem value="STOPPED" className={colorStatus("STOPPED")}>
-                            INTERROMPIDO
-                          </SelectItem>
-                          <SelectItem value="NOT_STARTED" className={colorStatus("NOT_STARTED")}>
-                            NÃO INICIADO
-                          </SelectItem>
+                          {statusMap.map((s) => (
+                            <SelectItem
+                              key={s.key}
+                              value={s.key}
+                              className={cn("cursor-pointer", colorStatus(s.key))}
+                            >
+                              <div className="flex items-center gap-2">
+                                <s.icon className={cn("h-4 w-4 text-white", s.animate && "animate-spin")} />
+                                <span>{s.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormControl>

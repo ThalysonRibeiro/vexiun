@@ -59,7 +59,7 @@ export async function validateWorkspaceExists(workspaceId: string) {
 export async function validateItemExists(itemId: string) {
   const item = await prisma.item.findUnique({
     where: { id: itemId },
-    select: { id: true },
+    select: { id: true, entityStatus: true },
   });
 
   if (!item) {

@@ -52,7 +52,7 @@ export const RenderEditableCell = memo(function RenderEditableCell({
           }}
           autoFocus
           disabled={isLoading === item.id}
-          className="flex-1"
+          className="flex-1 min-w-80"
         />
         <Button
           type="submit"

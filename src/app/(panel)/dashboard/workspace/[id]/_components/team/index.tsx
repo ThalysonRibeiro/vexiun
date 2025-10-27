@@ -64,7 +64,7 @@ export function Team({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="mt-6 mb-6 flex flex-col">
+    <section className="mt-6 mb-6 flex flex-col">
       <Dialog>
         <DialogTrigger asChild className="mr-auto">
           <Button variant={"outline"}>
@@ -129,6 +129,6 @@ export function Team({ workspaceId }: { workspaceId: string }) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 };

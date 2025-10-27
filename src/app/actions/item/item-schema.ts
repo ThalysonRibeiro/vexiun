@@ -2,6 +2,7 @@ import { ERROR_MESSAGES } from "@/lib/errors";
 import { JSONContent } from "@tiptap/core";
 import { z } from "zod";
 import { groupIdFormSchema } from "../group";
+import { EntityStatus } from "@/generated/prisma";
 
 export const itemIdFormSchema = z.object({
   itemId: z.string()
@@ -40,8 +41,20 @@ export const assignToFormSchema = z.object({
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
 });
 
+export const changeStatusFormSchema = itemIdFormSchema.extend({
+  workspaceId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+  newStatus: z.enum([
+    EntityStatus.ACTIVE,
+    EntityStatus.ARCHIVED,
+    EntityStatus.DELETED
+  ])
+})
+
 export type ItemFormData = z.infer<typeof itemFormSchema>;
 export type CreateItemType = z.infer<typeof createItemFormSchema>;
 export type UpdateItemType = z.infer<typeof updateItemFormSchema>;
 export type AssignToType = z.infer<typeof assignToFormSchema>;
 export type DeleteItemType = z.infer<typeof itemIdFormSchema>;
+export type ChangeStatusInputType = z.infer<typeof changeStatusFormSchema>;

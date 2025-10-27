@@ -14,7 +14,7 @@ import { ItemsTablesProps } from "./items/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-export function ListItems({ groupId, team, changeLayout }: ItemsTablesProps) {
+export function ListItems({ groupId, team, changeLayout, workspaceId }: ItemsTablesProps) {
   const formRef = useRef<HTMLDivElement>(null);
   const { data: items, isLoading: isLoadingItems } = useItems(groupId);
 
@@ -31,9 +31,12 @@ export function ListItems({ groupId, team, changeLayout }: ItemsTablesProps) {
     handleSaveField,
     handleSelectChange,
     handleDeleteItem,
-  } = useItemActions();
+    handleMoveToTrash,
+    handleArchiveItem,
+    handleRestoreItem
+  } = useItemActions(workspaceId);
 
-  const pagination = usePagination(items?.itemsNotCompleted ?? [], 10);
+  const pagination = usePagination(items?.response ?? [], 20);
   const currentItems = pagination.currentItems;
 
   useEffect(() => {
@@ -92,6 +95,9 @@ export function ListItems({ groupId, team, changeLayout }: ItemsTablesProps) {
     onSaveField: handleSaveField,
     onSelectChange: handleSelectChange,
     onDeleteItem: handleDeleteItem,
+    onMoveToTrash: handleMoveToTrash,
+    onArchiveItem: handleArchiveItem,
+    onRestoreItem: handleRestoreItem,
     onSaveDetails: handleSaveDetails,
     setEditingData,
     setDialogState,
@@ -111,7 +117,7 @@ export function ListItems({ groupId, team, changeLayout }: ItemsTablesProps) {
         )}
       </div>
 
-      {(items?.itemsNotCompleted ?? []).length > 10 && (
+      {(items?.itemsNotCompleted ?? []).length > 20 && (
         <PaginationControls {...pagination} />
       )}
     </div>

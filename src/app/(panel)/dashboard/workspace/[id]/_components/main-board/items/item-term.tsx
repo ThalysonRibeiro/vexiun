@@ -36,6 +36,7 @@ export const ItemTerm = memo(function ItemTerm({
 }: ItemTermProps) {
   const isEditing = editing.itemId === item.id && editing.field === 'term';
   const isOverdue = new Date(item.term) < new Date() && item.status !== 'DONE';
+  const isCompleted = new Date(item.term) < new Date() && item.status === 'DONE';
 
   return (
     <div>
@@ -71,14 +72,15 @@ export const ItemTerm = memo(function ItemTerm({
         <div
           onClick={() => onStartEditing(item, 'term')}
           className={cn(
-            "flex items-center justify-center gap-2 py-2 px-3 rounded-md font-medium text-sm cursor-pointer transition-colors",
+            "flex items-center justify-center gap-2 py-1 px-3 rounded-md font-medium text-sm cursor-pointer transition-colors",
             isOverdue
-              ? "bg-red-500/20 text-red-800 hover:bg-red-600/20"
-              : "bg-muted text-foreground hover:bg-muted"
+              ? "text-red-800 hover:bg-red-600/20"
+              : "text-foreground hover:bg-muted",
           )}
           title="Clique para editar"
         >
           {isOverdue && <CircleAlert className="h-4 w-4" />}
+          {isCompleted && <Check className="h-4 w-4 text-green-600" />}
           <Calendar className="h-4 w-4" />
           <span>{format(item.term, "dd/MM/yyyy")}</span>
         </div>

@@ -40,7 +40,11 @@ import { WorkspaceForm } from "./workspace-form";
 import { useState } from "react";
 import Link from "next/link";
 import { isSuccessResponse } from "@/lib/errors";
-import { useArchiveWorkspace, useChangeWorkspace, useWorkspacePermissions } from "@/hooks/use-workspace";
+import {
+  useArchiveWorkspace,
+  useWorkspacePermissions,
+  useMoveWorkspaceToTrash
+} from "@/hooks/use-workspace";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
@@ -60,7 +64,7 @@ export function WorkspaceList({ workspaces }: WorkspaceListProps) {
   const [selectedWorkspace, setSelectedWorkspace] = useState<WorkspaceWithDetails | null>(null);
   const router = useRouter();
   const archive = useArchiveWorkspace();
-  const deleteWs = useChangeWorkspace();
+  const deleteWs = useMoveWorkspaceToTrash();
 
   if (workspaces.length === 0) {
     return (

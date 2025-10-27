@@ -13,6 +13,8 @@ import {
 } from "@/app/actions/group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { EntityStatus } from "@/generated/prisma";
+import { getGroupItemByEntityStatus } from "@/app/data-access/groupe/get-item-by-entity-status";
 
 
 export interface UseGroupFormProps {
@@ -49,6 +51,26 @@ export function useGroups(workspaceId: string) {
     },
     enabled: !!workspaceId,
   });
+}
+
+export type GroupItemByEntityStatusResult = Awaited<ReturnType<typeof getGroupItemByEntityStatus>>;
+export type GroupItemByEntityStatusData = Extract<GroupItemByEntityStatusResult, { success: true }>['data'];
+
+export function useGroupItemByEntityStatus(workspaceId: string, status: EntityStatus) {
+  return useQuery<GroupItemByEntityStatusData>({
+    queryKey: ["items", "by-entity-status", status] as const,
+    queryFn: async () => {
+      const result = await getGroupItemByEntityStatus(workspaceId, status);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result.data;
+    },
+    enabled: !!workspaceId && !!status,
+    refetchOnWindowFocus: true
+  })
 }
 
 export function useInvalidateGreoups() {

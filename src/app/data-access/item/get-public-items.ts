@@ -21,7 +21,7 @@ export const getPublicItems = withAuth(async (
   await validateGroupExists(groupId);
 
   const response = await prisma.item.findMany({
-    where: { groupId },
+    where: { groupId, entityStatus: "ACTIVE" },
     include: {
       createdByUser: {
         select: {

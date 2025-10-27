@@ -48,7 +48,8 @@ export const getGroups = withAuth(async (
     // Busca TODOS os itens com id e status
     prisma.item.findMany({
       where: {
-        groupId: { in: groupIds }
+        groupId: { in: groupIds },
+        entityStatus: "ACTIVE"
       },
       select: {
         id: true,
@@ -61,7 +62,8 @@ export const getGroups = withAuth(async (
     prisma.item.groupBy({
       by: ["groupId", "status"],
       where: {
-        groupId: { in: groupIds }
+        groupId: { in: groupIds },
+        entityStatus: "ACTIVE"
       },
       _count: {
         id: true

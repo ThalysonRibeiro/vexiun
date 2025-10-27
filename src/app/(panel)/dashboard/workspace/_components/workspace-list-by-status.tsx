@@ -11,9 +11,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { useArchiveWorkspace, useChangeWorkspace, useDeleteWorkspace, useRestoreWorkspace } from "@/hooks/use-workspace";
+import {
+  useArchiveWorkspace,
+  useDeleteWorkspace,
+  useMoveWorkspaceToTrash,
+  useRestoreWorkspace
+} from "@/hooks/use-workspace";
 import { isSuccessResponse } from "@/lib/errors";
-import { Archive, FolderOpen, Trash, ArchiveRestore, Ellipsis, FolderKanban, Trash2, Users } from "lucide-react";
+import {
+  Archive,
+  FolderOpen,
+  Trash,
+  ArchiveRestore,
+  Ellipsis,
+  FolderKanban,
+  Trash2,
+  Users
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useWorkspacesByStatus } from "@/hooks/use-workspace";
@@ -102,7 +116,7 @@ interface WorkspaceCardProps {
 export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
   const archive = useArchiveWorkspace();
   const restore = useRestoreWorkspace();
-  const deleteWs = useChangeWorkspace();
+  const deleteWs = useMoveWorkspaceToTrash();
   const deletePemamently = useDeleteWorkspace();
 
   const handleArchive = async () => {

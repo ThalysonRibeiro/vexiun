@@ -23,7 +23,7 @@ export const notificationIdsFormSchema = z.object({
   revalidatePaths: z.array(z.string()).optional(),
 });
 
-const notificationIdFormSchema = z.object({
+export const notificationIdFormSchema = z.object({
   notificationId: z.string()
     .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),

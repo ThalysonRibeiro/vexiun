@@ -3,10 +3,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { WorkspaceList } from "./workspace-list";
-import { EntityStatus, Prisma, WorkspaceCategory, WorkspaceRole } from "@/generated/prisma";
+import { EntityStatus, WorkspaceCategory, WorkspaceRole } from "@/generated/prisma";
 import { DialogCreateWorkspace } from "../[id]/_components/dialog-create-workspace";
-import { usePathname } from "next/navigation";
-import { useChangeWorkspace, useWorkspacesByStatus } from "@/hooks/use-workspace";
+import { useWorkspacesByStatus } from "@/hooks/use-workspace";
 import { PermissionsTable } from "./permissions";
 import { WorkspaceListByStatus } from "./workspace-list-by-status";
 import { Archive, FolderOpen, Shield, Trash2, Users } from "lucide-react";
@@ -76,7 +75,7 @@ export function WorkspacesPageClient({
 
           <TabsTrigger value="shared-workspaces" className="gap-2 cursor-pointer hover:border-primary">
             <Users className="w-4 h-4" />
-            <p className="hidden lg:block">Compartilhadas</p>
+            <span className="hidden lg:block">Compartilhadas</span>
             {sharedWorkspaces.length > 0 && (
               <Badge variant="secondary">{sharedWorkspaces.length}</Badge>
             )}
@@ -84,7 +83,7 @@ export function WorkspacesPageClient({
 
           <TabsTrigger value="archived" className="gap-2 cursor-pointer hover:border-primary">
             <Archive className="w-4 h-4" />
-            <p className="hidden lg:block">Arquivadas</p>
+            <span className="hidden lg:block">Arquivadas</span>
             {(archivedWorkspaces?.data?.length || 0) > 0 && (
               <Badge variant="secondary">{archivedWorkspaces?.data?.length}</Badge>
             )}
@@ -92,7 +91,7 @@ export function WorkspacesPageClient({
 
           <TabsTrigger value="bin" className="gap-2 cursor-pointer hover:border-primary">
             <Trash2 className="w-4 h-4" />
-            <p className="hidden lg:block">Lixeira</p>
+            <span className="hidden lg:block">Lixeira</span>
             {(deletedWorkspaces?.data?.length || 0) > 0 && (
               <Badge variant="destructive">{deletedWorkspaces?.data?.length}</Badge>
             )}
@@ -100,7 +99,7 @@ export function WorkspacesPageClient({
 
           <TabsTrigger value="permissions" className="gap-2 cursor-pointer hover:border-primary">
             <Shield className="w-4 h-4" />
-            <p className="hidden lg:block">Permissões</p>
+            <span className="hidden lg:block">Permissões</span>
           </TabsTrigger>
         </TabsList>
 

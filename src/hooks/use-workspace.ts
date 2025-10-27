@@ -172,7 +172,7 @@ export function useRestoreWorkspace() {
   };
 }
 
-export function useChangeWorkspace() {
+export function useMoveWorkspaceToTrash() {
   const changeStatus = useChangeWorkspaceStatus();
 
   return {

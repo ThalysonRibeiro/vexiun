@@ -20,6 +20,7 @@ import { ItemPriorityStatus } from "./priority";
 import { colorPriority, colorStatus } from "@/utils/colorStatus";
 import { ItemDetails } from "./item-details";
 import { DialogStateProps, EditingField, TeamUser } from "./types";
+import { cn } from "@/lib/utils";
 
 
 interface ItemTableProps {
@@ -34,9 +35,12 @@ interface ItemTableProps {
   onSaveField: (item: ItemWhitCreatedAssignedUser) => void;
   onSelectChange: (item: ItemWhitCreatedAssignedUser, field: 'priority' | 'status', value: Priority | Status) => void;
   onDeleteItem: (itemId: string) => void;
+  onMoveToTrash: (itemId: string) => void;
   onSaveDetails: (item: ItemWhitCreatedAssignedUser) => void;
   setEditingData: (data: ItemWhitCreatedAssignedUser | null) => void;
   setDialogState: (state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)) => void;
+  onArchiveItem: (itemId: string) => void;
+  onRestoreItem: (itemId: string) => void;
 }
 
 export const ItemTable = memo(function ItemTable({
@@ -51,9 +55,12 @@ export const ItemTable = memo(function ItemTable({
   onSaveField,
   onSelectChange,
   onDeleteItem,
+  onMoveToTrash,
   onSaveDetails,
   setEditingData,
-  setDialogState
+  setDialogState,
+  onArchiveItem,
+  onRestoreItem
 }: ItemTableProps) {
   return (
     <Table className="border rounded-lg">
@@ -76,16 +83,19 @@ export const ItemTable = memo(function ItemTable({
           return (
             <TableRow key={item.id} className={isLoading === item.id ? 'opacity-50' : ''}>
 
-              <TableCell>
+              <TableCell className="py-0.5">
                 <ActionItem
                   item={item}
                   team={team}
                   isLoading={isLoading}
+                  entityStatus="ACTIVE"
                   onDeleteItem={onDeleteItem}
-                  onArchiveItem={() => { }}
+                  onMoveToTrash={onMoveToTrash}
+                  onArchiveItem={() => onArchiveItem(item.id)}
+                  onRestoreItem={() => onRestoreItem(item.id)}
                 />
               </TableCell>
-              <TableCell className="border-x">
+              <TableCell className="border-x py-0.5">
                 <div className="flex-1 min-w-0 text-base leading-tight">
                   <RenderEditableCell
                     item={item}
@@ -102,7 +112,7 @@ export const ItemTable = memo(function ItemTable({
                 </div>
               </TableCell>
 
-              <TableCell className="max-w-90">
+              <TableCell className="max-w-100 w-full py-0.5">
                 <EditableTextarea
                   item={item}
                   field="notes"
@@ -118,13 +128,13 @@ export const ItemTable = memo(function ItemTable({
                 />
               </TableCell>
 
-              <TableCell className="border-x"
+              <TableCell className="border-x py-0.5"
                 title="Para trocar de responsável edite o item"
               >
                 <ItemResponsible item={item} label="" />
               </TableCell>
 
-              <TableCell>
+              <TableCell className="py-0.5">
                 <ItemTerm
                   label=""
                   item={item}
@@ -138,7 +148,7 @@ export const ItemTable = memo(function ItemTable({
                 />
               </TableCell>
 
-              <TableCell className={colorPriority(item.priority)}>
+              <TableCell className={cn("py-0.5", colorPriority(item.priority))}>
 
                 <ItemPriorityStatus
                   className="w-full p-0 border-0 shadow-none"
@@ -150,7 +160,7 @@ export const ItemTable = memo(function ItemTable({
                 />
               </TableCell>
 
-              <TableCell className={colorStatus(item.status)}>
+              <TableCell className={cn("py-0.5", colorStatus(item.status))}>
                 <ItemPriorityStatus
                   className="w-full p-0 border-0 shadow-none"
                   type="status"
@@ -161,7 +171,7 @@ export const ItemTable = memo(function ItemTable({
                 />
               </TableCell>
 
-              <TableCell className="max-w-90 border-l">
+              <TableCell className="max-w-90 border-l py-0.5">
                 <EditableTextarea
                   item={item}
                   field="description"
@@ -177,7 +187,7 @@ export const ItemTable = memo(function ItemTable({
                 />
               </TableCell>
 
-              <TableCell className="border-l">
+              <TableCell className="border-l py-0.5">
                 <div className="flex items-center justify-center">
                   <ItemDetails
                     item={item}

@@ -29,7 +29,7 @@ export const getItemsByStatus = withAuth(async (
   }
 
   const response = await prisma.item.findMany({
-    where: { group: { workspaceId } },
+    where: { group: { workspaceId }, entityStatus: "ACTIVE" },
     include: {
       assignedToUser: {
         select: {

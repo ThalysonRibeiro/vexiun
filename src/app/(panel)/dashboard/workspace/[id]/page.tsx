@@ -1,8 +1,6 @@
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { WorkspaceContent } from "./_components/workspace-content";
-import { getGroups } from "@/app/data-access/groupe";
-import { unwrapServerData } from "@/utils/server-helpers";
 
 export default async function WorkspacePage({
   params,
@@ -13,21 +11,12 @@ export default async function WorkspacePage({
   if (!session) {
     redirect('/')
   }
-
   const workspaceId = (await params).id;
-
-  try {
-    const groupsData = await getGroups(workspaceId).then(unwrapServerData);
-
-    return (
-      <main className="container mx-auto px-6 pt-6">
-        <WorkspaceContent
-          groupsData={groupsData}
-          workspaceId={workspaceId}
-        />
-      </main>
-    )
-  } catch (error) {
-    redirect('/dashboard');
-  }
+  return (
+    <main className="container mx-auto px-6 pt-6">
+      <WorkspaceContent
+        workspaceId={workspaceId}
+      />
+    </main>
+  );
 }

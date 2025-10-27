@@ -8,7 +8,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { DeleteNotificationType, notificationIdsFormSchema } from "./notification-schema";
+import { DeleteNotificationType, notificationIdFormSchema, } from "./notification-schema";
 
 export const deleteNotification = withAuth(async (
   userId,
@@ -16,7 +16,7 @@ export const deleteNotification = withAuth(async (
   formData: DeleteNotificationType
 ): Promise<ActionResponse<string>> => {
 
-  const schema = notificationIdsFormSchema.safeParse(formData);
+  const schema = notificationIdFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };

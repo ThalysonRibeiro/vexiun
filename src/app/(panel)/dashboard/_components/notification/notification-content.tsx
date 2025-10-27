@@ -1,5 +1,5 @@
 "use client"
-import { Bell, Check, Trash, X } from "lucide-react";
+import { Bell, Check, Settings, Trash, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ import {
   useAcceptWorkspaceInvitation,
   useDeclineWorkspaceInvitation
 } from "@/hooks/use-workspace";
+import Link from "next/link";
 
 export function NotificationContent() {
   const { data: notifications = [], refetch } = useNotifications();
@@ -121,7 +122,7 @@ export function NotificationContent() {
               <Button
                 variant="link"
                 size="sm"
-                className="text-zinc-500 hover:text-zinc-700 font-normal text-sm cursor-pointer"
+                className="text-zinc-500 hover:text-zinc-700 font-normal text-sm cursor-pointer ml-auto"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkAllRead();
@@ -130,6 +131,9 @@ export function NotificationContent() {
                 Marcar todas como lidas
               </Button>
             )}
+            <Link href={"/dashboard/notifications"} className="text-zinc-500 hover:text-zinc-100">
+              <Settings strokeWidth={1} className="w-5 h-5" />
+            </Link>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
 
