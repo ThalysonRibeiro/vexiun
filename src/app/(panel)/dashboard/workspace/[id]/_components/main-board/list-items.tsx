@@ -8,10 +8,10 @@ import {
 } from "@/hooks/use-items";
 import { ItemCard } from "./items/item-card";
 import { ItemTable } from "./items/item-table";
-import { EmptyState } from "@/components/ui/empty-state";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ItemsTablesProps } from "./items/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "../../../_components/empty-state";
+import { List } from "lucide-react";
 
 
 export function ListItems({ groupId, team, changeLayout, workspaceId }: ItemsTablesProps) {
@@ -79,7 +79,10 @@ export function ListItems({ groupId, team, changeLayout, workspaceId }: ItemsTab
   if (items?.itemsNotCompleted.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <EmptyState title="Ainda não há itens cadastrados." description="Clique no botão acima para adicionar seu primeiro item." />
+        <EmptyState
+          icon={List}
+          title="Ainda não há itens cadastrados."
+          description="Clique no botão acima para adicionar seu primeiro item." />
       </div>
     );
   }

@@ -18,7 +18,13 @@ export const createGroupFormSchema = workspaceIdSchema.merge(groupFormSchema);
 
 export const updateGroupFormSchema = groupIdFormSchema.merge(groupFormSchema);
 
+export const changeGroupStatusSchema = groupIdFormSchema.extend({
+  workspaceId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+  status: z.enum(["ACTIVE", "DELETED", "ARCHIVED"])
+});
+
 export type GroupFormData = z.infer<typeof groupFormSchema>;
 export type CreateGroupType = z.infer<typeof createGroupFormSchema>;
 export type UpdateGroupType = z.infer<typeof updateGroupFormSchema>;
 export type DeleteGroupType = z.infer<typeof groupIdFormSchema>;
+export type ChangeGroupStatusType = z.infer<typeof changeGroupStatusSchema>;

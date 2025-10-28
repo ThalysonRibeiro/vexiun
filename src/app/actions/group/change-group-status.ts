@@ -10,15 +10,15 @@ import {
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { validateGroupExists } from "@/lib/db/validators";
-import { updateGroupFormSchema, UpdateGroupType } from "./group-schema";
+import { changeGroupStatusSchema, ChangeGroupStatusType } from "./group-schema";
 
 
-export const updateGroup = withAuth(async (
+export const changeGroupStatus = withAuth(async (
   userId,
   session,
-  formData: UpdateGroupType): Promise<ActionResponse<string>> => {
+  formData: ChangeGroupStatusType): Promise<ActionResponse<string>> => {
 
-  const schema = updateGroupFormSchema.safeParse(formData);
+  const schema = changeGroupStatusSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
@@ -29,17 +29,24 @@ export const updateGroup = withAuth(async (
     throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.GROUP);
   }
 
-  await prisma.group.update({
-    where: { id: formData.groupId },
-    data: {
-      title: formData.title,
-      textColor: formData.textColor
-    }
-  });
+  await prisma.$transaction([
+    prisma.group.update({
+      where: { id: formData.groupId },
+      data: {
+        status: formData.status
+      }
+    }),
+    prisma.item.updateMany({
+      where: { groupId: formData.groupId },
+      data: {
+        entityStatus: formData.status
+      }
+    })
+  ]);
 
   if (formData.revalidatePaths?.length) {
     formData.revalidatePaths.forEach((path) => revalidatePath(path));
   };
 
-  return successResponse("Grupo atualizado com sucesso");
+  return successResponse("Grupo movido para lixeira com sucesso!!");
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

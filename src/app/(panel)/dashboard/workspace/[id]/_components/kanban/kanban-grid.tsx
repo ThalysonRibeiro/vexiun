@@ -171,7 +171,8 @@ export function KanbanGrid() {
                   </DialogTrigger>
                   <DialogContentNewItem
                     closeDialog={setIsCloseDialog}
-                    status={getStatus} />
+                    status={getStatus}
+                  />
                 </Dialog>
               </CardAction>
             )}

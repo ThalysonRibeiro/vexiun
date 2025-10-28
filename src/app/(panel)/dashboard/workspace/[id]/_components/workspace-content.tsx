@@ -2,13 +2,11 @@
 import { Team } from "./team";
 import { Groups } from "./main-board/groups";
 import { KanbanGrid } from "./kanban/kanban-grid";
-import { GroupsData } from "@/hooks/use-groups";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Archived } from "./archived";
 import { Archive, LayoutDashboard, SquareDashedKanban, Trash, Users } from "lucide-react";
-import { Deleted } from "./deleted";
 import { useItemsCountByStatus } from "@/hooks/use-items";
 import { useTeamCount } from "@/hooks/use-team";
+import { ItemLifecycleManager } from "./Item-lifecycle-manager";
 
 interface WorkspaceContentProps {
   workspaceId: string;
@@ -63,9 +61,7 @@ export function WorkspaceContent({
       icon: <Archive className="w-4 h-4" />,
       length: archivedCount,
       component: (
-        <Archived
-          workspaceId={workspaceId}
-        />
+        <ItemLifecycleManager workspaceId={workspaceId} entityStatus="ARCHIVED" />
       )
     },
     {
@@ -74,9 +70,7 @@ export function WorkspaceContent({
       icon: <Trash className="w-4 h-4" />,
       length: deletedCount,
       component: (
-        <Deleted
-          workspaceId={workspaceId}
-        />
+        <ItemLifecycleManager workspaceId={workspaceId} entityStatus="DELETED" />
       )
     },
   ];

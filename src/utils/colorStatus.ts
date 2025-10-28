@@ -68,7 +68,7 @@ export function colorPriority(status: string): string {
     case "LOW":
       return "bg-red-400 dark:bg-red-400 text-white";
     default:
-      return "bg-red-300 dark:bg-red-300 text-white";
+      return "bg-zinc-400 dark:bg-zinc-400 text-white";
   }
 }
 export function borderColorPriority(status: string): string {
@@ -82,7 +82,7 @@ export function borderColorPriority(status: string): string {
     case "LOW":
       return "bg-red-400 dark:bg-red-400";
     default:
-      return "bg-red-300 dark:bg-red-300";
+      return "bg-zinc-400 dark:bg-zinc-400";
   }
 }
 

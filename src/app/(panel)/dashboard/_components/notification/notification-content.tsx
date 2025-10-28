@@ -131,7 +131,7 @@ export function NotificationContent() {
                 Marcar todas como lidas
               </Button>
             )}
-            <Link href={"/dashboard/notifications"} className="text-zinc-500 hover:text-zinc-100">
+            <Link href={"/dashboard/notifications"} className="text-zinc-500 hover:text-zinc-400">
               <Settings strokeWidth={1} className="w-5 h-5" />
             </Link>
           </DropdownMenuLabel>

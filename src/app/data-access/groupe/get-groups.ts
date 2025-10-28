@@ -27,7 +27,7 @@ export const getGroups = withAuth(async (
 
   // Busca os grupos
   const group = await prisma.group.findMany({
-    where: { workspaceId },
+    where: { workspaceId, status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
     take,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),

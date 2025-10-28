@@ -103,11 +103,11 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
         value={selectedGroupId}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={data?.group[0].title} />
+          <SelectValue placeholder={data?.group[0]?.title} />
         </SelectTrigger>
         <SelectContent>
           {data?.group.map(group => (
-            <SelectItem key={group.id} value={group.id}>{group.title}</SelectItem>
+            <SelectItem key={group.id} value={group.id}>{group?.title}</SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -175,22 +175,39 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
               control={form.control}
               name="priority"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Prioridade</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
                     >
-                      <SelectTrigger className={cn("", colorPriority(field.value))} size="sm">
-                        <SelectValue placeholder={priorityMap["STANDARD"]} />
+                      <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
+                        <SelectValue>
+                          {(() => {
+                            const p = priorityMap.find(p => p.key === field.value);
+                            return p ? (
+                              <div className="flex items-center gap-1.5">
+                                <p.icon className="h-3.5 w-3.5 text-white" />
+                                <span>{p.label}</span>
+                              </div>
+                            ) : null;
+                          })()}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="CRITICAL" className={colorPriority("CRITICAL")}>Crítico</SelectItem>
-                        <SelectItem value="HIGH" className={colorPriority("HIGH")}>Alto</SelectItem>
-                        <SelectItem value="MEDIUM" className={colorPriority("MEDIUM")}>Medio</SelectItem>
-                        <SelectItem value="LOW" className={colorPriority("LOW")}>Baixo</SelectItem>
-                        <SelectItem value="STANDARD" className={colorPriority("STANDARD")}>Padrão</SelectItem>
+                        {priorityMap.map((p) => (
+                          <SelectItem
+                            key={p.key}
+                            value={p.key}
+                            className={cn("cursor-pointer", colorPriority(p.key))}
+                          >
+                            <div className="flex items-center gap-2">
+                              <p.icon className="h-4 w-4 text-white" />
+                              <span>{p.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </FormControl>

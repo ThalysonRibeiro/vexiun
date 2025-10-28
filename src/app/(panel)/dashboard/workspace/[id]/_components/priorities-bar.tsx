@@ -1,5 +1,4 @@
 import { PrioritiesCount } from "@/app/data-access/item";
-import { colorPriority, priorityKeys, priorityMap } from "@/utils/colorStatus";
 
 interface PrioritiesBarProps {
   priorities: PrioritiesCount[];
@@ -31,13 +30,13 @@ export function PrioritiesBar({ priorities, label = true }: PrioritiesBarProps) 
 function getPriorityColor(priority: string) {
   switch (priority) {
     case "CRITICAL":
-      return "oklch(63.7% 0.237 25.331)";
+      return "oklch(37% 0.013 285.805)";
     case "HIGH":
-      return "oklch(70.5% 0.213 47.604)";
+      return "oklch(50.5% 0.213 27.518)";
     case "MEDIUM":
-      return "oklch(79.5% 0.184 86.047)";
+      return "oklch(63.7% 0.237 25.331)";
     case "LOW":
-      return "oklch(72.3% 0.219 149.579)";
+      return "oklch(70.4% 0.191 22.216)";
     default:
       return "oklch(70.5% 0.015 286.067)";
   }

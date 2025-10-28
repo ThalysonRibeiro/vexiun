@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { getGroups } from "@/app/data-access/groupe";
 import {
+  ChangeGroupStatusType,
   createGroup,
   CreateGroupType,
   deleteGroup,
@@ -15,6 +16,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityStatus } from "@/generated/prisma";
 import { getGroupItemByEntityStatus } from "@/app/data-access/groupe/get-item-by-entity-status";
+import { toast } from "sonner";
+import { useCallback, useState } from "react";
+import { useTeam } from "./use-team";
+import { changeGroupStatus } from "@/app/actions/group/change-group-status";
+import { ChangeStatusInputType } from "@/app/actions/item";
 
 
 export interface UseGroupFormProps {
@@ -58,7 +64,7 @@ export type GroupItemByEntityStatusData = Extract<GroupItemByEntityStatusResult,
 
 export function useGroupItemByEntityStatus(workspaceId: string, status: EntityStatus) {
   return useQuery<GroupItemByEntityStatusData>({
-    queryKey: ["items", "by-entity-status", status] as const,
+    queryKey: ["groups", "items", "by-entity-status", status] as const,
     queryFn: async () => {
       const result = await getGroupItemByEntityStatus(workspaceId, status);
 
@@ -95,7 +101,7 @@ export function useCreateGroup() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["group", variables.workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ["groups", variables.workspaceId] });
     },
   });
 }
@@ -114,15 +120,64 @@ export function useUpdateGroup() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.removeQueries({ queryKey: ["group", variables.groupId] });
+      queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
       queryClient.invalidateQueries({
-        queryKey: ["group"],
+        queryKey: ["groups"],
         exact: false,
         refetchType: "active"
       });
     },
     retry: 1
   });
+}
+
+export function useChangeGroupStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: ChangeGroupStatusType) => {
+      const result = await changeGroupStatus(data);
+
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
+      queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
+    }
+  });
+}
+
+export function useArchiveGroup() {
+  const changeStatus = useChangeGroupStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string, groupId: string) =>
+      changeStatus.mutateAsync({ workspaceId, groupId, status: "ARCHIVED" })
+  };
+}
+
+export function useRestoreGroup() {
+  const changeStatus = useChangeGroupStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string, groupId: string) =>
+      changeStatus.mutateAsync({ workspaceId, groupId, status: "ACTIVE" })
+  };
+}
+
+export function useMoveGroupToTrash() {
+  const changeStatus = useChangeGroupStatus();
+
+  return {
+    ...changeStatus,
+    mutateAsync: (workspaceId: string, groupId: string) =>
+      changeStatus.mutateAsync({ workspaceId, groupId, status: "DELETED" })
+  };
 }
 
 export function useDeleteGroup() {
@@ -139,13 +194,153 @@ export function useDeleteGroup() {
       return result;
     },
     onSuccess: (result, variables) => {
-      queryClient.removeQueries({ queryKey: ["group", variables.groupId] });
+      queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
       queryClient.invalidateQueries({
-        queryKey: ["group"],
+        queryKey: ["groups"],
         exact: false,
         refetchType: "active"
       });
     },
     retry: 1
   });
+}
+
+export function useGroupActions(workspaceId: string) {
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+  const deleteGroup = useDeleteGroup();
+  const archivedGroup = useArchiveGroup();
+  const restoreGroup = useRestoreGroup();
+  const moveToTrash = useMoveGroupToTrash();
+
+  const toggleDropdown = useCallback((groupId: string) => {
+    setOpenGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupId)) {
+        newSet.delete(groupId);
+      } else {
+        newSet.add(groupId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleEditGroup = useCallback((groupId: string) => {
+    setEditingGroupId(groupId);
+  }, []);
+
+  const closeEditForm = useCallback((value: boolean) => {
+    if (!value) {
+      setEditingGroupId(null);
+    }
+    return value;
+  }, []);
+
+  const closeAddGroupForm = useCallback((value: boolean) => {
+    setIsAddingGroup(value);
+    return value;
+  }, []);
+
+  const handleDeleteGroup = useCallback(async (groupId: string) => {
+    try {
+      if (!confirm('Deseja realmente deletar o grupo? todos os itens serão deletados junto')) {
+        return;
+      }
+      await deleteGroup.mutateAsync({
+        groupId,
+        revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
+      });
+      toast.success("Grupo deletado com sucesso!");
+      setOpenGroups(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(groupId);
+        return newSet;
+      });
+    } catch (error) {
+      toast.error("Erro ao deletar grupo");
+    }
+  }, [deleteGroup, workspaceId]);
+
+  const handleMoveToTrash = useCallback(async (groupId: string) => {
+    if (!confirm('Deseja realmente mover para lixeira?')) {
+      return;
+    }
+
+    setIsLoading(groupId);
+
+    try {
+      const response = await moveToTrash.mutateAsync(
+        workspaceId, groupId,
+      );
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao deletar item");
+        return;
+      }
+
+      toast.success("Group movido para lixeira com sucess!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [moveToTrash, workspaceId,]);
+
+  const handleArchiveGroup = useCallback(async (groupId: string) => {
+    setIsLoading(groupId);
+
+    try {
+      const response = await archivedGroup.mutateAsync(
+        workspaceId, groupId,
+      );
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao arquivar Group");
+        return;
+      }
+
+      toast.success("Group arquivado!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [workspaceId, archivedGroup]);
+
+  const handleRestoreGroup = useCallback(async (groupId: string) => {
+    setIsLoading(groupId);
+
+    try {
+      const response = await restoreGroup.mutateAsync(
+        workspaceId, groupId,
+      );
+
+      if (!isSuccessResponse(response)) {
+        toast.error("Erro ao restaurar Group");
+        return;
+      }
+
+      toast.success("Group restaurado!");
+    } finally {
+      setIsLoading(null);
+    }
+  }, [workspaceId, restoreGroup]);
+
+  return {
+    // Estado
+    isLoading,
+    isAddingGroup,
+    editingGroupId,
+    openGroups,
+    // Setters
+    setIsAddingGroup,
+    // Ações
+    toggleDropdown,
+    handleEditGroup,
+    closeEditForm,
+    closeAddGroupForm,
+    handleDeleteGroup,
+    handleMoveToTrash,
+    handleArchiveGroup,
+    handleRestoreGroup
+
+  }
 }
