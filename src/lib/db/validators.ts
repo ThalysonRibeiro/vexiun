@@ -25,7 +25,7 @@ export async function validateUserExists(userId: string) {
 export async function validateGroupExists(groupId: string) {
   const group = await prisma.group.findUnique({
     where: { id: groupId },
-    select: { id: true },
+    select: { id: true, status: true },
   });
 
   if (!group) {
@@ -69,35 +69,44 @@ export async function validateItemExists(itemId: string) {
   return item;
 }
 
-/**
- * Verifica se usuário tem acesso ao workspace
- */
 export async function validateWorkspaceAccess(
   workspaceId: string,
   userId: string
 ) {
-  const member = await prisma.workspaceMember.findUnique({
-    where: {
-      workspaceId_userId: { // ✅ Chave composta
-        workspaceId,
-        userId,
-      },
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          role: true, // Role global
+
+  try {
+    const member = await prisma.workspaceMember.findUnique({
+      where: {
+        workspaceId_userId: {
+          workspaceId,
+          userId,
         },
       },
-    },
-  });
+      include: {
+        workspace: {
+          select: {
+            status: true,
+            userId: true,
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            role: true,
+          },
+        },
+      },
+    });
 
-  if (!member) {
-    throw new PermissionError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
+    if (!member) {
+      throw new PermissionError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
+    }
+
+    return member;
+
+  } catch (error) {
+    throw error;
   }
-
-  return member;
 }
 
 /**

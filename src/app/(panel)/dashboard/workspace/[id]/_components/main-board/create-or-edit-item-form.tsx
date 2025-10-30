@@ -30,8 +30,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
 import { useSession } from "next-auth/react";
 import { useCreateItem, UseItemForm, UseItemFormProps } from "@/hooks/use-items";
+import { useParams } from "next/navigation";
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
+import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 
 interface CreateItemFormProps {
+  workspaceId: string;
   closeForm: (value: boolean) => void;
   initialValues?: UseItemFormProps['initialValues'];
   groupId: string;
@@ -47,20 +51,30 @@ type TeamUser = {
   email: string;
 }
 
-export function CreateOrEditItemForm({
-  closeForm, initialValues, groupId, itemId, editingItem, team
-}: CreateItemFormProps
-) {
+export function CreateOrEditItemForm(props: CreateItemFormProps) {
+  const { closeForm, initialValues, groupId, itemId, editingItem, team } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = UseItemForm({ initialValues });
   const { data: session } = useSession();
   const createItem = useCreateItem();
+
+  const { id: workspaceId } = useParams();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: workspace?.workspace.status as EntityStatus,
+    isOwner
+  });
 
   async function onSubmit(formData: ItemFormData) {
     setIsLoading(true);
 
     if (editingItem && itemId) {
       const response = await updateItem({
+        workspaceId: workspaceId as string,
         itemId: itemId,
         title: formData?.title,
         status: formData?.status,
@@ -86,6 +100,7 @@ export function CreateOrEditItemForm({
 
     } else {
       const response = await createItem.mutateAsync({
+        workspaceId: workspaceId as string,
         groupId: groupId,
         title: formData.title,
         term: formData.term,
@@ -123,112 +138,120 @@ export function CreateOrEditItemForm({
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <div className="flex-1 w-full">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Titulo</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    id="title"
-                    placeholder="Digite o nome do item..."
-                    aria-describedby="item-name-error"
-                    aria-required="true"
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Notas</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Notas adicionais para seu item"
-                    className="max-h-25 w-full"
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="flex-1 w-full">
-                <FormLabel>Descrição</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Descreva seu item aqui..."
-                    className="max-h-35 w-full"
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          {permissions.canCreateOrEditItem && (
             <FormField
               control={form.control}
-              name="priority"
+              name="title"
               render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Prioridade</FormLabel>
+                <FormItem className="w-full">
+                  <FormLabel>Titulo</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
-                      <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
-                        <SelectValue>
-                          {(() => {
-                            const p = priorityMap.find(p => p.key === field.value);
-                            return p ? (
-                              <div className="flex items-center gap-1.5">
-                                <p.icon className="h-3.5 w-3.5 text-white" />
-                                <span>{p.label}</span>
-                              </div>
-                            ) : null;
-                          })()}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {priorityMap.map((p) => (
-                          <SelectItem
-                            key={p.key}
-                            value={p.key}
-                            className={cn("cursor-pointer", colorPriority(p.key))}
-                          >
-                            <div className="flex items-center gap-2">
-                              <p.icon className="h-4 w-4 text-white" />
-                              <span>{p.label}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      {...field}
+                      id="title"
+                      placeholder="Digite o nome do item..."
+                      aria-describedby="item-name-error"
+                      aria-required="true"
+                    />
                   </FormControl>
                   <FormDescription />
                   <FormMessage />
                 </FormItem>
               )}
             />
+          )}
+          {permissions.canCreateOrEditItem && (
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Notas</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Notas adicionais para seu item"
+                      className="max-h-25 w-full"
+                    />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
-            {editingItem && (
+          {permissions.canCreateOrEditItem && (
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem className="flex-1 w-full">
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Descreva seu item aqui..."
+                      className="max-h-35 w-full"
+                    />
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            {permissions.canCreateOrEditItem && (
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Prioridade</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
+                          <SelectValue>
+                            {(() => {
+                              const p = priorityMap.find(p => p.key === field.value);
+                              return p ? (
+                                <div className="flex items-center gap-1.5">
+                                  <p.icon className="h-3.5 w-3.5 text-white" />
+                                  <span>{p.label}</span>
+                                </div>
+                              ) : null;
+                            })()}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {priorityMap.map((p) => (
+                            <SelectItem
+                              key={p.key}
+                              value={p.key}
+                              className={cn("cursor-pointer", colorPriority(p.key))}
+                            >
+                              <div className="flex items-center gap-2">
+                                <p.icon className="h-4 w-4 text-white" />
+                                <span>{p.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {editingItem && permissions.canCreateOrEditItem && (
               <FormField
                 control={form.control}
                 name="status"
@@ -276,28 +299,30 @@ export function CreateOrEditItemForm({
               />
             )}
 
-            <FormField
-              control={form.control}
-              name="term"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prazo</FormLabel>
-                  <FormControl>
-                    <CalendarTerm
-                      onChange={(date) => {
-                        field.onChange(date)
-                      }}
-                      initialDate={field.value || new Date()} // Adiciona esta linha
-                    />
-                  </FormControl>
-                  <FormDescription />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {permissions.canCreateOrEditItem && (
+              <FormField
+                control={form.control}
+                name="term"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prazo</FormLabel>
+                    <FormControl>
+                      <CalendarTerm
+                        onChange={(date) => {
+                          field.onChange(date)
+                        }}
+                        initialDate={field.value || new Date()} // Adiciona esta linha
+                      />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
 
-          {team && (
+          {team && permissions.canEdit && (
             <FormField
               control={form.control}
               name="assignedTo"
@@ -340,28 +365,29 @@ export function CreateOrEditItemForm({
           )}
         </div>
 
-
-        <FormField
-          control={form.control}
-          name="details"
-          render={({ field }) => {
-            return (
-              <FormItem>
-                <FormLabel>
-                  Detalhes
-                </FormLabel>
-                <FormControl>
-                  <div className="h-full min-h-80 max-h-80">
-                    <DetailsEditor
-                      content={field.value ?? {}}
-                      onContentChange={field.onChange}
-                    />
-                  </div>
-                </FormControl>
-              </FormItem>
-            )
-          }}
-        />
+        {permissions.canCreateOrEditItem && (
+          <FormField
+            control={form.control}
+            name="details"
+            render={({ field }) => {
+              return (
+                <FormItem>
+                  <FormLabel>
+                    Detalhes
+                  </FormLabel>
+                  <FormControl>
+                    <div className="h-full min-h-80 max-h-80">
+                      <DetailsEditor
+                        content={field.value && Object.keys(field.value).length ? field.value : null}
+                        onContentChange={field.onChange}
+                      />
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )
+            }}
+          />
+        )}
         <Button type="submit" className={cn("mt-3.5 w-fit px-10")}>
           {editingItem ? 'Salvar' : 'Cadastrar'}
         </Button>

@@ -1,6 +1,18 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import { Eye } from "lucide-react";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { JSONContent } from "@tiptap/core";
@@ -15,15 +27,19 @@ interface ItemCardFooterProps {
   dialogState: DialogStateProps;
   onSaveDetails: (item: ItemWhitCreatedAssignedUser) => void;
   setDialogState: (state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)) => void;
+  permissionsEdit: boolean;
 }
 
-export const ItemDetails = memo(function ItemDetails({
-  item,
-  isLoading,
-  dialogState,
-  onSaveDetails,
-  setDialogState
-}: ItemCardFooterProps) {
+export const ItemDetails = memo(function ItemDetails(props: ItemCardFooterProps) {
+  const {
+    item,
+    isLoading,
+    dialogState,
+    onSaveDetails,
+    setDialogState,
+    permissionsEdit,
+  } = props;
+
   return (
     <Dialog
       open={dialogState.isOpen && dialogState.itemId === item.id}
@@ -40,12 +56,21 @@ export const ItemDetails = memo(function ItemDetails({
         }
       }}
     >
-      <DialogTrigger className="w-full" asChild>
-        <Button variant="outline" className="w-full" size="sm">
-          <Eye className="h-4 w-4 mr-2" />
-          Detalhes do item
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger className="w-full" asChild>
+            <Button variant="outline" className="w-full" size="sm">
+              <Eye className="h-4 w-4 mr-2" />
+              Detalhes do item
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          {permissionsEdit
+            ? "Clique para visualizar ou editar os detalhes do item"
+            : "Clique para visualizar os detalhes do item"}
+        </TooltipContent>
+      </Tooltip>
       <DialogContent className="min-h-50 max-h-[calc(100dvh-3rem)] min-w-[calc(100dvw-20rem)] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Detalhes do item</DialogTitle>
@@ -65,34 +90,36 @@ export const ItemDetails = memo(function ItemDetails({
             }}
           />
         </div>
-        <div className="flex justify-end gap-2 border-t pt-4">
-          {!dialogState.isEditing ? (
-            <Button onClick={() => setDialogState(prev => ({ ...prev, isEditing: true }))}>
-              Editar
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setDialogState(prev => ({
-                    ...prev,
-                    isEditing: false,
-                    content: (item.details as JSONContent) ?? {}
-                  }));
-                }}
-              >
-                Cancelar
+        {permissionsEdit && (
+          <div className="flex justify-end gap-2 border-t pt-4">
+            {!dialogState.isEditing ? (
+              <Button onClick={() => setDialogState(prev => ({ ...prev, isEditing: true }))}>
+                Editar
               </Button>
-              <Button
-                onClick={() => onSaveDetails(item)}
-                disabled={isLoading === item.id}
-              >
-                Salvar
-              </Button>
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDialogState(prev => ({
+                      ...prev,
+                      isEditing: false,
+                      content: (item.details as JSONContent) ?? {}
+                    }));
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => onSaveDetails(item)}
+                  disabled={isLoading === item.id}
+                >
+                  Salvar
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

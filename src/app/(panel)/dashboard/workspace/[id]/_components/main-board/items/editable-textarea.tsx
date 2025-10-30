@@ -1,5 +1,10 @@
 "use client"
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,11 +14,12 @@ import { EditingField } from "./types"
 
 interface EditableTextareaProps {
   item: ItemWhitCreatedAssignedUser;
-  field: 'notes' | 'description';
+  field: "notes" | "description";
   value: string | null;
   placeholder: string;
   isLoading: string | null;
   editing: { itemId: string | null; field: EditingField };
+  permissionsEdit: boolean;
   editingData: ItemWhitCreatedAssignedUser | null;
   onStartEditing: (item: ItemWhitCreatedAssignedUser, field: EditingField) => void;
   onCancelEditing: () => void;
@@ -21,24 +27,26 @@ interface EditableTextareaProps {
   setEditingData: (data: ItemWhitCreatedAssignedUser | null) => void;
 }
 
-export const EditableTextarea = memo(function EditableTextarea({
-  item,
-  field,
-  value,
-  placeholder,
-  isLoading,
-  editing,
-  editingData,
-  onStartEditing,
-  onCancelEditing,
-  onSaveField,
-  setEditingData
-}: EditableTextareaProps) {
+export const EditableTextarea = memo(function EditableTextarea(props: EditableTextareaProps) {
+  const {
+    item,
+    field,
+    value,
+    placeholder,
+    isLoading,
+    editing,
+    permissionsEdit,
+    editingData,
+    onStartEditing,
+    onCancelEditing,
+    onSaveField,
+    setEditingData
+  } = props;
   const isEditing = editing.itemId === item.id && editing.field === field;
 
   return (
     <>
-      {isEditing ? (
+      {isEditing && permissionsEdit ? (
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -48,26 +56,26 @@ export const EditableTextarea = memo(function EditableTextarea({
         >
           <div className="flex-1 space-y-2">
             <Textarea
-              value={editingData?.[field] || ''}
+              value={editingData?.[field] || ""}
               onChange={(e) => setEditingData(editingData ? { ...editingData, [field]: e.target.value } : null)}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') onCancelEditing();
-                if (e.key === 'Enter' && e.ctrlKey) onSaveField(item);
+                if (e.key === "Escape") onCancelEditing();
+                if (e.key === "Enter" && e.ctrlKey) onSaveField(item);
               }}
               autoFocus
               disabled={isLoading === item.id}
-              className="max-h-[120px] min-w-80"
+              className="max-h-[120px] w-full"
               placeholder={placeholder}
               maxLength={1000}
             />
             <div className="flex justify-end">
               <span className={cn(
                 "text-xs",
-                (editingData?.[field] || '').length > 900 && "text-red-500",
-                (editingData?.[field] || '').length > 800 && (editingData?.[field] || '').length <= 900 && "text-yellow-500",
-                (editingData?.[field] || '').length <= 800 && "text-gray-500"
+                (editingData?.[field] || "").length > 900 && "text-red-500",
+                (editingData?.[field] || "").length > 800 && (editingData?.[field] || "").length <= 900 && "text-yellow-500",
+                (editingData?.[field] || "").length <= 800 && "text-gray-500"
               )}>
-                {(editingData?.[field] || '').length}/1000
+                {(editingData?.[field] || "").length}/1000
               </span>
             </div>
           </div>
@@ -96,27 +104,33 @@ export const EditableTextarea = memo(function EditableTextarea({
           </div>
         </form>
       ) : (
-        <div
-          onClick={() => onStartEditing(item, field)}
-          className="cursor-pointer hover:bg-accent p-1 rounded transition-colors group"
-          title="Clique para editar"
-        >
-          {value ? (
-            <p className="overflow-hidden text-ellipsis" style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              lineHeight: '1.4em',
-              maxHeight: '2.8em'
-            }}>
-              {value}
-            </p>
-          ) : (
-            <span className="text-gray-400 italic">
-              {placeholder}
-            </span>
-          )}
-        </div>
+        <Tooltip>
+          <TooltipTrigger
+            onClick={() => onStartEditing(item, field)}
+            className="cursor-pointer hover:bg-accent p-1 rounded transition-colors group w-full text-left"
+          >
+            {value ? (
+              <p className="overflow-hidden line-clamp-2 text-ellipsis" style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                lineHeight: "1.4em",
+                maxHeight: "2.8em"
+              }}>
+                {value}
+              </p>
+            ) : (
+              <span className="text-gray-400 italic">
+                {placeholder}
+              </span>
+            )}
+          </TooltipTrigger>
+          <TooltipContent>
+            {permissionsEdit
+              ? "Clique para editar"
+              : `Você não tem permissão para alterar ${field === "notes" ? "notas" : "a descrição"}`}
+          </TooltipContent>
+        </Tooltip>
       )}
     </>
   );

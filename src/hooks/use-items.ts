@@ -177,7 +177,7 @@ export type ItemsByEntityStatusData = Extract<ItemsByEntityStatusResult, { succe
 
 export function useItemsByEntityStatus(groupId: string, status: EntityStatus) {
   return useQuery<ItemsByEntityStatusData>({
-    queryKey: ["items", "by-entity-status", status] as const,
+    queryKey: ["items", "by-entity-status", groupId, status] as const,
     queryFn: async () => {
       const result = await getItemsByEntityStatus(groupId, status);
 
@@ -229,11 +229,14 @@ export function useCreateItem() {
       if (!isSuccessResponse(result)) {
         throw new Error(result.error);
       }
+      console.log(result);
+
 
       return result;
     },
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["items", variables.groupId] });
+      queryClient.invalidateQueries({ queryKey: ["items", "by-status"] });
     },
   });
 }
@@ -397,6 +400,7 @@ export function useItemActions(workspaceId: string) {
 
     try {
       const result = await updateItem.mutateAsync({
+        workspaceId,
         itemId: item.id,
         title: item.title,
         status: item.status,
@@ -418,7 +422,7 @@ export function useItemActions(workspaceId: string) {
     } finally {
       setIsLoading(null);
     }
-  }, [dialogState.content, updateItem]);
+  }, [dialogState.content, updateItem, workspaceId]);
 
   const handleSaveField = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
     if (!editingData) return;
@@ -427,6 +431,7 @@ export function useItemActions(workspaceId: string) {
 
     try {
       const response = await updateItem.mutateAsync({
+        workspaceId,
         itemId: item.id,
         title: editingData.title,
         status: editingData.status,
@@ -446,7 +451,7 @@ export function useItemActions(workspaceId: string) {
     } finally {
       setIsLoading(null);
     }
-  }, [editingData, cancelEditing, updateItem]);
+  }, [editingData, cancelEditing, updateItem, workspaceId]);
 
   const handleSelectChange = useCallback(async (
     item: ItemWhitCreatedAssignedUser,
@@ -457,6 +462,7 @@ export function useItemActions(workspaceId: string) {
 
     try {
       const response = await updateItem.mutateAsync({
+        workspaceId,
         itemId: item.id,
         title: item.title,
         status: field === 'status' ? value as Status : item.status,
@@ -476,7 +482,7 @@ export function useItemActions(workspaceId: string) {
     } finally {
       setIsLoading(null);
     }
-  }, [updateItem]);
+  }, [updateItem, workspaceId]);
 
   const handleDeleteItem = useCallback(async (itemId: string) => {
     if (!confirm('Deseja realmente deletar o item permanentemente?')) {
@@ -487,6 +493,7 @@ export function useItemActions(workspaceId: string) {
 
     try {
       const response = await deleteItem.mutateAsync({
+        workspaceId,
         itemId,
       });
 
@@ -499,7 +506,7 @@ export function useItemActions(workspaceId: string) {
     } finally {
       setIsLoading(null);
     }
-  }, [deleteItem]);
+  }, [deleteItem, workspaceId]);
 
   const handleMoveToTrash = useCallback(async (itemId: string) => {
     if (!confirm('Deseja realmente mover para lixeira?')) {

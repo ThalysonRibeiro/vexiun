@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -14,18 +15,15 @@ import { TeamUser } from "../items/types";
 import { cn } from "@/lib/utils";
 
 interface NewItemProps {
+  workspaceId: string;
   groupId: string;
   team: TeamUser[];
   openDialogs: Set<string>;
   setOpenDialogs: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-export const NewItem = memo(function NewItem({
-  groupId,
-  team,
-  openDialogs,
-  setOpenDialogs
-}: NewItemProps) {
+export const NewItem = memo(function NewItem(props: NewItemProps) {
+  const { workspaceId, groupId, team, openDialogs, setOpenDialogs } = props;
   return (
     <Dialog
       open={openDialogs.has(groupId)}
@@ -55,7 +53,12 @@ export const NewItem = memo(function NewItem({
         <DialogHeader>
           <DialogTitle>Cadastrar novo item</DialogTitle>
         </DialogHeader>
+        <DialogDescription>
+          Preencha as informações abaixo para criar um novo registro.
+        </DialogDescription>
+
         <CreateOrEditItemForm
+          workspaceId={workspaceId}
           groupId={groupId}
           closeForm={() => {
             setOpenDialogs(prev => {

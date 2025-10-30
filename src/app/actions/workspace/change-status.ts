@@ -41,13 +41,6 @@ export const changeWorkspaceStatus = withAuth(
       );
     }
 
-    // Só OWNER e ADMIN podem arquivar/deletar
-    if (["MEMBER", "VIEWER"].includes(role) && formData.newStatus !== "ACTIVE") {
-      throw new PermissionError(
-        ERROR_MESSAGES.PERMISSION.OWNER_ONLY
-      );
-    }
-
     // ✅ 5. Atualiza workspace e conteúdo em cascata
     await prisma.$transaction(async (tx) => {
       // Atualiza workspace

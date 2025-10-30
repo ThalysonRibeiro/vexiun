@@ -27,4 +27,4 @@ export const TitleGroup = memo(function TitleGroup({
       {title.slice(1)}
     </h3>
   )
-});
+},);

@@ -16,6 +16,10 @@ import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items"
 import { DetailsEditor } from "../details-editor"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
+import { useParams } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace"
+import { EntityStatus, WorkspaceRole } from "@/generated/prisma"
 
 type TeamUser = {
   id: string;
@@ -33,18 +37,28 @@ export function InfoItem({
 }) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const shetRef = useRef<HTMLDivElement>(null);
+  const { id: workspaceId } = useParams();
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: workspace?.workspace.status as EntityStatus,
+    isOwner
+  });
 
   return (
     <SheetContent ref={shetRef} className="overflow-y-scroll min-w-[calc(80vw-25rem)]">
-      {/* <SheetContent ref={shetRef} className="overflow-y-scroll h-[calc(100vh-10rem)]" side="bottom"> */}
-      {editable && (
+      {editable && permissions.canCreateOrEditItem && (
         <Button className="w-fit ml-4 mt-4 border-dashed" variant={"outline"}
           onClick={() => setIsEditing(prev => !prev)}
         >
           {isEditing ? 'Cancelar' : 'Editar'} {isEditing ? <X /> : <Edit />}
         </Button>
       )}
-      {isEditing && editable ? (
+      {isEditing && editable && permissions.canCreateOrEditItem ? (
         <div className="p-4 space-y-4">
           <CreateOrEditItemForm
             closeForm={() => setIsEditing(false)}

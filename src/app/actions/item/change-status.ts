@@ -22,23 +22,13 @@ export const changeItemStatus = withAuth(
     const permission = await validateWorkspacePermission(
       formData.workspaceId,
       userId,
-      "MEMBER"
+      "ADMIN"
     );
-
-    if (!permission) {
-      throw new PermissionError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
-    }
 
     const { role } = permission;
     const { entityStatus: currentStatus, id } = item;
 
     if (currentStatus === "DELETED" && role !== "OWNER") {
-      throw new PermissionError(
-        ERROR_MESSAGES.PERMISSION.OWNER_ONLY
-      );
-    }
-
-    if (["MEMBER", "VIEWER"].includes(role) && formData.newStatus !== "ACTIVE") {
       throw new PermissionError(
         ERROR_MESSAGES.PERMISSION.OWNER_ONLY
       );

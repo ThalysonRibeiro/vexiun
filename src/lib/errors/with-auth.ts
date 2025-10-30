@@ -1,9 +1,8 @@
 
 import { auth } from "@/lib/auth";
-import { ActionResponse, handleError, withErrorHandler } from "./error-handler";
+import { ActionResponse, withErrorHandler } from "./error-handler";
 import { AuthenticationError } from "./custom-errors";
 import { Session } from "next-auth";
-
 
 /**
  * Uso:
@@ -19,9 +18,6 @@ import { Session } from "next-auth";
  * );
  * ```
  */
-
-// src/lib/errors/wrappers.ts
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function withAuth<TArgs extends any[], TReturn = any>(
   handler: (userId: string, session: Session | null, ...args: TArgs) => Promise<ActionResponse<TReturn>>,

@@ -12,7 +12,7 @@ import { Item } from "@/generated/prisma";
 import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { JSONContent } from "@tiptap/core";
-import { validateGroupExists, validateUserExists } from "@/lib/db/validators";
+import { validateGroupExists, validateUserExists, validateWorkspacePermission } from "@/lib/db/validators";
 import { createItemFormSchema, CreateItemType } from "./item-schema";
 
 export const createItem = withAuth(async (
@@ -29,6 +29,12 @@ export const createItem = withAuth(async (
   if (formData.assignedTo && formData.assignedTo !== session?.user?.id) {
     await validateUserExists(formData?.assignedTo as string);
   };
+
+  await validateWorkspacePermission(
+    formData.workspaceId,
+    userId,
+    "MEMBER"
+  );
 
   const newItem = await prisma.item.create({
     data: {

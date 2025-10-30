@@ -18,9 +18,7 @@ import { EntityStatus } from "@/generated/prisma";
 import { getGroupItemByEntityStatus } from "@/app/data-access/groupe/get-item-by-entity-status";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
-import { useTeam } from "./use-team";
 import { changeGroupStatus } from "@/app/actions/group/change-group-status";
-import { ChangeStatusInputType } from "@/app/actions/item";
 
 
 export interface UseGroupFormProps {
@@ -64,7 +62,7 @@ export type GroupItemByEntityStatusData = Extract<GroupItemByEntityStatusResult,
 
 export function useGroupItemByEntityStatus(workspaceId: string, status: EntityStatus) {
   return useQuery<GroupItemByEntityStatusData>({
-    queryKey: ["groups", "items", "by-entity-status", status] as const,
+    queryKey: ["groups", "items", "by-entity-status", workspaceId, status] as const,
     queryFn: async () => {
       const result = await getGroupItemByEntityStatus(workspaceId, status);
 
@@ -249,6 +247,7 @@ export function useGroupActions(workspaceId: string) {
         return;
       }
       await deleteGroup.mutateAsync({
+        workspaceId,
         groupId,
         revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
       });

@@ -14,6 +14,15 @@ export const ERROR_MESSAGES = {
     ADMIN_ONLY: "Apenas administradores podem realizar esta ação",
   },
 
+  // Status de entidades
+  STATUS: {
+    WORKSPACE_INACTIVE: "Workspace inativo",
+    GROUP_INACTIVE: "Grupo inativo ou deletado",
+    ITEM_INACTIVE: "Item inativo ou deletado",
+    ALREADY_DELETED: "Este recurso já foi deletado",
+    ALREADY_ACTIVE: "Este recurso já está ativo",
+  },
+
   // Não encontrado
   NOT_FOUND: {
     WORKSPACE: "Workspace não encontrado",

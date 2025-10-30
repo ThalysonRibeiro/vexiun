@@ -26,7 +26,11 @@ export const itemFormSchema = z.object({
 });
 export const createItemFormSchema = groupIdFormSchema.merge(itemFormSchema);
 
-export const updateItemFormSchema = itemIdFormSchema.merge(itemFormSchema);
+export const updateItemFormSchema = itemIdFormSchema.merge(itemFormSchema.extend({
+  workspaceId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+}));
 
 
 export const assignToFormSchema = z.object({
@@ -40,6 +44,13 @@ export const assignToFormSchema = z.object({
     .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
 });
+
+export const deleteItemFormSchema = itemIdFormSchema.extend({
+  workspaceId: z.string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+});
+
 
 export const changeStatusFormSchema = itemIdFormSchema.extend({
   workspaceId: z.string()
@@ -56,5 +67,5 @@ export type ItemFormData = z.infer<typeof itemFormSchema>;
 export type CreateItemType = z.infer<typeof createItemFormSchema>;
 export type UpdateItemType = z.infer<typeof updateItemFormSchema>;
 export type AssignToType = z.infer<typeof assignToFormSchema>;
-export type DeleteItemType = z.infer<typeof itemIdFormSchema>;
+export type DeleteItemType = z.infer<typeof deleteItemFormSchema>;
 export type ChangeStatusInputType = z.infer<typeof changeStatusFormSchema>;

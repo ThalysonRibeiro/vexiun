@@ -5,7 +5,7 @@ import {
   CardContent, CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { Status } from "@/generated/prisma";
+import { EntityStatus, Status, WorkspaceRole } from "@/generated/prisma";
 import { Eye, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
@@ -22,6 +22,8 @@ import { useTeam } from "@/hooks/use-team";
 import { isSuccessResponse } from "@/lib/errors";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useSession } from "next-auth/react";
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 
 export function KanbanGrid() {
   const params = useParams();
@@ -32,6 +34,17 @@ export function KanbanGrid() {
   const [isCloseDialog, setIsCloseDialog] = useState<boolean>(false);
   const [getStatus, setGetStatus] = useState<Status>("NOT_STARTED");
   const updateItem = useUpdateItem();
+
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: workspace?.workspace.status as EntityStatus,
+    isOwner
+  });
 
   function handleDragStart(e: React.DragEvent, item: ItemWhitCreatedAssignedUser) {
     setDraggedItem(item);
@@ -152,11 +165,13 @@ export function KanbanGrid() {
         >
           <CardHeader className={`${config.bgColor} py-4`}>
             <CardTitle
-              className={cn("text-white", config.status === "DONE" && "mb-4"
+              className={cn("text-white",
+                config.status === "DONE" && "mb-4",
+                !permissions.canCreateOrEditItem && "mb-4"
               )}>
               {config.title} ({config.count})
             </CardTitle>
-            {config.status !== "DONE" && (
+            {config.status !== "DONE" && permissions.canCreateOrEditItem && (
               <CardAction>
                 <Dialog open={isCloseDialog} onOpenChange={setIsCloseDialog}>
                   <DialogTrigger asChild>
@@ -185,18 +200,11 @@ export function KanbanGrid() {
                   key={item.id}
                   className={cn("space-y-1 text-sm border rounded bg-background p-2 kanban-item hover:shadow-md transition-all duration-200 select-none",
                     draggedItem?.id === item.id ? 'opacity-50 scale-95 rotate-2 border border-dashed border-primary/50' : '',
-                    config.status !== "DONE" && "cursor-move"
+                    config.status !== "DONE" && "cursor-move",
+                    !permissions.canCreateOrEditItem && "cursor-auto",
                   )}
-                  draggable={config.status !== "DONE"}
-                  onDragStart={(e) => {
-                    switch (config.status) {
-                      case "IN_PROGRESS":
-                      case "STOPPED":
-                      case "NOT_STARTED":
-                        handleDragStart(e, item)
-                        break;
-                    }
-                  }}
+                  draggable={config.status !== "DONE" && permissions.canCreateOrEditItem}
+                  onDragStart={(e) => handleDragStart(e, item)}
                 >
                   <h3 className="font-medium truncate">{item.title}</h3>
                   <div className="flex gap-4 text-muted-foreground">

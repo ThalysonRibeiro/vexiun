@@ -2,7 +2,7 @@
 
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { memo } from "react";
-import { Priority, Status } from "@/generated/prisma";
+import { EntityStatus, Priority, Status, WorkspaceRole } from "@/generated/prisma";
 import {
   Card,
   CardAction,
@@ -21,6 +21,9 @@ import { ItemPriorityStatus } from "./priority";
 import { ItemDetails } from "./item-details";
 import { RenderEditableCell } from "./render-editablecell";
 import { DialogStateProps, EditingField, TeamUser } from "./types";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 
 
 
@@ -44,27 +47,38 @@ interface ItemCardProps {
   onRestoreItem: (itemId: string) => void;
 }
 
-export const ItemCard = memo(function ItemCard({
-  item,
-  team,
-  isLoading,
-  editing,
-  editingData,
-  dialogState,
-  onStartEditing,
-  onCancelEditing,
-  onSaveField,
-  onSelectChange,
-  onDeleteItem,
-  onMoveToTrash,
-  onSaveDetails,
-  setEditingData,
-  setDialogState,
-  onArchiveItem,
-  onRestoreItem
-}: ItemCardProps
-) {
+export const ItemCard = memo(function ItemCard(props: ItemCardProps) {
+  const {
+    item,
+    team,
+    isLoading,
+    editing,
+    editingData,
+    dialogState,
+    onStartEditing,
+    onCancelEditing,
+    onSaveField,
+    onSelectChange,
+    onDeleteItem,
+    onMoveToTrash,
+    onSaveDetails,
+    setEditingData,
+    setDialogState,
+    onArchiveItem,
+    onRestoreItem
+  } = props;
   const titleCapitalized = item.title[0].toUpperCase() + item.title.slice(1);
+  const { id: workspaceId } = useParams();
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: workspace?.workspace.status as EntityStatus,
+    isOwner
+  });
   return (
     <Card
       key={item.id}
@@ -79,7 +93,11 @@ export const ItemCard = memo(function ItemCard({
             item={item}
             field={"title"}
             value={titleCapitalized}
-            isEditing={(itemId, field) => editing.itemId === itemId && editing.field === field}
+            isEditing={
+              (itemId, field) =>
+                (editing.itemId === itemId && editing.field === field)
+            }
+            permissionsEdit={permissions.canCreateOrEditItem}
             onStartEditing={onStartEditing}
             onCancelEditing={onCancelEditing}
             onSaveField={onSaveField}
@@ -110,6 +128,7 @@ export const ItemCard = memo(function ItemCard({
             placeholder="Clique para adicionar notas"
             isLoading={isLoading}
             editing={editing}
+            permissionsEdit={permissions.canCreateOrEditItem}
             editingData={editingData}
             onSaveField={onSaveField}
             onStartEditing={onStartEditing}
@@ -123,6 +142,7 @@ export const ItemCard = memo(function ItemCard({
             placeholder="Clique para adicionar descrição"
             isLoading={isLoading}
             editing={editing}
+            permissionsEdit={permissions.canCreateOrEditItem}
             editingData={editingData}
             onSaveField={onSaveField}
             onStartEditing={onStartEditing}
@@ -136,6 +156,7 @@ export const ItemCard = memo(function ItemCard({
 
         <ItemResponsible
           item={item} label="Responsável"
+          permissionsEdit={permissions.canEdit}
           className="p-2 bg-muted/50 rounded-md hover:bg-muted transition-colors"
         />
 
@@ -145,6 +166,7 @@ export const ItemCard = memo(function ItemCard({
           item={item}
           isLoading={isLoading}
           editing={editing}
+          permissionsEdit={permissions.canCreateOrEditItem}
           editingData={editingData}
           onStartEditing={onStartEditing}
           onCancelEditing={onCancelEditing}
@@ -159,6 +181,7 @@ export const ItemCard = memo(function ItemCard({
             item={item}
             isLoading={isLoading}
             onSelectChange={onSelectChange}
+            permissionsEdit={permissions.canCreateOrEditItem}
           />
           <ItemPriorityStatus
             type="status"
@@ -166,6 +189,7 @@ export const ItemCard = memo(function ItemCard({
             item={item}
             isLoading={isLoading}
             onSelectChange={onSelectChange}
+            permissionsEdit={permissions.canCreateOrEditItem}
           />
         </div>
       </CardContent>
@@ -177,6 +201,7 @@ export const ItemCard = memo(function ItemCard({
           dialogState={dialogState}
           onSaveDetails={onSaveDetails}
           setDialogState={setDialogState}
+          permissionsEdit={permissions.canCreateOrEditItem}
         />
       </CardFooter>
     </Card>

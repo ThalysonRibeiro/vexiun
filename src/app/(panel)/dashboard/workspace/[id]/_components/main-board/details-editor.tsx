@@ -48,15 +48,14 @@ import { useEffect, useState } from "react";
 interface DetailsEditorProps {
   autofocus?: boolean;
   editable?: boolean;
-  content: JSONContent;
+  content: JSONContent | null;
   onContentChange: (content: JSONContent) => void;
 }
-
 
 export function DetailsEditor({
   autofocus = false,
   editable = true,
-  content = {},
+  content = null,
   onContentChange
 }: DetailsEditorProps
 ) {
@@ -64,6 +63,7 @@ export function DetailsEditor({
   useEffect(() => {
     setKey(prev => prev + 1);
   }, [editable]);
+
   const handleUpdate = ({ editor }: { editor: Editor }) => {
     const json = editor.getJSON();
     const serialized = JSON.parse(JSON.stringify(json));

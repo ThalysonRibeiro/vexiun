@@ -15,7 +15,10 @@ import { InfoItem } from "./info-item"
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items"
 import { memo } from "react"
 import { TeamUser } from "./types"
-import { EntityStatus } from "@/generated/prisma"
+import { EntityStatus, WorkspaceRole } from "@/generated/prisma"
+import { useParams } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace"
 
 interface ActionItemProps {
   item: ItemWhitCreatedAssignedUser;
@@ -29,17 +32,31 @@ interface ActionItemProps {
   onRestoreItem: (itemId: string) => void;
 }
 
-export const ActionItem = memo(function ActionItem({
-  item,
-  team,
-  isLoading,
-  entityStatus,
-  isDone = false,
-  onDeleteItem,
-  onMoveToTrash,
-  onArchiveItem,
-  onRestoreItem,
-}: ActionItemProps) {
+export const ActionItem = memo(function ActionItem(props: ActionItemProps) {
+  const {
+    item,
+    team,
+    isLoading,
+    entityStatus,
+    isDone = false,
+    onDeleteItem,
+    onMoveToTrash,
+    onArchiveItem,
+    onRestoreItem,
+  } = props;
+
+  const { id: workspaceId } = useParams();
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: entityStatus as EntityStatus,
+    isOwner
+  });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer" asChild>
@@ -65,38 +82,51 @@ export const ActionItem = memo(function ActionItem({
           </Sheet>
         )}
 
-        {entityStatus !== "ARCHIVED" && entityStatus !== "DELETED" && (
-          <DropdownMenuItem
-            disabled={isLoading === item.id}
-            onClick={() => onArchiveItem(item.id)}
-            className="cursor-pointer"
-          >
-            <Archive className="h-4 w-4" /> Arquivar
-          </DropdownMenuItem>
-        )}
+        {(permissions.canEdit ||
+          permissions.canArchive ||
+          permissions.canDelete ||
+          permissions.canRestore) && (
+            <>
 
-        {entityStatus !== "ACTIVE" && !isDone && (
-          <DropdownMenuItem
-            disabled={isLoading === item.id}
-            onClick={() => onRestoreItem(item.id)}
-            className="cursor-pointer"
-          >
-            <ArchiveRestore className="h-4 w-4" /> Restaurar
-          </DropdownMenuItem>
-        )}
+              {entityStatus !== "ARCHIVED" && entityStatus !== "DELETED" && (
+                <DropdownMenuItem
+                  disabled={isLoading === item.id}
+                  onClick={() => onArchiveItem(item.id)}
+                  className="cursor-pointer"
+                >
+                  <Archive className="h-4 w-4" /> Arquivar
+                </DropdownMenuItem>
+              )}
 
-        {!isDone && (entityStatus === "ACTIVE" || entityStatus === "ARCHIVED") && (
-          <DropdownMenuItem
-            variant="destructive"
-            disabled={isLoading === item.id}
-            onClick={() => onMoveToTrash(item.id)}
-            className="cursor-pointer"
-          >
-            <Trash className="h-4 w-4" />
-            Mover para lixeira
-          </DropdownMenuItem>
-        )}
-        {entityStatus === "DELETED" && (
+              {entityStatus !== "ACTIVE" && !isDone &&
+                permissions.canRestore && (
+                  <DropdownMenuItem
+                    disabled={isLoading === item.id}
+                    onClick={() => onRestoreItem(item.id)}
+                    className="cursor-pointer"
+                  >
+                    <ArchiveRestore className="h-4 w-4" /> Restaurar
+                  </DropdownMenuItem>
+                )}
+
+              {!isDone &&
+                (entityStatus === "ACTIVE" || entityStatus === "ARCHIVED") &&
+                permissions.canDelete && (
+                  <DropdownMenuItem
+                    variant="destructive"
+                    disabled={isLoading === item.id}
+                    onClick={() => onMoveToTrash(item.id)}
+                    className="cursor-pointer"
+                  >
+                    <Trash className="h-4 w-4" />
+                    Mover para lixeira
+                  </DropdownMenuItem>
+                )}
+
+            </>
+          )}
+
+        {entityStatus === "DELETED" && permissions.canDeletePermanently && (
           <DropdownMenuItem
             variant="destructive"
             disabled={isLoading === item.id}

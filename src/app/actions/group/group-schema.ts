@@ -3,6 +3,7 @@ import { z } from "zod";
 import { workspaceIdSchema } from "../workspace";
 
 export const groupIdFormSchema = z.object({
+  workspaceId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
   groupId: z.string()
     .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
@@ -19,7 +20,6 @@ export const createGroupFormSchema = workspaceIdSchema.merge(groupFormSchema);
 export const updateGroupFormSchema = groupIdFormSchema.merge(groupFormSchema);
 
 export const changeGroupStatusSchema = groupIdFormSchema.extend({
-  workspaceId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
   status: z.enum(["ACTIVE", "DELETED", "ARCHIVED"])
 });
 

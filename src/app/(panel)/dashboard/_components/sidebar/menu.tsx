@@ -13,8 +13,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Session } from "next-auth";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown, User, LogOut, Loader2, Bell, Users } from "lucide-react";
+import { ChevronsUpDown, User, LogOut, Loader2, Bell, Users, Mail } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 interface MenuProps {
   userData: Session;
@@ -87,6 +88,14 @@ export function Menu({ userData }: MenuProps) {
           <Link href="/dashboard/profile" className="flex items-center gap-2">
             <User className="mr-2 h-4 w-4" />
             Perfil
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/dashboard/invites" className="flex items-center w-full gap-2">
+            <Mail className="mr-2 h-4 w-4" />
+            Convites
+            <Badge className="ml-auto">1</Badge>
           </Link>
         </DropdownMenuItem>
 

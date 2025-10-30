@@ -67,13 +67,14 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
   async function onSubmit(formData: ItemFormData) {
 
     const response = await createItem.mutateAsync({
+      workspaceId,
       groupId: selectedGroupId || data?.group[0].id as string,
       title: formData.title,
       term: formData.term,
       priority: formData.priority,
       notes: formData.notes || "",
       description: formData.description || "",
-      status: "NOT_STARTED",
+      status,
       assignedTo: formData.assignedTo ?? session?.user?.id,
       details: formData.details,
     });

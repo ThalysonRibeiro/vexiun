@@ -1,10 +1,15 @@
 "use client"
 
-import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
 import { memo } from "react";
+import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { EditingField } from "./types";
 
 interface RenderEditableCellProps {
@@ -18,21 +23,25 @@ interface RenderEditableCellProps {
   onCancelEditing: () => void,
   onSaveField: (item: ItemWhitCreatedAssignedUser) => void,
   isLoading: string | null,
+  permissionsEdit: boolean;
 }
 
-export const RenderEditableCell = memo(function RenderEditableCell({
-  item,
-  field,
-  value,
-  isEditing,
-  editingData,
-  setEditingData,
-  onStartEditing,
-  onCancelEditing,
-  onSaveField,
-  isLoading,
-}: RenderEditableCellProps) {
-  if (isEditing(item.id, field) && field) {
+export const RenderEditableCell = memo(function RenderEditableCell(props: RenderEditableCellProps) {
+  const {
+    item,
+    field,
+    value,
+    isEditing,
+    editingData,
+    setEditingData,
+    onStartEditing,
+    onCancelEditing,
+    onSaveField,
+    isLoading,
+    permissionsEdit,
+  } = props;
+
+  if (isEditing(item.id, field) && field && permissionsEdit) {
     const fieldValue = editingData?.[field] as string || '';
 
     return (
@@ -52,7 +61,7 @@ export const RenderEditableCell = memo(function RenderEditableCell({
           }}
           autoFocus
           disabled={isLoading === item.id}
-          className="flex-1 min-w-80"
+          className="flex-1 w-full min-w-30"
         />
         <Button
           type="submit"
@@ -78,21 +87,29 @@ export const RenderEditableCell = memo(function RenderEditableCell({
   }
 
   return (
-    <button
-      onClick={() => onStartEditing(item, field)}
-      className="cursor-pointer hover:bg-accent p-1 rounded transition-colors overflow-auto"
-      title="Clique para editar"
-    >
-      <p className="overflow-hidden max-w-75 text-ellipsis truncate" style={{
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        lineHeight: '1.4em',
-        maxHeight: '2.8em'
-      }}>
-        {value || 'Clique para editar'}
-      </p>
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={() => onStartEditing(item, field)}
+          className="cursor-pointer hover:bg-accent p-1 rounded transition-colors overflow-auto"
+        >
+          <p className="overflow-hidden max-w-75 text-ellipsis truncate" style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '1.4em',
+            maxHeight: '2.8em'
+          }}>
+            {value || 'Clique para editar'}
+          </p>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        {permissionsEdit
+          ? "Clique para editar"
+          : "Você não tem permissão para alterar o titulo"}
+      </TooltipContent>
+    </Tooltip>
   );
 });
 

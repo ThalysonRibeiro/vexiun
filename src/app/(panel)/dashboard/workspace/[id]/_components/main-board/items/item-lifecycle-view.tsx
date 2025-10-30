@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { EntityStatus } from "@/generated/prisma";
+import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import {
@@ -34,6 +34,9 @@ import { format } from "date-fns";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { InfoItem } from "./info-item";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 
 interface ItemLifecycleViewProps {
   textColor?: string;
@@ -49,20 +52,34 @@ interface ItemLifecycleViewProps {
   onRestoreItem: (itemId: string) => void;
 }
 
-function ItemLifecycleView({
-  textColor = "#22c55e",
-  entityStatus,
-  isDone = false,
-  items,
-  changeLayout,
-  isOpen = true,
-  isLoading,
-  onDeleteItem,
-  onMoveToTrash,
-  onArchiveItem,
-  onRestoreItem
-}: ItemLifecycleViewProps) {
+function ItemLifecycleView(props: ItemLifecycleViewProps) {
+  const {
+    textColor = "#22c55e",
+    entityStatus,
+    isDone = false,
+    items,
+    changeLayout,
+    isOpen = true,
+    isLoading,
+    onDeleteItem,
+    onMoveToTrash,
+    onArchiveItem,
+    onRestoreItem
+  } = props;
   const pagination = usePagination(items ?? [], 10);
+
+  const { id: workspaceId } = useParams();
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: entityStatus as EntityStatus,
+    isOwner
+  });
+
   return (
     <>
       {changeLayout ? (
@@ -75,17 +92,19 @@ function ItemLifecycleView({
                 </CardTitle>
                 <CardDescription></CardDescription>
                 <CardAction>
-                  <ActionItem
-                    item={item}
-                    team={[]}
-                    isLoading={isLoading}
-                    entityStatus={entityStatus}
-                    isDone={isDone}
-                    onDeleteItem={() => onDeleteItem(item.id)}
-                    onMoveToTrash={() => onMoveToTrash(item.id)}
-                    onArchiveItem={() => onArchiveItem(item.id)}
-                    onRestoreItem={() => onRestoreItem(item.id)}
-                  />
+                  {permissions.canRestore && (
+                    <ActionItem
+                      item={item}
+                      team={[]}
+                      isLoading={isLoading}
+                      entityStatus={entityStatus}
+                      isDone={isDone}
+                      onDeleteItem={() => onDeleteItem(item.id)}
+                      onMoveToTrash={() => onMoveToTrash(item.id)}
+                      onArchiveItem={() => onArchiveItem(item.id)}
+                      onRestoreItem={() => onRestoreItem(item.id)}
+                    />
+                  )}
                 </CardAction>
               </CardHeader>
 
@@ -121,7 +140,7 @@ function ItemLifecycleView({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Ações</TableHead>
+                    {permissions.canRestore && <TableHead className="border-r">Ações</TableHead>}
                     <TableHead>Titulo</TableHead>
                     <TableHead className="text-center max-w-25 overflow-hidden border-x">
                       Responsável
@@ -138,21 +157,25 @@ function ItemLifecycleView({
                 <TableBody>
                   {pagination?.currentItems.map(item => (
                     <TableRow key={item.id}>
-                      <TableCell className="py-0.5">
-                        <ActionItem
-                          item={item}
-                          team={[]}
-                          isLoading={isLoading}
-                          entityStatus={entityStatus}
-                          isDone={isDone}
-                          onDeleteItem={() => onDeleteItem(item.id)}
-                          onMoveToTrash={() => onMoveToTrash(item.id)}
-                          onArchiveItem={() => onArchiveItem(item.id)}
-                          onRestoreItem={() => onRestoreItem(item.id)}
-                        />
-                      </TableCell>
+                      {permissions.canRestore && (
+                        <TableCell className="py-0.5 border-r">
+                          <ActionItem
+                            item={item}
+                            team={[]}
+                            isLoading={isLoading}
+                            entityStatus={entityStatus}
+                            isDone={isDone}
+                            onDeleteItem={() => onDeleteItem(item.id)}
+                            onMoveToTrash={() => onMoveToTrash(item.id)}
+                            onArchiveItem={() => onArchiveItem(item.id)}
+                            onRestoreItem={() => onRestoreItem(item.id)}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell className="flex items-center justify-between min-w-30 w-full">
-                        <TitleItem title={item.title} />
+                        <div>
+                          <TitleItem title={item.title} />
+                        </div>
                       </TableCell>
 
                       <TableCell className="border-x py-0.5">

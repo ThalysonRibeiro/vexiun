@@ -2,6 +2,8 @@ import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { WorkspaceContent } from "./_components/workspace-content";
 
+export const revalidate = 120;
+
 export default async function WorkspacePage({
   params,
 }: {

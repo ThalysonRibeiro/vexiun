@@ -16,6 +16,9 @@ import { Badge } from "@/components/ui/badge";
 import { TitleGroup } from "./group/title-group";
 import { ActionGroup } from "./group/action-group";
 import { NewItem } from "./group/new-item";
+import { useSession } from "next-auth/react";
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
+import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 
 export function Groups({
   workspaceId,
@@ -26,6 +29,17 @@ export function Groups({
   const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
   const { data: groups } = useGroups(workspaceId);
   const { data: team } = useTeam(workspaceId);
+
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: workspace?.workspace.status as EntityStatus,
+    isOwner
+  });
 
   const {
     isLoading,
@@ -48,21 +62,23 @@ export function Groups({
       {groups?.group.length === 0 && <h2 className="text-center">Cadastre um group</h2>}
       {/* Botão/Formulário para adicionar novo grupo */}
       <div className="">
-        {isAddingGroup ? (
+        {isAddingGroup && permissions.canCreateGroup ? (
           <GroupForm
             workspaceId={workspaceId}
             setAddGroup={closeAddGroupForm}
           />
         ) : (
           <div className="flex gap-4">
-            <Button
-              onClick={() => setIsAddingGroup(true)}
-              variant="outline"
-              className="cursor-pointer"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Novo grupo
-            </Button>
+            {permissions.canCreateGroup && (
+              <Button
+                onClick={() => setIsAddingGroup(true)}
+                variant="outline"
+                className="cursor-pointer"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Novo grupo
+              </Button>
+            )}
 
             <Button
               onClick={() => setChangeLayout(prev => !prev)}
@@ -86,6 +102,7 @@ export function Groups({
 
               <div className="flex items-center gap-3 mb-4 w-full">
                 <ActionGroup
+                  status="ACTIVE"
                   groupId={group.id}
                   onEditGroup={handleEditGroup}
                   onArchiveGroup={handleArchiveGroup}
@@ -93,7 +110,7 @@ export function Groups({
                   onRestoreGroup={handleRestoreGroup}
                   onDeleteGroup={handleDeleteGroup}
                 />
-                {editingGroupId === group.id ? (
+                {editingGroupId === group.id && permissions.canEdit ? (
                   <GroupForm
                     workspaceId={workspaceId}
                     setAddGroup={closeEditForm}
@@ -151,12 +168,15 @@ export function Groups({
                     changeLayout={changeLayout}
                     workspaceId={workspaceId}
                   />
-                  <NewItem
-                    groupId={group.id}
-                    team={team ?? []}
-                    openDialogs={openDialogs}
-                    setOpenDialogs={setOpenDialogs}
-                  />
+                  {permissions.canCreateOrEditItem && (
+                    <NewItem
+                      workspaceId={workspaceId}
+                      groupId={group.id}
+                      team={team ?? []}
+                      openDialogs={openDialogs}
+                      setOpenDialogs={setOpenDialogs}
+                    />
+                  )}
                 </CollapsibleContent>
               </Collapsible>
 

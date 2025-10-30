@@ -16,15 +16,13 @@ const permissions = [
   { action: "Convidar membros", viewer: false, member: false, admin: true, owner: true, },
   { action: "Remover membros", viewer: false, member: false, admin: true, owner: true, },
   { action: "Alterar cargos de membros", viewer: false, member: false, admin: false, owner: true, },
-  { action: "Criar grupos", viewer: false, member: true, admin: true, owner: true, },
+  { action: "Criar grupos", viewer: false, member: false, admin: true, owner: true, },
   { action: "Editar grupos", viewer: false, member: false, admin: true, owner: true, },
   { action: "Deletar grupos", viewer: false, member: false, admin: true, owner: true, },
   { action: "Criar items/tarefas", viewer: false, member: true, admin: true, owner: true, },
-  { action: "Editar items próprios", viewer: false, member: true, admin: true, owner: true, },
-  { action: "Editar qualquer item", viewer: false, member: false, admin: true, owner: true, },
-  { action: "Deletar items próprios", viewer: false, member: true, admin: true, owner: true, },
+  { action: "Editar items/tarefas", viewer: false, member: false, admin: true, owner: true, },
   { action: "Deletar qualquer item", viewer: false, member: false, admin: false, owner: true, },
-  { action: "Atribuir tarefas", viewer: false, member: true, admin: true, owner: true, },
+  { action: "Atribuir tarefas", viewer: false, member: false, admin: true, owner: true, },
   { action: "Ver todos os items", viewer: true, member: true, admin: true, owner: true, },
 ];
 

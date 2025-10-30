@@ -8,17 +8,25 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { DeleteItemType, itemIdFormSchema } from "./item-schema";
+import { deleteItemFormSchema, DeleteItemType } from "./item-schema";
+import { validateWorkspacePermission } from "@/lib/db/validators";
 
 export const deleteItem = withAuth(async (
   userId,
   session,
   formData: DeleteItemType): Promise<ActionResponse<string>> => {
 
-  const schema = itemIdFormSchema.safeParse(formData);
+  const schema = deleteItemFormSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
   };
+
+  await validateWorkspacePermission(
+    formData.workspaceId,
+    userId,
+    "ADMIN"
+  );
+
   await prisma.item.delete({
     where: { id: formData.itemId }
   });

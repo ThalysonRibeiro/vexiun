@@ -9,7 +9,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { validateGroupExists } from "@/lib/db/validators";
+import { validateGroupExists, validateWorkspacePermission } from "@/lib/db/validators";
 import { changeGroupStatusSchema, ChangeGroupStatusType } from "./group-schema";
 
 
@@ -28,6 +28,16 @@ export const changeGroupStatus = withAuth(async (
   if (!existingGroup) {
     throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.GROUP);
   }
+
+  if (existingGroup.status !== "ACTIVE") {
+    throw new ValidationError(ERROR_MESSAGES.STATUS.GROUP_INACTIVE);
+  }
+
+  await validateWorkspacePermission(
+    formData.workspaceId,
+    userId,
+    "ADMIN"
+  );
 
   await prisma.$transaction([
     prisma.group.update({

@@ -1,6 +1,5 @@
 "use client";
 
-import { WorkspaceByStatus } from "@/app/data-access/workspace";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,8 @@ import {
   useArchiveWorkspace,
   useDeleteWorkspace,
   useMoveWorkspaceToTrash,
-  useRestoreWorkspace
+  useRestoreWorkspace,
+  WorkspaceByStatus
 } from "@/hooks/use-workspace";
 import { isSuccessResponse } from "@/lib/errors";
 import {
@@ -33,7 +33,7 @@ import { toast } from "sonner";
 import { useWorkspacesByStatus } from "@/hooks/use-workspace";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EntityStatus } from "@/generated/prisma";
-import { EmptyState } from "./empty-state";
+import { EmptyState } from "../../../../../components/ui/empty-state";
 
 
 interface WorkspaceListByStatusProps {
@@ -106,8 +106,6 @@ export function WorkspaceListByStatus({
     </section>
   );
 }
-
-
 
 interface WorkspaceCardProps {
   workspace: WorkspaceByStatus;

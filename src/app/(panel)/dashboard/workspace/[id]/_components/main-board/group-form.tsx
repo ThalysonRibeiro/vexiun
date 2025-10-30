@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { useCreateGroup, UseGroupForm, useUpdateGroup } from "@/hooks/use-groups";
 import { GroupFormData } from "@/app/actions/group";
+import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 
 
 interface CreateGroupFormProps {
@@ -25,7 +27,8 @@ interface CreateGroupFormProps {
   workspaceId: string;
 }
 
-export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: CreateGroupFormProps) {
+export function GroupForm(props: CreateGroupFormProps) {
+  const { setAddGroup, initialValues, groupId, workspaceId } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
   const form = UseGroupForm({ initialValues: initialValues });
@@ -47,6 +50,7 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
 
     if (groupId) {
       await updateGroup.mutateAsync({
+        workspaceId,
         groupId,
         title: formData.title,
         textColor: formData.textColor,
@@ -107,7 +111,7 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
             control={form.control}
             name="textColor"
             render={({ field }) => (
-              <FormItem className="rounded-full overflow-hidden border-2 w-8 h-8 relative">
+              <FormItem className="rounded-full overflow-hidden border-2 w-8 h-8 relative mt-2.5 mb-auto">
                 <FormControl>
                   <Input
                     {...field}
@@ -118,11 +122,28 @@ export function GroupForm({ setAddGroup, initialValues, groupId, workspaceId }: 
                     className="border-0 p-0 cursor-pointer w-15  h-15 absolute -top-1 -left-1 "
                   />
                 </FormControl>
-                <FormDescription />
-                <FormMessage />
               </FormItem>
             )}
           />
+          <Button
+            type="submit"
+            size="sm"
+            variant="ghost"
+            disabled={isLoading}
+            className="text-green-600 hover:text-green-700 mt-2.5 mb-auto"
+          >
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => setAddGroup(false)}
+            disabled={isLoading}
+            className="text-red-600 hover:text-red-700 mt-2.5 mb-auto"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </form>
       </Form>
     </div>

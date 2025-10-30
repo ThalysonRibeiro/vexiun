@@ -8,7 +8,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { validateWorkspaceExists } from "@/lib/db/validators";
+import { validateWorkspaceExists, validateWorkspacePermission } from "@/lib/db/validators";
 import { updateWorkspaceSchema, UpdateWorkspaceType } from "./workspace-schema";
 
 export const updateWorkspace = withAuth(async (
@@ -21,6 +21,13 @@ export const updateWorkspace = withAuth(async (
     throw new ValidationError(schema.error.issues[0].message);
   };
   const existingWorkspace = await validateWorkspaceExists(formData.workspaceId);
+
+  await validateWorkspacePermission(
+    formData.workspaceId,
+    userId,
+    "ADMIN"
+  );
+
   await prisma.workspace.update({
     where: { id: existingWorkspace.id },
     data: {

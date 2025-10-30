@@ -24,15 +24,14 @@ import {
 } from "@/app/actions/workspace/delete";
 import {
   EntityStatus,
+  Prisma,
   WorkspaceCategory,
   WorkspaceRole
 } from "@/generated/prisma";
 import { changeWorkspaceStatus } from "@/app/actions/workspace/change-status";
-import { getWorkspacesByStatus } from "@/app/data-access/workspace";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
-
+import { CACHE_TIMES } from "@/lib/constants";
 
 export interface UseWorkspaceProps {
   initialValues?: {
@@ -277,19 +276,31 @@ export function useDeclineWorkspaceInvitation() {
 }
 
 
-type WorkspacesByStatusResult = Awaited<ReturnType<typeof getWorkspacesByStatus>>;
-type WorkspacesByStatusData = Extract<WorkspacesByStatusResult, { success: true }>['data'];
+export type WorkspaceByStatus = Prisma.WorkspaceGetPayload<{
+  include: {
+    _count: {
+      select: {
+        groups: true,
+        members: true,
+      },
+    },
+    statusChanger: {
+      select: {
+        name: true,
+        email: true
+      }
+    }
+  },
+}>
 
-/**
- * Busca workspaces com base no status
- */
 export function useWorkspacesByStatus(status: EntityStatus) {
-  return useQuery<WorkspacesByStatusData>({
-    queryKey: ["workspaces", "by-status", status] as const,
+  return useQuery<WorkspaceByStatus[]>({
+    queryKey: ["workspaces", "by-status", status],
     queryFn: async () => {
-      const result = await getWorkspacesByStatus(status);
+      const response = await fetch(`/api/workspace/by-status?status=${status}`);
+      const result = await response.json();
 
-      if (!isSuccessResponse(result)) {
+      if (!result.success) {
         throw new Error(result.error);
       }
 
@@ -299,6 +310,36 @@ export function useWorkspacesByStatus(status: EntityStatus) {
   });
 }
 
+
+type WorkspaceMemberDataResult = {
+  success: true;
+  data: {
+    workspace: { status: string; userId: string };
+    member: { role: string; userId: string };
+  };
+} | {
+  success: false;
+  error: string;
+};
+
+export function useWorkspaceMemberData(workspaceId: string) {
+  return useQuery({
+    queryKey: ["workspaces", "workspace-member", workspaceId],
+    queryFn: async () => {
+
+      const response = await fetch(`/api/workspace/${workspaceId}/member`);
+      const result: WorkspaceMemberDataResult = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return result.data;
+    },
+    enabled: !!workspaceId,
+    staleTime: CACHE_TIMES.MEDIUM,
+  });
+}
 
 interface UseWorkspacePermissionsProps {
   userRole: WorkspaceRole;
@@ -353,6 +394,15 @@ export function useWorkspacePermissions({
     return ["ADMIN", "OWNER"].includes(userRole);
   };
 
+  const canCreateGroup = () => {
+    // Só OWNER e ADMIN podem criar grupos
+    return ["ADMIN", "OWNER"].includes(userRole);
+  };
+
+  const canCreateOrEditItem = () => {
+    return ["ADMIN", "OWNER", "MEMBER"].includes(userRole);
+  };
+
   const canManageMembers = () => {
     // Só OWNER e ADMIN
     return ["ADMIN", "OWNER"].includes(userRole);
@@ -369,6 +419,8 @@ export function useWorkspacePermissions({
     canDelete: canDelete(),
     canRestore: canRestore(),
     canEdit: canEdit(),
+    canCreateGroup: canCreateGroup(),
+    canCreateOrEditItem: canCreateOrEditItem(),
     canManageMembers: canManageMembers(),
     canDeletePermanently: canDeletePermanently(),
 

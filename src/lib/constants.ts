@@ -9,6 +9,13 @@ export const APP_NAME = "Catalyst";
 export const APP_DESCRIPTION = "Accelerate your team's productivity";
 export const APP_TAGLINE = "Where collaboration meets velocity";
 
+export const CACHE_TIMES = {
+  SHORT: 1 * 60 * 1000,    // 1min - dados frequentes
+  MEDIUM: 5 * 60 * 1000,   // 5min - dados normais
+  LONG: 15 * 60 * 1000,    // 15min - dados estáveis
+  PERMANENT: Infinity,      // Dados imutáveis
+} as const;
+
 export const CATEGORIES_ARRAY: {
   id: WorkspaceCategory,
   label: string,

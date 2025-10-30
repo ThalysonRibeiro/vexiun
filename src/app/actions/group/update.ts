@@ -9,7 +9,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { validateGroupExists } from "@/lib/db/validators";
+import { validateGroupExists, validateWorkspacePermission } from "@/lib/db/validators";
 import { updateGroupFormSchema, UpdateGroupType } from "./group-schema";
 
 
@@ -28,6 +28,12 @@ export const updateGroup = withAuth(async (
   if (!existingGroup) {
     throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.GROUP);
   }
+
+  await validateWorkspacePermission(
+    formData.workspaceId,
+    userId,
+    "ADMIN"
+  );
 
   await prisma.group.update({
     where: { id: formData.groupId },

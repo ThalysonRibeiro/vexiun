@@ -1,10 +1,9 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { ValidationError, withAuth } from "@/lib/errors";
-import { PermissionError } from "@/lib/errors";
 import { successResponse } from "@/lib/errors/error-handler";
 import { ERROR_MESSAGES } from "@/lib/errors";
-import { validateWorkspaceAccess } from "@/lib/db/validators";
+import { validateWorkspacePermission } from "@/lib/db/validators";
 import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { assignToFormSchema, AssignToType } from "./item-schema";
@@ -17,11 +16,11 @@ export const assignTo = withAuth(
       throw new ValidationError(schema.error.issues[0].message);
     };
 
-    const hasAccess = await validateWorkspaceAccess(formData.workspaceId, formData.assignedTo);
-
-    if (!hasAccess) {
-      throw new PermissionError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
-    }
+    await validateWorkspacePermission(
+      formData.workspaceId,
+      userId,
+      "ADMIN"
+    );
 
     const result = await prisma.item.update({
       where: { id: formData.itemId },

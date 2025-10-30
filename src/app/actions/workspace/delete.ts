@@ -24,21 +24,11 @@ export const deleteWorkspace = withAuth(async (
 
   const existingWorkspace = await validateWorkspaceExists(formData.workspaceId);
 
-  const permission = await validateWorkspacePermission(
+  await validateWorkspacePermission(
     formData.workspaceId,
     userId,
-    "OWNER" // Mínimo ADMIN para deletar
+    "OWNER"
   );
-
-  const { role } = permission;
-  const { userId: ownerId } = existingWorkspace;
-  if (userId !== ownerId) {
-    throw new PermissionError("Você não tem permissão para deletar esta workspace");
-  }
-
-  if (role !== "OWNER") {
-    throw new PermissionError("Você não tem permissão para deletar esta workspace");
-  }
 
   await prisma.$transaction(async (tx) => {
     await tx.notification.deleteMany({

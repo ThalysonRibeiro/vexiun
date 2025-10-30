@@ -346,5 +346,201 @@
       "}"
     ],
     "description": "Hook de mutation com optimistic update"
+  },
+
+  "Route Handler GET with Auth": {
+    "prefix": "route-get",
+    "body": [
+      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { NextResponse } from \"next/server\";",
+      "import prisma from \"@/lib/prisma\";",
+      "",
+      "export const GET = withAuthRoute(async (req, userId, session) => {",
+      "  const searchParams = req.nextUrl.searchParams;",
+      "  $1",
+      "",
+      "  const data = await prisma.$2.findMany({",
+      "    where: {",
+      "      $3",
+      "    }",
+      "  });",
+      "",
+      "  return NextResponse.json({",
+      "    success: true,",
+      "    data",
+      "  });",
+      "});"
+    ],
+    "description": "Create a GET route handler with authentication"
+  },
+  
+  "Route Handler GET with Dynamic Params": {
+    "prefix": "route-get-params",
+    "body": [
+      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { NextResponse } from \"next/server\";",
+      "import prisma from \"@/lib/prisma\";",
+      "",
+      "export const GET = withAuthRoute(async (req, userId, session, context) => {",
+      "  const { ${1:paramName} } = await context!.params!;",
+      "  $2",
+      "",
+      "  const data = await prisma.$3.findUnique({",
+      "    where: {",
+      "      ${1:paramName}",
+      "    }",
+      "  });",
+      "",
+      "  return NextResponse.json({",
+      "    success: true,",
+      "    data",
+      "  });",
+      "});"
+    ],
+    "description": "Create a GET route handler with dynamic params"
+  },
+
+  "Route Handler POST with Auth": {
+    "prefix": "route-post",
+    "body": [
+      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { NextResponse } from \"next/server\";",
+      "import prisma from \"@/lib/prisma\";",
+      "",
+      "export const POST = withAuthRoute(async (req, userId, session) => {",
+      "  const body = await req.json();",
+      "  $1",
+      "",
+      "  const data = await prisma.$2.create({",
+      "    data: {",
+      "      ...body,",
+      "      userId",
+      "    }",
+      "  });",
+      "",
+      "  return NextResponse.json({",
+      "    success: true,",
+      "    data",
+      "  });",
+      "});"
+    ],
+    "description": "Create a POST route handler with authentication"
+  },
+
+  "Route Handler GET with Query Params and Filters": {
+    "prefix": "route-get-filters",
+    "body": [
+      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { NextResponse } from \"next/server\";",
+      "import prisma from \"@/lib/prisma\";",
+      "import { ${1:EntityStatus} } from \"@/generated/prisma\";",
+      "",
+      "export const GET = withAuthRoute(async (req, userId, session) => {",
+      "  const searchParams = req.nextUrl.searchParams;",
+      "  const ${2:status} = searchParams.get(\"${2:status}\") as ${1:EntityStatus} || \"${3:ACTIVE}\";",
+      "  $4",
+      "",
+      "  const data = await prisma.$5.findMany({",
+      "    where: {",
+      "      userId,",
+      "      ${2:status}",
+      "    },",
+      "    orderBy: {",
+      "      createdAt: 'desc'",
+      "    }",
+      "  });",
+      "",
+      "  return NextResponse.json({",
+      "    success: true,",
+      "    data",
+      "  });",
+      "});"
+    ],
+    "description": "Create a GET route handler with filters"
+  },
+
+  "Convert Server Action to Route Handler": {
+    "prefix": "convert-action",
+    "body": [
+      "// ANTES (Server Action):",
+      "// export const ${1:actionName} = withAuth(async (userId, session, ${2:args}) => {",
+      "//   const data = await prisma.$3.findMany({ where: { userId } });",
+      "//   return successResponse(data);",
+      "// });",
+      "",
+      "// DEPOIS (Route Handler):",
+      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { NextResponse } from \"next/server\";",
+      "import prisma from \"@/lib/prisma\";",
+      "",
+      "export const GET = withAuthRoute(async (req, userId, session) => {",
+      "  // TODO: Adaptar lógica da action aqui",
+      "  const data = await prisma.$3.findMany({",
+      "    where: { userId }",
+      "  });",
+      "",
+      "  return NextResponse.json({",
+      "    success: true,",
+      "    data",
+      "  });",
+      "});"
+    ],
+    "description": "Template for converting server action to route handler"
+  },
+
+  "Route Handler with Validation": {
+    "prefix": "route-validate",
+    "body": [
+      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { NextResponse } from \"next/server\";",
+      "import { validateWorkspaceAccess } from \"@/lib/helpers/validate-workspace-access\";",
+      "import prisma from \"@/lib/prisma\";",
+      "",
+      "export const GET = withAuthRoute(async (req, userId, session, context) => {",
+      "  const { ${1:workspaceId} } = await context!.params!;",
+      "  ",
+      "  // Valida acesso",
+      "  await validateWorkspaceAccess(${1:workspaceId}, userId);",
+      "  $2",
+      "",
+      "  const data = await prisma.$3.findMany({",
+      "    where: {",
+      "      ${1:workspaceId}",
+      "    }",
+      "  });",
+      "",
+      "  return NextResponse.json({",
+      "    success: true,",
+      "    data",
+      "  });",
+      "});"
+    ],
+    "description": "Route handler with workspace validation"
+  },
+
+  "TanStack Query Hook": {
+    "prefix": "hook-query-fetch",
+    "body": [
+      "import { useQuery } from \"@tanstack/react-query\";",
+      "",
+      "export function use${1:DataName}(${2:id}: string) {",
+      "  return useQuery({",
+      "    queryKey: [\"${3:key}\", ${2:id}],",
+      "    queryFn: async () => {",
+      "      const response = await fetch(`/api/${4:endpoint}/\\${${2:id}}`);",
+      "      const result = await response.json();",
+      "",
+      "      if (!result.success) {",
+      "        throw new Error(result.error);",
+      "      }",
+      "",
+      "      return result.data;",
+      "    },",
+      "    enabled: !!${2:id},",
+      "    staleTime: ${5|0,CACHE_TIMES.SHORT,CACHE_TIMES.MEDIUM,CACHE_TIMES.LONG|},",
+      "  });",
+      "}"
+    ],
+    "description": "Create a TanStack Query hook"
   }
 }

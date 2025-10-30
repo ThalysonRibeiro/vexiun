@@ -2,7 +2,7 @@
 
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { memo } from "react"
-import { Priority, Status } from "@/generated/prisma";
+import { EntityStatus, Priority, Status, WorkspaceRole } from "@/generated/prisma";
 import {
   Table,
   TableBody,
@@ -21,6 +21,9 @@ import { colorPriority, colorStatus } from "@/utils/colorStatus";
 import { ItemDetails } from "./item-details";
 import { DialogStateProps, EditingField, TeamUser } from "./types";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 
 
 interface ItemTableProps {
@@ -43,25 +46,39 @@ interface ItemTableProps {
   onRestoreItem: (itemId: string) => void;
 }
 
-export const ItemTable = memo(function ItemTable({
-  currentItems,
-  team,
-  isLoading,
-  editing,
-  editingData,
-  dialogState,
-  onStartEditing,
-  onCancelEditing,
-  onSaveField,
-  onSelectChange,
-  onDeleteItem,
-  onMoveToTrash,
-  onSaveDetails,
-  setEditingData,
-  setDialogState,
-  onArchiveItem,
-  onRestoreItem
-}: ItemTableProps) {
+export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
+  const {
+    currentItems,
+    team,
+    isLoading,
+    editing,
+    editingData,
+    dialogState,
+    onStartEditing,
+    onCancelEditing,
+    onSaveField,
+    onSelectChange,
+    onDeleteItem,
+    onMoveToTrash,
+    onSaveDetails,
+    setEditingData,
+    setDialogState,
+    onArchiveItem,
+    onRestoreItem
+  } = props;
+
+  const { id: workspaceId } = useParams();
+  const { data: session } = useSession();
+  const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
+
+  const currentUserId = session?.user.id;
+  const isOwner = workspace?.workspace.userId === currentUserId;
+  const permissions = useWorkspacePermissions({
+    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    workspaceStatus: workspace?.workspace.status as EntityStatus,
+    isOwner
+  });
+
   return (
     <Table className="border rounded-lg">
       <TableHeader>
@@ -102,6 +119,7 @@ export const ItemTable = memo(function ItemTable({
                     field={"title"}
                     value={titleCapitalized}
                     isEditing={(itemId, field) => editing.itemId === itemId && editing.field === field}
+                    permissionsEdit={permissions.canCreateOrEditItem}
                     onStartEditing={onStartEditing}
                     onCancelEditing={onCancelEditing}
                     onSaveField={onSaveField}
@@ -120,6 +138,7 @@ export const ItemTable = memo(function ItemTable({
                   placeholder="Clique para adicionar notas"
                   isLoading={isLoading}
                   editing={editing}
+                  permissionsEdit={permissions.canCreateOrEditItem}
                   editingData={editingData}
                   onSaveField={onSaveField}
                   onStartEditing={onStartEditing}
@@ -131,7 +150,7 @@ export const ItemTable = memo(function ItemTable({
               <TableCell className="border-x py-0.5"
                 title="Para trocar de responsável edite o item"
               >
-                <ItemResponsible item={item} label="" />
+                <ItemResponsible item={item} label="" permissionsEdit={permissions.canEdit} />
               </TableCell>
 
               <TableCell className="py-0.5">
@@ -140,6 +159,7 @@ export const ItemTable = memo(function ItemTable({
                   item={item}
                   isLoading={isLoading}
                   editing={editing}
+                  permissionsEdit={permissions.canCreateOrEditItem}
                   editingData={editingData}
                   onStartEditing={onStartEditing}
                   onCancelEditing={onCancelEditing}
@@ -157,6 +177,7 @@ export const ItemTable = memo(function ItemTable({
                   item={item}
                   isLoading={isLoading}
                   onSelectChange={onSelectChange}
+                  permissionsEdit={permissions.canCreateOrEditItem}
                 />
               </TableCell>
 
@@ -168,6 +189,7 @@ export const ItemTable = memo(function ItemTable({
                   item={item}
                   isLoading={isLoading}
                   onSelectChange={onSelectChange}
+                  permissionsEdit={permissions.canCreateOrEditItem}
                 />
               </TableCell>
 
@@ -179,6 +201,7 @@ export const ItemTable = memo(function ItemTable({
                   placeholder="Clique para adicionar descrição"
                   isLoading={isLoading}
                   editing={editing}
+                  permissionsEdit={permissions.canCreateOrEditItem}
                   editingData={editingData}
                   onSaveField={onSaveField}
                   onStartEditing={onStartEditing}
@@ -195,6 +218,7 @@ export const ItemTable = memo(function ItemTable({
                     dialogState={dialogState}
                     onSaveDetails={onSaveDetails}
                     setDialogState={setDialogState}
+                    permissionsEdit={permissions.canCreateOrEditItem}
                   />
                 </div>
               </TableCell>
