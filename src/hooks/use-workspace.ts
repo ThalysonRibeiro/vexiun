@@ -32,6 +32,9 @@ import { changeWorkspaceStatus } from "@/app/actions/workspace/change-status";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CACHE_TIMES } from "@/lib/constants";
+import { useCallback, useState } from "react";
+import { WorkspaceWithDetails } from "@/app/(panel)/dashboard/workspace/_components/workspaces-page-client";
+import { toast } from "sonner";
 
 export interface UseWorkspaceProps {
   initialValues?: {
@@ -339,6 +342,72 @@ export function useWorkspaceMemberData(workspaceId: string) {
     enabled: !!workspaceId,
     staleTime: CACHE_TIMES.MEDIUM,
   });
+}
+
+export function useActionsWorkspaceList() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<WorkspaceWithDetails | null>(null);
+  const archive = useArchiveWorkspace();
+  const deleteWs = useMoveWorkspaceToTrash();
+
+  const handleArchive = useCallback(async (workspaceId: string) => {
+    const result = await archive.mutateAsync(workspaceId);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao arquivar");
+    }
+    toast.success(result.message);
+  }, [archive]);
+
+  const handleDelete = useCallback(async (workspaceId: string) => {
+    if (
+      !confirm(
+        "Deseja realmente mover para lixeira? Todos os grupos e items serão movidos para lixeira."
+      )
+    ) {
+      return;
+    }
+    const result = await deleteWs.mutateAsync(workspaceId);
+    if (!isSuccessResponse(result)) {
+      toast.error("Erro ao deletar");
+    }
+    toast.success(result.message);
+  }, [deleteWs]);
+
+  const handleSelectForEdit = useCallback((workspace: WorkspaceWithDetails) => {
+    setSelectedWorkspace({
+      userId: workspace.userId,
+      id: workspace.id,
+      title: workspace.title,
+      groupsCount: workspace.groupsCount,
+      itemsCount: workspace.itemsCount,
+      members: workspace.members,
+      menbersRole: workspace.menbersRole,
+      categories: workspace.categories,
+      status: workspace.status,
+      statusChangedAt: workspace.statusChangedAt,
+      description: workspace.description,
+      statusChangedBy: workspace.statusChangedBy,
+      lastActivityAt: workspace.lastActivityAt,
+    });
+    setDropdownOpen(null);
+    setTimeout(() => setIsOpen(true), 0);
+  }, []);
+
+  return {
+    // Estado
+    isOpen,
+    dropdownOpen,
+    selectedWorkspace,
+    // Setters
+    setIsOpen,
+    setDropdownOpen,
+    setSelectedWorkspace,
+    // Ações
+    handleArchive,
+    handleDelete,
+    handleSelectForEdit
+  }
 }
 
 interface UseWorkspacePermissionsProps {

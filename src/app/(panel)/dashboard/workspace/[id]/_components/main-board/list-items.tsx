@@ -122,8 +122,6 @@ export function ListItems(props: ItemsTablesProps) {
 
     const newScrollLeft = scrollLeftStart - walk;
 
-    console.log('Mouse Move - walk:', walk, 'new scrollLeft:', newScrollLeft, 'actual:', container.scrollLeft);
-
     container.scrollLeft = newScrollLeft;
   };
 
