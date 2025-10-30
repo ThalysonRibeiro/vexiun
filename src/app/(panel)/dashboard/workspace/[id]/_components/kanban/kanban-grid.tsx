@@ -103,6 +103,7 @@ export function KanbanGrid() {
     e.preventDefault();
     if (draggedItem && draggedItem.status !== status) {
       const response = await updateItem.mutateAsync({
+        workspaceId,
         itemId: draggedItem.id,
         status: status,
         description: draggedItem.description,
