@@ -1,14 +1,14 @@
 import { transporter } from "@/lib/mailer";
 
 export async function sendVerificationEmail(to: string, token: string, name?: string) {
-    const verifyUrl = `${process.env.NEXT_PUBLIC_URL}/verify-email?token=${token}`;
+  const verifyUrl = `${process.env.NEXT_PUBLIC_URL}/verify-email?token=${token}`;
 
-    try {
-        await transporter.sendMail({
-            from: process.env.MAIL_USER,
-            to,
-            subject: "Verificação de Email",
-            html: `
+  try {
+    await transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to,
+      subject: "Verificação de Email",
+      html: `
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
@@ -161,7 +161,7 @@ export async function sendVerificationEmail(to: string, token: string, name?: st
                 
                 <div class="content">
                     <div class="greeting">
-                        Olá, ${name || 'Usuário'}! 👋
+                        Olá, ${name || "Usuário"}! 👋
                     </div>
                     
                     <div class="message">
@@ -193,26 +193,30 @@ export async function sendVerificationEmail(to: string, token: string, name?: st
             </div>
         </body>
         </html>
-      `,
-        });
-    } catch (error) {
-        console.error("Erro ao enviar email de verificação:", error);
-        throw new Error("Não foi possível enviar o email de verificação.");
-    }
+      `
+    });
+  } catch (error) {
+    console.error("Erro ao enviar email de verificação:", error);
+    throw new Error("Não foi possível enviar o email de verificação.");
+  }
 }
 
-export async function sendLoginAlertEmail(to: string, name?: string, loginInfo?: {
+export async function sendLoginAlertEmail(
+  to: string,
+  name?: string,
+  loginInfo?: {
     timestamp: string;
     ip?: string;
     userAgent?: string;
     location?: string;
-}) {
-    try {
-        await transporter.sendMail({
-            from: process.env.MAIL_USER,
-            to,
-            subject: "🔔 Novo Login Detectado - DevTasks",
-            html: `
+  }
+) {
+  try {
+    await transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to,
+      subject: "🔔 Novo Login Detectado - DevTasks",
+      html: `
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
@@ -375,7 +379,7 @@ export async function sendLoginAlertEmail(to: string, name?: string, loginInfo?:
                 
                 <div class="content">
                     <div class="greeting">
-                        Olá, ${name || 'Usuário'}! 👋
+                        Olá, ${name || "Usuário"}! 👋
                     </div>
                     
                     <div class="message">
@@ -386,26 +390,38 @@ export async function sendLoginAlertEmail(to: string, name?: string, loginInfo?:
                         <h3>📊 Detalhes do Login</h3>
                         <div class="info-item">
                             <span class="info-label">Data e Hora:</span>
-                            <span class="info-value">${loginInfo?.timestamp || 'Não disponível'}</span>
+                            <span class="info-value">${loginInfo?.timestamp || "Não disponível"}</span>
                         </div>
-                        ${loginInfo?.ip ? `
+                        ${
+                          loginInfo?.ip
+                            ? `
                         <div class="info-item">
                             <span class="info-label">Endereço IP:</span>
                             <span class="info-value">${loginInfo.ip}</span>
                         </div>
-                        ` : ''}
-                        ${loginInfo?.location ? `
+                        `
+                            : ""
+                        }
+                        ${
+                          loginInfo?.location
+                            ? `
                         <div class="info-item">
                             <span class="info-label">Localização:</span>
                             <span class="info-value">${loginInfo.location}</span>
                         </div>
-                        ` : ''}
-                        ${loginInfo?.userAgent ? `
+                        `
+                            : ""
+                        }
+                        ${
+                          loginInfo?.userAgent
+                            ? `
                         <div class="info-item">
                             <span class="info-label">Dispositivo:</span>
                             <span class="info-value">${loginInfo.userAgent}</span>
                         </div>
-                        ` : ''}
+                        `
+                            : ""
+                        }
                     </div>
                     
                     <div class="security-note">
@@ -427,35 +443,35 @@ export async function sendLoginAlertEmail(to: string, name?: string, loginInfo?:
             </div>
         </body>
         </html>
-      `,
-        });
-    } catch (error) {
-        console.error("Erro ao enviar email de alerta de login:", error);
-        throw new Error("Não foi possível enviar o email de alerta de login.");
-    }
+      `
+    });
+  } catch (error) {
+    console.error("Erro ao enviar email de alerta de login:", error);
+    throw new Error("Não foi possível enviar o email de alerta de login.");
+  }
 }
 
 export async function sendEmail({
-    to,
-    subject,
-    html,
-    text,
+  to,
+  subject,
+  html,
+  text
 }: {
-    to: string;
-    subject: string;
-    html?: string;
-    text?: string;
+  to: string;
+  subject: string;
+  html?: string;
+  text?: string;
 }) {
-    try {
-        await transporter.sendMail({
-            from: `"Seu App" <${process.env.MAIL_USER}>`,
-            to,
-            subject,
-            html,
-            text,
-        });
-        console.log(`Email enviado para ${to}`);
-    } catch (err) {
-        console.error("Erro ao enviar e-mail:", err);
-    }
+  try {
+    await transporter.sendMail({
+      from: `"Seu App" <${process.env.MAIL_USER}>`,
+      to,
+      subject,
+      html,
+      text
+    });
+    console.log(`Email enviado para ${to}`);
+  } catch (err) {
+    console.error("Erro ao enviar e-mail:", err);
+  }
 }

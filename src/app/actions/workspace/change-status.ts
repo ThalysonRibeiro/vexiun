@@ -5,10 +5,7 @@ import { successResponse } from "@/lib/errors/error-handler";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
 import { EntityStatus } from "@/generated/prisma";
-import {
-  validateWorkspaceExists,
-  validateWorkspacePermission
-} from "@/lib/db/validators";
+import { validateWorkspaceExists, validateWorkspacePermission } from "@/lib/db/validators";
 import { ChangeStatusInput, changeWorkspaceStatusSchema } from "./workspace-schema";
 import { entityStatusMessages } from "@/lib/entityStatus/messages";
 
@@ -36,9 +33,7 @@ export const changeWorkspaceStatus = withAuth(
 
     // DELETED só pode ser alterado pelo OWNER
     if (currentStatus === "DELETED" && role !== "OWNER") {
-      throw new PermissionError(
-        ERROR_MESSAGES.PERMISSION.OWNER_ONLY
-      );
+      throw new PermissionError(ERROR_MESSAGES.PERMISSION.OWNER_ONLY);
     }
 
     // ✅ 5. Atualiza workspace e conteúdo em cascata
@@ -68,7 +63,7 @@ export const changeWorkspaceStatus = withAuth(
       if (groups.length > 0) {
         await tx.item.updateMany({
           where: {
-            groupId: { in: groups.map(g => g.id) }
+            groupId: { in: groups.map((g) => g.id) }
           },
           data: { entityStatus: formData.newStatus }
         });

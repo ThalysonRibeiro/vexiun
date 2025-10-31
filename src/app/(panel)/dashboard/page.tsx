@@ -30,16 +30,22 @@ export default async function Dashboard() {
   const session = await getSession();
 
   if (!session) {
-    redirect('/')
+    redirect("/");
   }
 
   const workspaces = await getMyWorkspaces().then(unwrapServerData);
   const sharedWorkspaces = await getSharedWorkspaces().then(unwrapServerData);
   const weekSummaryDate = await getWeekSummary(session?.user?.id as string).then(unwrapServerData);
   const detailUser = await getDetailUser().then(unwrapServerData);
-  if (!detailUser) { return null; };
-  if (!weekSummaryDate?.summary) { return null; };
-  if (!workspaces) { return null; };
+  if (!detailUser) {
+    return null;
+  }
+  if (!weekSummaryDate?.summary) {
+    return null;
+  }
+  if (!workspaces) {
+    return null;
+  }
 
   return (
     <>
@@ -64,22 +70,19 @@ export default async function Dashboard() {
           <Separator />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-5">
             <div className="hidden">
-              <DialogCreateWorkspace
-                isNoWorkspace={workspaces.length === 0 ? true : false} />
+              <DialogCreateWorkspace isNoWorkspace={workspaces.length === 0 ? true : false} />
             </div>
-            {sharedWorkspaces.map(shared => (
-              <Link
-                href={`/dashboard/workspace/${shared.id}`}
-                key={shared.id}
-              >
+            {sharedWorkspaces.map((shared) => (
+              <Link href={`/dashboard/workspace/${shared.id}`} key={shared.id}>
                 <Card className="hover:border-primary/50 hover:bg-primary/20 hover:-translate-y-1 transition-all duration-300 ease-in-out">
                   <CardHeader className="p-2">
                     <CardTitle>{shared.title}</CardTitle>
                     <CardDescription className="flex flex-col gap-2">
-                      Última atividade {formatDistanceToNow(
-                        new Date(shared.lastActivityAt),
-                        { addSuffix: true, locale: ptBR }
-                      )}
+                      Última atividade{" "}
+                      {formatDistanceToNow(new Date(shared.lastActivityAt), {
+                        addSuffix: true,
+                        locale: ptBR
+                      })}
                       <BadgeWorkspace role={shared.menbersRole as WorkspaceRole} />
                     </CardDescription>
                   </CardHeader>
@@ -87,24 +90,24 @@ export default async function Dashboard() {
                     {shared.members.length > 0 && (
                       <div className="flex relative">
                         {shared.members.slice(0, 6).map((member, index) => (
-                          <Avatar key={member.id} className={cn("absolute",
-                            index === 0 && "left-0",
-                            index === 1 && "left-5",
-                            index === 2 && "left-10",
-                            index === 3 && "left-15",
-                            index === 4 && "left-20",
-                            index === 5 && "left-25",
-                          )}>
+                          <Avatar
+                            key={member.id}
+                            className={cn(
+                              "absolute",
+                              index === 0 && "left-0",
+                              index === 1 && "left-5",
+                              index === 2 && "left-10",
+                              index === 3 && "left-15",
+                              index === 4 && "left-20",
+                              index === 5 && "left-25"
+                            )}
+                          >
                             <AvatarImage src={member.image as string} />
-                            <AvatarFallback>
-                              {member.name?.charAt(0) ?? "N"}
-                            </AvatarFallback>
+                            <AvatarFallback>{member.name?.charAt(0) ?? "N"}</AvatarFallback>
                           </Avatar>
                         ))}
                         {shared.members.length > 6 && (
-                          <span className="ml-2 flex gap-1">
-                            +{shared.members.length}
-                          </span>
+                          <span className="ml-2 flex gap-1">+{shared.members.length}</span>
                         )}
                       </div>
                     )}
@@ -165,5 +168,5 @@ export default async function Dashboard() {
         </section>
       </main>
     </>
-  )
+  );
 }

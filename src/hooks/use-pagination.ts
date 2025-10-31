@@ -24,11 +24,11 @@ export function usePagination<T>(items: T[], itemsPerPage: number = 10) {
       }
     } else {
       if (currentPage <= 3) {
-        pages.push(1, 2, 3, '...', totalPages);
+        pages.push(1, 2, 3, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        pages.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
       } else {
-        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
     return pages;
@@ -47,6 +47,6 @@ export function usePagination<T>(items: T[], itemsPerPage: number = 10) {
     handlePrevPage,
     handleNextPage,
     getPageNumbers,
-    currentItems: getPaginatedItems,
+    currentItems: getPaginatedItems
   };
 }

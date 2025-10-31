@@ -1,18 +1,27 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { ChevronUp, Plus } from "lucide-react"
-import { Children, cloneElement, isValidElement, ReactElement, ReactNode, useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils";
+import { ChevronUp, Plus } from "lucide-react";
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 
-const UTILITY_BUTTON_ITEM_TYPE = Symbol('UtilityButtonItem');
+const UTILITY_BUTTON_ITEM_TYPE = Symbol("UtilityButtonItem");
 
 interface UtilityButtonItemProps {
-  children: ReactNode
-  icon?: ReactNode
-  delay?: 0 | 75 | 150
-  onClick?: () => void
-  isOpen?: boolean
-  [UTILITY_BUTTON_ITEM_TYPE]?: true
+  children: ReactNode;
+  icon?: ReactNode;
+  delay?: 0 | 75 | 150;
+  onClick?: () => void;
+  isOpen?: boolean;
+  [UTILITY_BUTTON_ITEM_TYPE]?: true;
 }
 
 export function UtilityButtonItem({
@@ -23,10 +32,10 @@ export function UtilityButtonItem({
   isOpen = true
 }: UtilityButtonItemProps) {
   const delayClass = {
-    0: 'delay-0',
-    75: 'delay-75',
-    150: 'delay-150'
-  }[delay]
+    0: "delay-0",
+    75: "delay-75",
+    150: "delay-150"
+  }[delay];
 
   return (
     <div
@@ -37,19 +46,13 @@ export function UtilityButtonItem({
         delayClass,
         "h-12 pl-4 pr-4 min-w-12",
         "hover:shadow-xl hover:scale-105",
-        isOpen
-          ? "translate-y-0 opacity-100"
-          : "translate-y-8 opacity-0 pointer-events-none"
+        isOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"
       )}
     >
-      <span className="font-medium text-sm whitespace-nowrap">
-        {children}
-      </span>
-      <div className="flex-shrink-0">
-        {icon}
-      </div>
+      <span className="font-medium text-sm whitespace-nowrap">{children}</span>
+      <div className="flex-shrink-0">{icon}</div>
     </div>
-  )
+  );
 }
 
 type UtilityButtonChildren =
@@ -57,7 +60,7 @@ type UtilityButtonChildren =
   | ReactElement<UtilityButtonItemProps>[];
 
 interface UtilityButtonProps {
-  children: UtilityButtonChildren
+  children: UtilityButtonChildren;
 }
 
 export default function UtilityButton({ children }: UtilityButtonProps) {
@@ -81,7 +84,7 @@ export default function UtilityButton({ children }: UtilityButtonProps) {
   }, []);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       const validateChildren = (child: ReactNode) => {
         if (!isValidElement(child)) return false;
 
@@ -92,9 +95,7 @@ export default function UtilityButton({ children }: UtilityButtonProps) {
       const allValid = childArray.every(validateChildren);
 
       if (!allValid) {
-        console.error(
-          'UtilityButton: Todos os children devem ser componentes UtilityButtonItem'
-        );
+        console.error("UtilityButton: Todos os children devem ser componentes UtilityButtonItem");
       }
     }
   }, [children]);
@@ -122,19 +123,20 @@ export default function UtilityButton({ children }: UtilityButtonProps) {
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
         >
-          <Plus className={cn(
-            "w-6 h-6 text-white absolute transition-all duration-300",
-            isOpen ? "rotate-[135deg]" : "rotate-0 opacity-100"
-          )} />
-
+          <Plus
+            className={cn(
+              "w-6 h-6 text-white absolute transition-all duration-300",
+              isOpen ? "rotate-[135deg]" : "rotate-0 opacity-100"
+            )}
+          />
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-UtilityButtonItem.displayName = 'UtilityButtonItem';
-UtilityButton.displayName = 'UtilityButton';
+UtilityButtonItem.displayName = "UtilityButtonItem";
+UtilityButton.displayName = "UtilityButton";
 
 /*
 // ============================================

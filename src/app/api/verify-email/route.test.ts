@@ -5,7 +5,7 @@ import { GET } from "./route";
 jest.mock("@/lib/prisma", () => ({
   user: {
     findFirst: jest.fn(),
-    update: jest.fn(),
+    update: jest.fn()
   }
 }));
 
@@ -18,22 +18,27 @@ describe("API Route: /api/verify-email", () => {
     const token = "testToken";
     const user = { id: "1", email: "test@example.com", name: "Test User" };
 
-    (prisma.user.findFirst as jest.Mock).mockResolvedValue({ ...user, verificationExpiresAt: new Date(Date.now() + 10000) });
+    (prisma.user.findFirst as jest.Mock).mockResolvedValue({
+      ...user,
+      verificationExpiresAt: new Date(Date.now() + 10000)
+    });
 
     const request = new NextRequest(`http://localhost/api/verify-email?token=${token}`, {
-      method: "GET",
+      method: "GET"
     });
     const response = await GET(request);
     const responseBody = await response.json();
 
-    expect(prisma.user.findFirst).toHaveBeenCalledWith({ where: { emailVerificationToken: token } });
+    expect(prisma.user.findFirst).toHaveBeenCalledWith({
+      where: { emailVerificationToken: token }
+    });
     expect(prisma.user.update).toHaveBeenCalledWith({
       where: { id: user.id },
       data: {
         emailVerified: expect.any(Date),
         emailVerificationToken: null,
-        verificationExpiresAt: null,
-      },
+        verificationExpiresAt: null
+      }
     });
     expect(response.status).toBe(200);
     expect(responseBody).toEqual({
@@ -44,7 +49,7 @@ describe("API Route: /api/verify-email", () => {
 
   it("should return 400 if token is not provided", async () => {
     const request = new NextRequest("http://localhost/api/verify-email", {
-      method: "GET",
+      method: "GET"
     });
     const response = await GET(request);
     const responseBody = await response.json();
@@ -60,31 +65,38 @@ describe("API Route: /api/verify-email", () => {
     (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
 
     const request = new NextRequest(`http://localhost/api/verify-email?token=${token}`, {
-      method: "GET",
+      method: "GET"
     });
     const response = await GET(request);
     const responseBody = await response.json();
 
     expect(response.status).toBe(400);
     expect(responseBody).toEqual({ error: "Token inválido ou expirado" });
-    expect(prisma.user.findFirst).toHaveBeenCalledWith({ where: { emailVerificationToken: token } });
+    expect(prisma.user.findFirst).toHaveBeenCalledWith({
+      where: { emailVerificationToken: token }
+    });
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
   it("should return 400 if token is expired", async () => {
     const token = "expiredToken";
     const user = { id: "1", email: "test@example.com", name: "Test User" };
-    (prisma.user.findFirst as jest.Mock).mockResolvedValue({ ...user, verificationExpiresAt: new Date(Date.now() - 10000) });
+    (prisma.user.findFirst as jest.Mock).mockResolvedValue({
+      ...user,
+      verificationExpiresAt: new Date(Date.now() - 10000)
+    });
 
     const request = new NextRequest(`http://localhost/api/verify-email?token=${token}`, {
-      method: "GET",
+      method: "GET"
     });
     const response = await GET(request);
     const responseBody = await response.json();
 
     expect(response.status).toBe(400);
     expect(responseBody).toEqual({ error: "Token inválido ou expirado" });
-    expect(prisma.user.findFirst).toHaveBeenCalledWith({ where: { emailVerificationToken: token } });
+    expect(prisma.user.findFirst).toHaveBeenCalledWith({
+      where: { emailVerificationToken: token }
+    });
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
@@ -93,14 +105,16 @@ describe("API Route: /api/verify-email", () => {
     (prisma.user.findFirst as jest.Mock).mockRejectedValue(new Error("Database error"));
 
     const request = new NextRequest(`http://localhost/api/verify-email?token=${token}`, {
-      method: "GET",
+      method: "GET"
     });
     const response = await GET(request);
     const responseBody = await response.json();
 
     expect(response.status).toBe(500);
     expect(responseBody).toEqual({ error: "Erro interno do servidor" });
-    expect(prisma.user.findFirst).toHaveBeenCalledWith({ where: { emailVerificationToken: token } });
+    expect(prisma.user.findFirst).toHaveBeenCalledWith({
+      where: { emailVerificationToken: token }
+    });
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 });

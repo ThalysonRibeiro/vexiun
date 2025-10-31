@@ -9,7 +9,9 @@ describe("GlobalError component", () => {
     render(<ErrorContent error={mockError} reset={mockReset} />);
 
     expect(screen.getByText("Oops, algo deu errado!")).toBeInTheDocument();
-    expect(screen.getByText(/Lamentamos, mas parece que ocorreu um erro inesperado/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Lamentamos, mas parece que ocorreu um erro inesperado/)
+    ).toBeInTheDocument();
 
     expect(screen.getByText("Detalhes do erro:")).toBeInTheDocument();
     expect(screen.getByText("Test error message")).toBeInTheDocument();
@@ -22,5 +24,3 @@ describe("GlobalError component", () => {
     expect(mockReset).toHaveBeenCalledTimes(1);
   });
 });
-
-

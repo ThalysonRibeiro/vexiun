@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Team } from "./team";
 import { Groups } from "./main-board/groups";
 import { KanbanGrid } from "./kanban/kanban-grid";
@@ -15,11 +15,7 @@ interface WorkspaceContentProps {
   workspaceId: string;
 }
 
-export function WorkspaceContent({
-  workspaceId
-}: WorkspaceContentProps
-) {
-
+export function WorkspaceContent({ workspaceId }: WorkspaceContentProps) {
   const { data: activeCount = 0 } = useItemsCountByStatus(workspaceId, "ACTIVE");
   const { data: archivedCount = 0 } = useItemsCountByStatus(workspaceId, "ARCHIVED");
   const { data: deletedCount = 0 } = useItemsCountByStatus(workspaceId, "DELETED");
@@ -31,7 +27,7 @@ export function WorkspaceContent({
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: workspace?.workspace.status as EntityStatus,
     isOwner
   });
@@ -43,11 +39,7 @@ export function WorkspaceContent({
       label: "Quadro principal",
       icon: <LayoutDashboard className="w-4 h-4" />,
       length: activeCount,
-      component: (
-        <Groups
-          workspaceId={workspaceId}
-        />
-      )
+      component: <Groups workspaceId={workspaceId} />
     },
     {
       key: "kanban",
@@ -55,9 +47,7 @@ export function WorkspaceContent({
       label: "Kanban",
       icon: <SquareDashedKanban className="w-4 h-4" />,
       length: activeCount,
-      component: (
-        <KanbanGrid />
-      ),
+      component: <KanbanGrid />
     },
     {
       key: "team",
@@ -65,11 +55,7 @@ export function WorkspaceContent({
       label: "Equipe",
       icon: <Users className="w-4 h-4" />,
       length: teamCount,
-      component: (
-        <Team
-          workspaceId={workspaceId}
-        />
-      )
+      component: <Team workspaceId={workspaceId} />
     },
     {
       key: "archived",
@@ -77,9 +63,7 @@ export function WorkspaceContent({
       label: "Arquivados",
       icon: <Archive className="w-4 h-4" />,
       length: archivedCount,
-      component: (
-        <ItemLifecycleManager workspaceId={workspaceId} entityStatus="ARCHIVED" />
-      )
+      component: <ItemLifecycleManager workspaceId={workspaceId} entityStatus="ARCHIVED" />
     },
     {
       key: "deleted",
@@ -87,16 +71,15 @@ export function WorkspaceContent({
       label: "Lixeira",
       icon: <Trash className="w-4 h-4" />,
       length: deletedCount,
-      component: (
-        <ItemLifecycleManager workspaceId={workspaceId} entityStatus="DELETED" />
-      )
-    },
+      component: <ItemLifecycleManager workspaceId={workspaceId} entityStatus="DELETED" />
+    }
   ];
   return (
     <Tabs defaultValue="main-board" className="w-full mt-6 md:ml-4">
       <TabsList className="flex items-center justify-start gap-2 w-full">
-        {tabsConfig.filter(tab => tab.havePermission)
-          .map(tab => (
+        {tabsConfig
+          .filter((tab) => tab.havePermission)
+          .map((tab) => (
             <TabsTrigger
               key={tab.key}
               value={tab.key}
@@ -108,9 +91,11 @@ export function WorkspaceContent({
             </TabsTrigger>
           ))}
       </TabsList>
-      {tabsConfig.map(tab => (
-        <TabsContent key={tab.key} value={tab.key}>{tab.component}</TabsContent>
+      {tabsConfig.map((tab) => (
+        <TabsContent key={tab.key} value={tab.key}>
+          {tab.component}
+        </TabsContent>
       ))}
     </Tabs>
-  )
+  );
 }

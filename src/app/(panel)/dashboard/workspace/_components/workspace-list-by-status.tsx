@@ -2,7 +2,15 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +43,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EntityStatus } from "@/generated/prisma";
 import { EmptyState } from "../../../../../components/ui/empty-state";
 
-
 interface WorkspaceListByStatusProps {
   status: EntityStatus;
   emptyMessage?: string;
@@ -45,23 +52,23 @@ const emptyStateConfig = {
   ACTIVE: {
     icon: FolderOpen,
     title: "Nenhum workspace ativo",
-    description: "Você ainda não tem nenhum workspace. Crie um para começar!",
+    description: "Você ainda não tem nenhum workspace. Crie um para começar!"
   },
   ARCHIVED: {
     icon: Archive,
     title: "Nenhum workspace arquivado",
-    description: "Workspaces arquivados aparecerão aqui.",
+    description: "Workspaces arquivados aparecerão aqui."
   },
   DELETED: {
     icon: Trash,
     title: "A lixeira está vazia",
-    description: "Workspaces deletados aparecerão aqui por 30 dias.",
-  },
+    description: "Workspaces deletados aparecerão aqui por 30 dias."
+  }
 };
 
 export function WorkspaceListByStatus({
   status,
-  emptyMessage = "Nenhum workspace encontrado",
+  emptyMessage = "Nenhum workspace encontrado"
 }: WorkspaceListByStatusProps) {
   const workspacesByStatus = useWorkspacesByStatus(status);
 
@@ -88,13 +95,7 @@ export function WorkspaceListByStatus({
   // Empty state
   if (!workspacesByStatus.data || workspacesByStatus.data.length === 0) {
     const config = emptyStateConfig[status];
-    return (
-      <EmptyState
-        icon={config.icon}
-        title={config.title}
-        description={config.description}
-      />
-    );
+    return <EmptyState icon={config.icon} title={config.title} description={config.description} />;
   }
 
   // Success state
@@ -123,7 +124,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
       toast.error("Erro ao arquivar");
     }
     toast.success(result.message);
-  }
+  };
 
   const handleRestore = async () => {
     const result = await restore.mutateAsync(workspace.id);
@@ -149,30 +150,24 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
   };
 
   const handleDeletePermanently = async (workspaceId: string) => {
-    if (
-      !confirm(
-        "Deseja realmente deletar permanentemente? Esta ação não pode ser desfeita."
-      )
-    ) {
+    if (!confirm("Deseja realmente deletar permanentemente? Esta ação não pode ser desfeita.")) {
       return;
     }
     const result = await deletePemamently.mutateAsync({
       workspaceId,
-      revalidatePaths: ["/dashboard/workspace"],
+      revalidatePaths: ["/dashboard/workspace"]
     });
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao deletar permanentemente");
     }
     toast.success(result.data);
-  }
+  };
 
   const isActive = workspace.status === "ACTIVE";
   const canAccess = workspace.status !== "DELETED";
 
   return (
     <Card className="hover:border-primary/50 hover:bg-primary/20 hover:-translate-y-1 transition-all duration-300relative overflow-hidden">
-
-
       <CardHeader className="relative">
         {workspace.status !== "ACTIVE" && (
           <Badge
@@ -185,10 +180,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
 
         <CardTitle className="text-xl">
           {canAccess ? (
-            <Link
-              href={`/dashboard/workspace/${workspace.id}`}
-              className="min-w-0 line-clamp-1"
-            >
+            <Link href={`/dashboard/workspace/${workspace.id}`} className="min-w-0 line-clamp-1">
               {workspace.title}
             </Link>
           ) : (
@@ -198,9 +190,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
 
         <div className="flex flex-col items-start justify-between">
           {workspace.description && (
-            <CardDescription className="mt-2 line-clamp-2">
-              {workspace.description}
-            </CardDescription>
+            <CardDescription className="mt-2 line-clamp-2">{workspace.description}</CardDescription>
           )}
 
           {workspace.categories && workspace.categories.length > 0 && (
@@ -290,14 +280,13 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
         <CardFooter className="text-xs text-muted-foreground border-t pt-4">
           {workspace.statusChangedAt ? (
             <div>
-              Alterado em{" "}
-              {new Date(workspace.statusChangedAt).toLocaleDateString("pt-BR")}
-              {workspace.statusChanger && ` por ${workspace.statusChanger.name || workspace.statusChanger.email}`}
+              Alterado em {new Date(workspace.statusChangedAt).toLocaleDateString("pt-BR")}
+              {workspace.statusChanger &&
+                ` por ${workspace.statusChanger.name || workspace.statusChanger.email}`}
             </div>
           ) : (
             <div>
-              Última atividade em{" "}
-              {new Date(workspace.lastActivityAt).toLocaleDateString("pt-BR")}
+              Última atividade em {new Date(workspace.lastActivityAt).toLocaleDateString("pt-BR")}
             </div>
           )}
         </CardFooter>

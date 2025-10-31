@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Bell, Check, Settings, Trash, X } from "lucide-react";
 import {
   DropdownMenu,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { cn, } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { notificationColor, notificationMap } from "@/utils/colorStatus";
 import { NotificationType } from "@/generated/prisma";
 import { formatDistanceToNow } from "date-fns";
@@ -23,16 +23,13 @@ import {
 } from "@/hooks/use-notifications";
 import { toast } from "sonner";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
-import {
-  useAcceptWorkspaceInvitation,
-  useDeclineWorkspaceInvitation
-} from "@/hooks/use-workspace";
+import { useAcceptWorkspaceInvitation, useDeclineWorkspaceInvitation } from "@/hooks/use-workspace";
 import Link from "next/link";
 
 export function NotificationContent() {
   const { data: notifications = [], refetch } = useNotifications();
   const acceptWorkspaceInvitation = useAcceptWorkspaceInvitation();
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
   const declineWorkspaceInvitation = useDeclineWorkspaceInvitation();
   const markAllAsRead = useMarkAllAsRead();
   const markNotificationAsRead = useMarkNotificationAsRead();
@@ -61,10 +58,9 @@ export function NotificationContent() {
       toast.error("Erro ao deletar notificação");
     }
     refetch();
-
   };
 
-  const handleAcceptWorkspaceInvite = async (workspaceId: string,) => {
+  const handleAcceptWorkspaceInvite = async (workspaceId: string) => {
     try {
       await acceptWorkspaceInvitation.mutateAsync({
         workspaceId,
@@ -73,19 +69,16 @@ export function NotificationContent() {
     } catch (error) {
       toast.error("Falha ao aceitar convite");
     }
-  }
+  };
 
   const handleDeclineWorkspaceInvitation = async (workspaceId: string) => {
     try {
       await declineWorkspaceInvitation.mutateAsync({ workspaceId });
     } catch (error) {
-      toast.error("Falha ao rejeitar convite")
+      toast.error("Falha ao rejeitar convite");
     }
-  }
-  const withoutAvatar = [
-    "SISTEM_MESSAGE",
-    "NOTICES_MESSAGE"
-  ];
+  };
+  const withoutAvatar = ["SISTEM_MESSAGE", "NOTICES_MESSAGE"];
   const excludedTypes = [
     "SISTEM_MESSAGE",
     "NOTICES_MESSAGE",
@@ -106,11 +99,13 @@ export function NotificationContent() {
           >
             <Bell className="w-6 h-6" />
             {unreadCount > 0 && (
-              <div className={cn(
-                "absolute -top-1.5 -right-2 bg-primary rounded-full",
-                "w-5 h-5 flex items-center justify-center text-xs text-primary-foreground font-semibold",
-              )}>
-                {unreadCount > 9 ? '9+' : unreadCount}
+              <div
+                className={cn(
+                  "absolute -top-1.5 -right-2 bg-primary rounded-full",
+                  "w-5 h-5 flex items-center justify-center text-xs text-primary-foreground font-semibold"
+                )}
+              >
+                {unreadCount > 9 ? "9+" : unreadCount}
               </div>
             )}
           </Button>
@@ -160,35 +155,40 @@ export function NotificationContent() {
                     case "ITEM_ASSIGNED":
                       break;
                     default:
-                      handleMarkAsRead(notification.id)
+                      handleMarkAsRead(notification.id);
                       break;
                   }
                 }}
               >
-                <span className={cn("absolute bottom-1 right-2 text-xs text-gray-500",
-                )}>
+                <span className={cn("absolute bottom-1 right-2 text-xs text-gray-500")}>
                   {formatDistanceToNow(new Date(notification.createdAt), {
                     addSuffix: true,
                     locale: ptBR
                   })}
                 </span>
                 {/* Badge de tipo */}
-                <span className={cn(
-                  "absolute top-2 right-2 rounded px-2 py-0.5 text-[11px] font-medium",
-                  notificationColor(notification.type as NotificationType)
-                )}>
+                <span
+                  className={cn(
+                    "absolute top-2 right-2 rounded px-2 py-0.5 text-[11px] font-medium",
+                    notificationColor(notification.type as NotificationType)
+                  )}
+                >
                   {notificationMap[notification.type as keyof typeof notificationMap]}
                 </span>
 
                 {/* Avatar (se aplicável) */}
-                {!notification.type === withoutAvatar.includes(notification.type as NotificationType) && (
+                {!notification.type ===
+                  withoutAvatar.includes(notification.type as NotificationType) && (
                   <Avatar className="absolute top-2 left-2 w-6 h-6">
                     <AvatarImage src={notification.image as string} />
-                    <AvatarFallback>{notification.nameReference?.split(" ")[0][0].toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>
+                      {notification.nameReference?.split(" ")[0][0].toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                 )}
 
-                {!notification.type === withoutAvatar.includes(notification.type as NotificationType) && (
+                {!notification.type ===
+                  withoutAvatar.includes(notification.type as NotificationType) && (
                   <div className="text-sm font-medium -mb-6 ml-7 truncate max-w-45">
                     <span className="uppercase">{notification.nameReference?.slice(0, 1)}</span>
                     <span>{notification.nameReference?.slice(1)}</span>
@@ -196,10 +196,7 @@ export function NotificationContent() {
                 )}
 
                 {/* Mensagem */}
-                <p className={cn(
-                  "text-sm mt-6 pr-16",
-                  !notification.isRead && "italic"
-                )}>
+                <p className={cn("text-sm mt-6 pr-16", !notification.isRead && "italic")}>
                   {notification.message}
                 </p>
 
@@ -228,7 +225,7 @@ export function NotificationContent() {
                           className="ml-auto h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-green-500 cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAcceptWorkspaceInvite(notification.referenceId as string,);
+                            handleAcceptWorkspaceInvite(notification.referenceId as string);
                             handleDelete(notification.id);
                           }}
                         >
@@ -260,7 +257,8 @@ export function NotificationContent() {
                         }}
                       >
                         <Trash className="h-4 w-4" />
-                      </Button>)}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </DropdownMenuItem>
@@ -269,5 +267,5 @@ export function NotificationContent() {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }

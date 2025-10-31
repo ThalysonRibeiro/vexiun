@@ -9,14 +9,10 @@ export type StatusCount = {
   count: number;
 };
 
-export const getStatus = withAuth(async (
-  userId,
-  session,
-  workspaceId: string) => {
-
+export const getStatus = withAuth(async (userId, session, workspaceId: string) => {
   if (!workspaceId) {
     return successResponse([]);
-  };
+  }
 
   const hasAccess = await validateWorkspaceAccess(workspaceId, userId);
 
@@ -27,15 +23,15 @@ export const getStatus = withAuth(async (
   const items = await prisma.item.findMany({
     where: {
       group: {
-        workspaceId: workspaceId,
-      },
+        workspaceId: workspaceId
+      }
     },
     select: {
-      status: true,
+      status: true
     },
     orderBy: {
-      status: "asc",
-    },
+      status: "asc"
+    }
   });
 
   const statusCount = items.reduce((acc, item) => {

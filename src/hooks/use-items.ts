@@ -33,7 +33,6 @@ import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-
 export interface UseItemFormProps {
   initialValues?: {
     title: string;
@@ -44,7 +43,7 @@ export interface UseItemFormProps {
     description?: string;
     details?: JSONContent | null;
     assignedTo?: string | null;
-  }
+  };
 }
 
 export function UseItemForm({ initialValues }: UseItemFormProps) {
@@ -58,9 +57,9 @@ export function UseItemForm({ initialValues }: UseItemFormProps) {
       notes: "",
       description: "",
       details: null,
-      assignedTo: null,
+      assignedTo: null
     }
-  })
+  });
 }
 
 export type ItemData = Awaited<ReturnType<typeof getPublicItems>>;
@@ -69,27 +68,27 @@ export type ItemWhitCreatedAssignedUser = Prisma.ItemGetPayload<{
   include: {
     createdByUser: {
       select: {
-        id: true,
-        name: true,
-        image: true,
-        email: true,
-        createdBy: true,
-      }
-    },
+        id: true;
+        name: true;
+        image: true;
+        email: true;
+        createdBy: true;
+      };
+    };
     assignedToUser: {
       select: {
-        id: true,
-        name: true,
-        image: true,
-        email: true,
-        createdBy: true,
-      }
-    },
-  }
-}>
+        id: true;
+        name: true;
+        image: true;
+        email: true;
+        createdBy: true;
+      };
+    };
+  };
+}>;
 
 export type ItemsResults = Awaited<ReturnType<typeof getPublicItems>>;
-export type ItemsData = Extract<ItemsResults, { success: true }>['data'];
+export type ItemsData = Extract<ItemsResults, { success: true }>["data"];
 
 export function useItems(groupId: string) {
   return useQuery<ItemsData>({
@@ -101,16 +100,14 @@ export function useItems(groupId: string) {
       }
 
       return result.data;
-
     },
     enabled: !!groupId,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: true
   });
-};
-
+}
 
 export type ItemsByStatusResult = Awaited<ReturnType<typeof getItemsByStatus>>;
-export type ItemsByStatusData = Extract<ItemsByStatusResult, { success: true }>['data'];
+export type ItemsByStatusData = Extract<ItemsByStatusResult, { success: true }>["data"];
 
 export function useItemsByStatus(workspaceId: string) {
   return useQuery<ItemsByStatusData>({
@@ -125,13 +122,15 @@ export function useItemsByStatus(workspaceId: string) {
       return result.data;
     },
     enabled: !!workspaceId,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: true
   });
 }
 
-
 export type ItemsAssociatedWithMemberResult = Awaited<ReturnType<typeof getAssociatedWithMember>>;
-export type ItemsAssociatedWithMemberData = Extract<ItemsAssociatedWithMemberResult, { success: true }>['data'];
+export type ItemsAssociatedWithMemberData = Extract<
+  ItemsAssociatedWithMemberResult,
+  { success: true }
+>["data"];
 
 export function useItemsAssociatedWithMember(workspaceId: string, memberId: string) {
   return useQuery<ItemsAssociatedWithMemberData>({
@@ -165,7 +164,7 @@ export function usePrefetchMemberItems() {
 
         return result.data;
       },
-      staleTime: 5 * 60 * 1000, // Cache por 5min
+      staleTime: 5 * 60 * 1000 // Cache por 5min
     });
   };
 
@@ -173,7 +172,7 @@ export function usePrefetchMemberItems() {
 }
 
 export type ItemsByEntityStatusResult = Awaited<ReturnType<typeof getItemsByEntityStatus>>;
-export type ItemsByEntityStatusData = Extract<ItemsByEntityStatusResult, { success: true }>['data'];
+export type ItemsByEntityStatusData = Extract<ItemsByEntityStatusResult, { success: true }>["data"];
 
 export function useItemsByEntityStatus(groupId: string, status: EntityStatus) {
   return useQuery<ItemsByEntityStatusData>({
@@ -192,11 +191,7 @@ export function useItemsByEntityStatus(groupId: string, status: EntityStatus) {
   });
 }
 
-
-export function useItemsCountByStatus(
-  workspaceId: string,
-  entityStatus: EntityStatus
-) {
+export function useItemsCountByStatus(workspaceId: string, entityStatus: EntityStatus) {
   return useQuery<number | undefined>({
     queryKey: ["items", "items-count", workspaceId, entityStatus],
     queryFn: async () => {
@@ -207,7 +202,7 @@ export function useItemsCountByStatus(
 
       return result.data?.count;
     },
-    enabled: !!workspaceId,
+    enabled: !!workspaceId
   });
 }
 
@@ -231,13 +226,12 @@ export function useCreateItem() {
       }
       console.log(result);
 
-
       return result;
     },
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["items", variables.groupId] });
       queryClient.invalidateQueries({ queryKey: ["items", "by-status"] });
-    },
+    }
   });
 }
 
@@ -286,7 +280,7 @@ export function useAssignTo() {
         queryKey: ["items"],
         exact: false,
         refetchType: "active"
-      })
+      });
     },
     retry: 1
   });
@@ -393,183 +387,196 @@ export function useItemActions(workspaceId: string) {
     setEditingData(null);
   }, []);
 
-  const handleSaveDetails = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
-    if (!dialogState.content) return;
+  const handleSaveDetails = useCallback(
+    async (item: ItemWhitCreatedAssignedUser) => {
+      if (!dialogState.content) return;
 
-    setIsLoading(item.id);
+      setIsLoading(item.id);
 
-    try {
-      const result = await updateItem.mutateAsync({
-        workspaceId,
-        itemId: item.id,
-        title: item.title,
-        status: item.status,
-        term: item.term,
-        priority: item.priority,
-        notes: item.notes,
-        description: item.description,
-        details: dialogState.content,
-        assignedTo: item.assignedTo,
-      });
+      try {
+        const result = await updateItem.mutateAsync({
+          workspaceId,
+          itemId: item.id,
+          title: item.title,
+          status: item.status,
+          term: item.term,
+          priority: item.priority,
+          notes: item.notes,
+          description: item.description,
+          details: dialogState.content,
+          assignedTo: item.assignedTo
+        });
 
-      if (!isSuccessResponse(result)) {
-        toast.error("Erro ao atualizar detalhes");
+        if (!isSuccessResponse(result)) {
+          toast.error("Erro ao atualizar detalhes");
+          return;
+        }
+
+        toast.success("Detalhes atualizados com sucesso!");
+        setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
+      } finally {
+        setIsLoading(null);
+      }
+    },
+    [dialogState.content, updateItem, workspaceId]
+  );
+
+  const handleSaveField = useCallback(
+    async (item: ItemWhitCreatedAssignedUser) => {
+      if (!editingData) return;
+
+      setIsLoading(item.id);
+
+      try {
+        const response = await updateItem.mutateAsync({
+          workspaceId,
+          itemId: item.id,
+          title: editingData.title,
+          status: editingData.status,
+          term: editingData.term,
+          priority: editingData.priority,
+          notes: editingData.notes,
+          description: editingData.description
+        });
+
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao atualizar item");
+          return;
+        }
+
+        toast.success("Item atualizado com sucesso!");
+        cancelEditing();
+      } finally {
+        setIsLoading(null);
+      }
+    },
+    [editingData, cancelEditing, updateItem, workspaceId]
+  );
+
+  const handleSelectChange = useCallback(
+    async (
+      item: ItemWhitCreatedAssignedUser,
+      field: "priority" | "status",
+      value: Priority | Status
+    ) => {
+      setIsLoading(item.id);
+
+      try {
+        const response = await updateItem.mutateAsync({
+          workspaceId,
+          itemId: item.id,
+          title: item.title,
+          status: field === "status" ? (value as Status) : item.status,
+          term: item.term,
+          priority: field === "priority" ? (value as Priority) : item.priority,
+          notes: item.notes,
+          description: item.description,
+          details: item.details as JSONContent
+        });
+
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao atualizar item");
+          return;
+        }
+
+        toast.success("Item atualizado!");
+      } finally {
+        setIsLoading(null);
+      }
+    },
+    [updateItem, workspaceId]
+  );
+
+  const handleDeleteItem = useCallback(
+    async (itemId: string) => {
+      if (!confirm("Deseja realmente deletar o item permanentemente?")) {
         return;
       }
 
-      toast.success("Detalhes atualizados com sucesso!");
-      setDialogState({ isOpen: false, itemId: null, isEditing: false, content: null });
-    } finally {
-      setIsLoading(null);
-    }
-  }, [dialogState.content, updateItem, workspaceId]);
+      setIsLoading(itemId);
 
-  const handleSaveField = useCallback(async (item: ItemWhitCreatedAssignedUser) => {
-    if (!editingData) return;
+      try {
+        const response = await deleteItem.mutateAsync({
+          workspaceId,
+          itemId
+        });
 
-    setIsLoading(item.id);
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao deletar item");
+          return;
+        }
 
-    try {
-      const response = await updateItem.mutateAsync({
-        workspaceId,
-        itemId: item.id,
-        title: editingData.title,
-        status: editingData.status,
-        term: editingData.term,
-        priority: editingData.priority,
-        notes: editingData.notes,
-        description: editingData.description
-      });
+        toast.success("Item movido para lixeira com sucess!");
+      } finally {
+        setIsLoading(null);
+      }
+    },
+    [deleteItem, workspaceId]
+  );
 
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao atualizar item");
+  const handleMoveToTrash = useCallback(
+    async (itemId: string) => {
+      if (!confirm("Deseja realmente mover para lixeira?")) {
         return;
       }
 
-      toast.success("Item atualizado com sucesso!");
-      cancelEditing();
-    } finally {
-      setIsLoading(null);
-    }
-  }, [editingData, cancelEditing, updateItem, workspaceId]);
+      setIsLoading(itemId);
 
-  const handleSelectChange = useCallback(async (
-    item: ItemWhitCreatedAssignedUser,
-    field: 'priority' | 'status',
-    value: Priority | Status
-  ) => {
-    setIsLoading(item.id);
+      try {
+        const response = await moveToTrash.mutateAsync(workspaceId, itemId);
 
-    try {
-      const response = await updateItem.mutateAsync({
-        workspaceId,
-        itemId: item.id,
-        title: item.title,
-        status: field === 'status' ? value as Status : item.status,
-        term: item.term,
-        priority: field === 'priority' ? value as Priority : item.priority,
-        notes: item.notes,
-        description: item.description,
-        details: item.details as JSONContent
-      });
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao deletar item");
+          return;
+        }
 
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao atualizar item");
-        return;
+        toast.success("Item movido para lixeira com sucess!");
+      } finally {
+        setIsLoading(null);
       }
+    },
+    [moveToTrash, workspaceId]
+  );
 
-      toast.success("Item atualizado!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [updateItem, workspaceId]);
+  const handleArchiveItem = useCallback(
+    async (itemId: string) => {
+      setIsLoading(itemId);
 
-  const handleDeleteItem = useCallback(async (itemId: string) => {
-    if (!confirm('Deseja realmente deletar o item permanentemente?')) {
-      return;
-    }
+      try {
+        const response = await archivedItem.mutateAsync(workspaceId, itemId);
 
-    setIsLoading(itemId);
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao arquivar item");
+          return;
+        }
 
-    try {
-      const response = await deleteItem.mutateAsync({
-        workspaceId,
-        itemId,
-      });
-
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao deletar item");
-        return;
+        toast.success("Item arquiovado!");
+      } finally {
+        setIsLoading(null);
       }
+    },
+    [workspaceId, archivedItem]
+  );
 
-      toast.success("Item movido para lixeira com sucess!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [deleteItem, workspaceId]);
+  const handleRestoreItem = useCallback(
+    async (itemId: string) => {
+      setIsLoading(itemId);
 
-  const handleMoveToTrash = useCallback(async (itemId: string) => {
-    if (!confirm('Deseja realmente mover para lixeira?')) {
-      return;
-    }
+      try {
+        const response = await restoreItem.mutateAsync(workspaceId, itemId);
 
-    setIsLoading(itemId);
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao restaurar item");
+          return;
+        }
 
-    try {
-      const response = await moveToTrash.mutateAsync(
-        workspaceId, itemId,
-      );
-
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao deletar item");
-        return;
+        toast.success("Item restaurado!");
+      } finally {
+        setIsLoading(null);
       }
-
-      toast.success("Item movido para lixeira com sucess!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [moveToTrash, workspaceId,]);
-
-  const handleArchiveItem = useCallback(async (itemId: string) => {
-    setIsLoading(itemId);
-
-    try {
-      const response = await archivedItem.mutateAsync(
-        workspaceId, itemId,
-      );
-
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao arquivar item");
-        return;
-      }
-
-      toast.success("Item arquiovado!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [workspaceId, archivedItem]);
-
-  const handleRestoreItem = useCallback(async (itemId: string) => {
-    setIsLoading(itemId);
-
-    try {
-      const response = await restoreItem.mutateAsync(
-        workspaceId, itemId,
-      );
-
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao restaurar item");
-        return;
-      }
-
-      toast.success("Item restaurado!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [workspaceId, restoreItem]);
-
-
+    },
+    [workspaceId, restoreItem]
+  );
 
   return {
     // Estado

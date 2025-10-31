@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -27,7 +32,7 @@ import {
 
 export const metadata: Metadata = {
   title: "FAQ - Documentação Catalyst",
-  description: "Perguntas frequentes e respostas sobre o Catalyst",
+  description: "Perguntas frequentes e respostas sobre o Catalyst"
 };
 
 export default function FAQPage() {
@@ -109,13 +114,16 @@ export default function FAQPage() {
                     </p>
                     <ol className="space-y-2 text-muted-foreground">
                       <li>1. Acesse a página de login</li>
-                      <li>2. Escolha seu método de autenticação preferido (Google, GitHub ou email)</li>
+                      <li>
+                        2. Escolha seu método de autenticação preferido (Google, GitHub ou email)
+                      </li>
                       <li>3. Complete seu perfil com informações básicas</li>
                       <li>4. Confirme seu email (se necessário)</li>
                       <li>5. Comece criando seu primeiro workspace!</li>
                     </ol>
                     <p className="text-muted-foreground mt-4">
-                      Todo o processo leva menos de 2 minutos e você já pode começar a usar todas as funcionalidades.
+                      Todo o processo leva menos de 2 minutos e você já pode começar a usar todas as
+                      funcionalidades.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -132,8 +140,9 @@ export default function FAQPage() {
                           Workspace
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          Um workspace é como um projeto ou departamento. É o nível mais alto de organização,
-                          onde você pode ter múltiplos grupos e convidar membros da equipe.
+                          Um workspace é como um projeto ou departamento. É o nível mais alto de
+                          organização, onde você pode ter múltiplos grupos e convidar membros da
+                          equipe.
                         </p>
                       </div>
                       <div className="p-4 border rounded-lg">
@@ -142,8 +151,8 @@ export default function FAQPage() {
                           Grupo
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          Grupos são categorias dentro de um workspace. Use para organizar tarefas por tipo,
-                          prioridade ou equipe responsável.
+                          Grupos são categorias dentro de um workspace. Use para organizar tarefas
+                          por tipo, prioridade ou equipe responsável.
                         </p>
                       </div>
                     </div>
@@ -166,7 +175,8 @@ export default function FAQPage() {
                       <li>• Suporte por email</li>
                     </ul>
                     <p className="text-muted-foreground mt-4">
-                      Para equipes maiores ou funcionalidades avançadas, oferecemos planos pagos com recursos adicionais.
+                      Para equipes maiores ou funcionalidades avançadas, oferecemos planos pagos com
+                      recursos adicionais.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -186,12 +196,18 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      O Catalyst utiliza um sistema de workspaces que permite organizar múltiplos projetos e atribuir equipes específicas a cada um deles. Você pode:
+                      O Catalyst utiliza um sistema de workspaces que permite organizar múltiplos
+                      projetos e atribuir equipes específicas a cada um deles. Você pode:
                     </p>
                     <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
                       <li>Criar workspaces para diferentes departamentos ou clientes</li>
-                      <li>Configurar projetos dentro de cada workspace com suas próprias metas e prazos</li>
-                      <li>Formar equipes personalizadas com membros específicos para cada projeto</li>
+                      <li>
+                        Configurar projetos dentro de cada workspace com suas próprias metas e
+                        prazos
+                      </li>
+                      <li>
+                        Formar equipes personalizadas com membros específicos para cada projeto
+                      </li>
                       <li>Definir permissões e níveis de acesso para cada membro da equipe</li>
                       <li>Acompanhar o progresso de todos os projetos em um único dashboard</li>
                     </ul>
@@ -231,7 +247,8 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      Grupos são a melhor forma de organizar tarefas dentro de um workspace. Aqui estão algumas estratégias:
+                      Grupos são a melhor forma de organizar tarefas dentro de um workspace. Aqui
+                      estão algumas estratégias:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="p-4 border rounded-lg">
@@ -271,7 +288,8 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      As metas pessoais são objetivos semanais que você define para si mesmo. O sistema permite:
+                      As metas pessoais são objetivos semanais que você define para si mesmo. O
+                      sistema permite:
                     </p>
                     <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
                       <li>Definir metas com frequência semanal (ex: "Estudar React 3x/semana")</li>
@@ -289,7 +307,8 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      Sim! O Catalyst permite criar metas em diferentes categorias para organizar todos os aspectos da sua vida:
+                      Sim! O Catalyst permite criar metas em diferentes categorias para organizar
+                      todos os aspectos da sua vida:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -330,7 +349,8 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      O Catalyst possui um sistema avançado de controle de permissões que permite definir exatamente o que cada membro pode ver e editar:
+                      O Catalyst possui um sistema avançado de controle de permissões que permite
+                      definir exatamente o que cada membro pode ver e editar:
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 border rounded-lg">
@@ -380,7 +400,8 @@ export default function FAQPage() {
                       <li>5. Envie o convite</li>
                     </ol>
                     <p className="text-muted-foreground mt-4">
-                      O membro receberá um email com instruções para aceitar o convite e começar a colaborar.
+                      O membro receberá um email com instruções para aceitar o convite e começar a
+                      colaborar.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -400,7 +421,8 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      Sim! O Catalyst oferece integrações nativas com mais de 30 ferramentas populares, incluindo:
+                      Sim! O Catalyst oferece integrações nativas com mais de 30 ferramentas
+                      populares, incluindo:
                     </p>
                     <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
                       <li>GitHub - Para sincronizar com repositórios</li>
@@ -410,7 +432,8 @@ export default function FAQPage() {
                       <li>Jira - Para sincronização de tarefas</li>
                     </ul>
                     <p className="text-muted-foreground mt-4">
-                      Nossa API aberta também permite criar integrações personalizadas para ferramentas específicas do seu fluxo de trabalho.
+                      Nossa API aberta também permite criar integrações personalizadas para
+                      ferramentas específicas do seu fluxo de trabalho.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -421,17 +444,26 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground mb-4">
-                      O Catalyst foi projetado para eliminar obstáculos e otimizar o fluxo de trabalho das equipes através de:
+                      O Catalyst foi projetado para eliminar obstáculos e otimizar o fluxo de
+                      trabalho das equipes através de:
                     </p>
                     <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-                      <li>Centralização de todas as informações e recursos do projeto em um único lugar</li>
+                      <li>
+                        Centralização de todas as informações e recursos do projeto em um único
+                        lugar
+                      </li>
                       <li>Automação de tarefas repetitivas e notificações</li>
                       <li>Visualização clara do progresso e gargalos em tempo real</li>
-                      <li>Ferramentas de colaboração que reduzem a necessidade de reuniões excessivas</li>
-                      <li>Relatórios e métricas que ajudam a identificar oportunidades de melhoria</li>
+                      <li>
+                        Ferramentas de colaboração que reduzem a necessidade de reuniões excessivas
+                      </li>
+                      <li>
+                        Relatórios e métricas que ajudam a identificar oportunidades de melhoria
+                      </li>
                     </ul>
                     <p className="text-muted-foreground mt-4">
-                      Nossos clientes relatam um aumento médio de 35% na produtividade após três meses de uso da plataforma.
+                      Nossos clientes relatam um aumento médio de 35% na produtividade após três
+                      meses de uso da plataforma.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -442,7 +474,12 @@ export default function FAQPage() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <p className="text-muted-foreground">
-                      Sim, o Catalyst suporta completamente metodologias ágeis como Scrum e Kanban. A plataforma inclui recursos como quadros Kanban personalizáveis, planejamento de sprints, backlogs de produto, estimativas de pontos de história, gráficos de burndown e retrospectivas. Você pode adaptar esses recursos para seguir rigorosamente uma metodologia específica ou criar um processo híbrido que melhor atenda às necessidades da sua equipe.
+                      Sim, o Catalyst suporta completamente metodologias ágeis como Scrum e Kanban.
+                      A plataforma inclui recursos como quadros Kanban personalizáveis, planejamento
+                      de sprints, backlogs de produto, estimativas de pontos de história, gráficos
+                      de burndown e retrospectivas. Você pode adaptar esses recursos para seguir
+                      rigorosamente uma metodologia específica ou criar um processo híbrido que
+                      melhor atenda às necessidades da sua equipe.
                     </p>
                   </AccordionContent>
                 </AccordionItem>

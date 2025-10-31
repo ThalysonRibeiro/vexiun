@@ -25,16 +25,21 @@ export const POST = async (req: Request) => {
   }
 
   const results = await new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream({
-      tags: [`${userId}`],
-      public_id: file.name,
-    }, function (error, result) {
-      if (error) {
-        reject(error);
-      }
-      resolve(result);
-    }).end(buffer);
+    cloudinary.uploader
+      .upload_stream(
+        {
+          tags: [`${userId}`],
+          public_id: file.name
+        },
+        function (error, result) {
+          if (error) {
+            reject(error);
+          }
+          resolve(result);
+        }
+      )
+      .end(buffer);
   });
 
-  return NextResponse.json(results)
-}
+  return NextResponse.json(results);
+};

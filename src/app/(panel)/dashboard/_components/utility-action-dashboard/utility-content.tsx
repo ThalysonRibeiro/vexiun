@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Folder, MessageCirclePlus, User } from "lucide-react"
-import UtilityButton, { UtilityButtonItem } from "../../../../../components/ui/utility-button"
-import { ComponentType, ReactNode, useState } from "react"
-import { ChatMessage } from "./chat-message"
-import { CreateWorkspace } from "./create-workspace"
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Folder, MessageCirclePlus, User } from "lucide-react";
+import UtilityButton, { UtilityButtonItem } from "../../../../../components/ui/utility-button";
+import { ComponentType, ReactNode, useState } from "react";
+import { ChatMessage } from "./chat-message";
+import { CreateWorkspace } from "./create-workspace";
 
-type DialogType = 'project' | 'chat';
+type DialogType = "project" | "chat";
 
 interface DialogConfig {
   type: DialogType;
@@ -27,20 +27,20 @@ interface DialogConfig {
 
 const DIALOGS: DialogConfig[] = [
   {
-    type: 'project',
-    title: 'Criar workspace',
+    type: "project",
+    title: "Criar workspace",
     icon: Folder,
-    label: 'Criar workspace',
+    label: "Criar workspace",
     delay: 75,
-    renderContent: (closeDialog) => <CreateWorkspace setClose={closeDialog} />,
+    renderContent: (closeDialog) => <CreateWorkspace setClose={closeDialog} />
   },
   {
-    type: 'chat',
-    title: 'Chat',
+    type: "chat",
+    title: "Chat",
     icon: MessageCirclePlus,
-    label: 'Chat',
+    label: "Chat",
     delay: 150,
-    renderContent: () => <ChatMessage />,
+    renderContent: () => <ChatMessage />
   }
 ];
 
@@ -80,5 +80,5 @@ export function UtilityContent() {
         </Dialog>
       ))}
     </>
-  )
+  );
 }

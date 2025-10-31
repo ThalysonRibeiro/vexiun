@@ -9,17 +9,12 @@ export type PrioritiesCount = {
   count: number;
 };
 type PrioritiesResponse = Awaited<ReturnType<typeof getPriorities>>;
-export type PrioritiesData = Extract<PrioritiesResponse, { success: true }>['data'];
+export type PrioritiesData = Extract<PrioritiesResponse, { success: true }>["data"];
 
-
-export const getPriorities = withAuth(async (
-  userId,
-  session,
-  workspaceId: string) => {
-
+export const getPriorities = withAuth(async (userId, session, workspaceId: string) => {
   if (!workspaceId) {
     return successResponse([]);
-  };
+  }
 
   const hasAccess = await validateWorkspaceAccess(workspaceId, userId);
 
@@ -30,15 +25,15 @@ export const getPriorities = withAuth(async (
   const items = await prisma.item.findMany({
     where: {
       group: {
-        workspaceId: workspaceId,
-      },
+        workspaceId: workspaceId
+      }
     },
     select: {
-      priority: true,
+      priority: true
     },
     orderBy: {
-      priority: "asc",
-    },
+      priority: "asc"
+    }
   });
 
   const prioritiesCount = items.reduce((acc, item) => {

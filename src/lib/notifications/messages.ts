@@ -1,4 +1,3 @@
-
 export const notificationMessages = {
   WORKSPACE_INVITE: (senderName: string, workspaceName: string) =>
     `${senderName} convidou você para "${workspaceName}"`,
@@ -13,13 +12,9 @@ export const notificationMessages = {
     `${assignerName} designou você para: "${itemTitle}"`,
 
   CHAT_MESSAGE: (senderName: string, preview?: string) =>
-    preview
-      ? `${senderName}: ${preview.slice(0, 50)}...`
-      : `${senderName} enviou uma mensagem`,
+    preview ? `${senderName}: ${preview.slice(0, 50)}...` : `${senderName} enviou uma mensagem`,
 
-  SISTEM_MESSAGE: (message: string) =>
-    message, // Mensagem customizada do sistema
+  SISTEM_MESSAGE: (message: string) => message, // Mensagem customizada do sistema
 
-  NOTICES_MESSAGE: (title: string) =>
-    title, // Título da notícia
+  NOTICES_MESSAGE: (title: string) => title // Título da notícia
 } as const;

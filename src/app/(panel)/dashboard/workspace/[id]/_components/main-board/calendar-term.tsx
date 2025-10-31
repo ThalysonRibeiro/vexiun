@@ -1,18 +1,14 @@
-"use client"
+"use client";
 
-import { ChevronDownIcon, CalendarIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { useEffect, useState } from "react"
+import { ChevronDownIcon, CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useEffect, useState } from "react";
 
 export function CalendarTerm({
   onChange,
-  initialDate,
+  initialDate
 }: {
   onChange: (date: Date) => void;
   initialDate?: Date;
@@ -44,11 +40,7 @@ export function CalendarTerm({
             type="button"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? (
-              date.toLocaleDateString('pt-BR')
-            ) : (
-              <span>Selecione a data</span>
-            )}
+            {date ? date.toLocaleDateString("pt-BR") : <span>Selecione a data</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -59,12 +51,7 @@ export function CalendarTerm({
           style={{ zIndex: 9999 }}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            defaultMonth={date}
-          />
+          <Calendar mode="single" selected={date} onSelect={handleDateSelect} defaultMonth={date} />
         </PopoverContent>
       </Popover>
     </div>

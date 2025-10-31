@@ -2,12 +2,7 @@
 import prisma from "@/lib/prisma";
 import type { Goals, GoalCompletions } from "@/generated/prisma";
 import { GoalMetrics } from "@/app/(panel)/dashboard/goals/metrics/_types";
-import {
-  ActionResponse,
-  ERROR_MESSAGES,
-  successResponse,
-  withErrorHandler
-} from "@/lib/errors";
+import { ActionResponse, ERROR_MESSAGES, successResponse, withErrorHandler } from "@/lib/errors";
 
 function getMondayStart(date: Date): Date {
   const d = new Date(date);
@@ -45,106 +40,108 @@ function monthLabel(index: number): string {
     "September",
     "October",
     "November",
-    "December",
+    "December"
   ];
   return months[index];
 }
 
-export const getGoalsMetrics = withErrorHandler(async (
-  userId: string): Promise<ActionResponse<GoalMetrics | null>> => {
-
-  const goalsResult = await prisma.goals.findMany({
-    where: { userId },
-    include: {
-      goalCompletions: {
-        orderBy: {
-          createdAt: "asc",
-        },
-      },
-    },
-  });
-
-  const goals = Array.isArray(goalsResult) ? goalsResult : [];
-  if (goals.length === 0) {
-    return successResponse(null);
-  }
-
-  const allCompletions = goals.reduce<{ createdAt: Date }[]>((acc, g: Goals & { goalCompletions: GoalCompletions[] }) => {
-    const completions = Array.isArray(g.goalCompletions) ? g.goalCompletions : [];
-    if (completions.length > 0) {
-      for (const c of completions) {
-        acc.push({ createdAt: new Date(c.createdAt) });
+export const getGoalsMetrics = withErrorHandler(
+  async (userId: string): Promise<ActionResponse<GoalMetrics | null>> => {
+    const goalsResult = await prisma.goals.findMany({
+      where: { userId },
+      include: {
+        goalCompletions: {
+          orderBy: {
+            createdAt: "asc"
+          }
+        }
       }
-    }
-    return acc;
-  }, []);
-  if (allCompletions.length === 0) {
-    return successResponse(null);
-  }
-  const firstCompletionDate = allCompletions[0].createdAt;
-  const lastCompletionDate = allCompletions[allCompletions.length - 1].createdAt;
-
-  const weeks: Date[] = [];
-  let cursor = getMondayStart(firstCompletionDate);
-  const last = getMondayStart(lastCompletionDate);
-  while (cursor.getTime() <= last.getTime()) {
-    weeks.push(new Date(cursor));
-    const next = new Date(cursor);
-    next.setDate(next.getDate() + 7);
-    cursor = next;
-  }
-
-  const weeklyProgress = weeks.map((weekStart) => {
-    const weekEnd = getSundayEnd(weekStart);
-    const weekLabel = formatDayMonth(weekStart);
-
-    let completed = 0;
-    let total = 0;
-
-    goals.forEach((goal) => {
-      const completionsInWeek = goal.goalCompletions.filter(
-        (c) => c.createdAt >= weekStart && c.createdAt <= weekEnd
-      ).length;
-      completed += completionsInWeek;
-      total += goal.desiredWeeklyFrequency;
     });
 
-    return { week: weekLabel, completed, total };
-  });
-
-  const completedWeeks: string[] = [];
-  const incompletedWeeks: string[] = [];
-
-  weeklyProgress.forEach((weekData) => {
-    if (weekData.completed >= weekData.total) {
-      completedWeeks.push(weekData.week);
-    } else {
-      incompletedWeeks.push(weekData.week);
+    const goals = Array.isArray(goalsResult) ? goalsResult : [];
+    if (goals.length === 0) {
+      return successResponse(null);
     }
-  });
 
-  const monthlyProgress = Array.from({ length: 12 }).map((_, i) => {
-    const label = monthLabel(i);
-    let completed = 0;
-    let total = 0;
+    const allCompletions = goals.reduce<{ createdAt: Date }[]>(
+      (acc, g: Goals & { goalCompletions: GoalCompletions[] }) => {
+        const completions = Array.isArray(g.goalCompletions) ? g.goalCompletions : [];
+        if (completions.length > 0) {
+          for (const c of completions) {
+            acc.push({ createdAt: new Date(c.createdAt) });
+          }
+        }
+        return acc;
+      },
+      []
+    );
+    if (allCompletions.length === 0) {
+      return successResponse(null);
+    }
+    const firstCompletionDate = allCompletions[0].createdAt;
+    const lastCompletionDate = allCompletions[allCompletions.length - 1].createdAt;
 
-    goals.forEach((goal) => {
-      const completionsInMonth = goal.goalCompletions.filter(
-        (c) => new Date(c.createdAt).getMonth() === i
-      ).length;
-      completed += completionsInMonth;
-      total += goal.desiredWeeklyFrequency * 4; // Approximate monthly frequency
+    const weeks: Date[] = [];
+    let cursor = getMondayStart(firstCompletionDate);
+    const last = getMondayStart(lastCompletionDate);
+    while (cursor.getTime() <= last.getTime()) {
+      weeks.push(new Date(cursor));
+      const next = new Date(cursor);
+      next.setDate(next.getDate() + 7);
+      cursor = next;
+    }
+
+    const weeklyProgress = weeks.map((weekStart) => {
+      const weekEnd = getSundayEnd(weekStart);
+      const weekLabel = formatDayMonth(weekStart);
+
+      let completed = 0;
+      let total = 0;
+
+      goals.forEach((goal) => {
+        const completionsInWeek = goal.goalCompletions.filter(
+          (c) => c.createdAt >= weekStart && c.createdAt <= weekEnd
+        ).length;
+        completed += completionsInWeek;
+        total += goal.desiredWeeklyFrequency;
+      });
+
+      return { week: weekLabel, completed, total };
     });
 
-    return { month: label, completed, total };
-  });
+    const completedWeeks: string[] = [];
+    const incompletedWeeks: string[] = [];
 
-  return successResponse({
-    weeklyProgress,
-    completedWeeks,
-    incompletedWeeks,
-    monthlyProgress,
-  });
+    weeklyProgress.forEach((weekData) => {
+      if (weekData.completed >= weekData.total) {
+        completedWeeks.push(weekData.week);
+      } else {
+        incompletedWeeks.push(weekData.week);
+      }
+    });
 
-}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
+    const monthlyProgress = Array.from({ length: 12 }).map((_, i) => {
+      const label = monthLabel(i);
+      let completed = 0;
+      let total = 0;
 
+      goals.forEach((goal) => {
+        const completionsInMonth = goal.goalCompletions.filter(
+          (c) => new Date(c.createdAt).getMonth() === i
+        ).length;
+        completed += completionsInMonth;
+        total += goal.desiredWeeklyFrequency * 4; // Approximate monthly frequency
+      });
+
+      return { month: label, completed, total };
+    });
+
+    return successResponse({
+      weeklyProgress,
+      completedWeeks,
+      incompletedWeeks,
+      monthlyProgress
+    });
+  },
+  ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR
+);

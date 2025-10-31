@@ -20,20 +20,22 @@ export const GET = auth(async function GET(req) {
       select: {
         id: true,
         role: true,
-        name: true, // ✅ Útil para logs
+        name: true // ✅ Útil para logs
       }
     });
 
-    if (!user || user.role !== 'SUPER_ADMIN') {
+    if (!user || user.role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Acesso negado. Apenas SUPER_ADMIN." }, { status: 403 }); // ✅ 403 é mais apropriado
     }
 
-    const triggers = await prisma.$queryRaw<Array<{
-      trigger_name: string;
-      event_object_table: string;
-      action_timing: string;
-      event_manipulation: string;
-    }>>`
+    const triggers = await prisma.$queryRaw<
+      Array<{
+        trigger_name: string;
+        event_object_table: string;
+        action_timing: string;
+        event_manipulation: string;
+      }>
+    >`
       SELECT 
         trigger_name, 
         event_object_table,
@@ -54,9 +56,12 @@ export const GET = auth(async function GET(req) {
     });
   } catch (error) {
     console.error("Error checking triggers:", error); // ✅ Log do erro
-    return NextResponse.json({
-      success: false,
-      error: 'Erro ao verificar triggers'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Erro ao verificar triggers"
+      },
+      { status: 500 }
+    );
   }
 });

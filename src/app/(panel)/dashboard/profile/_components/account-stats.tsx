@@ -1,67 +1,70 @@
-"use client"
+"use client";
 
 import { Calendar, Clock, Database, TrendingUp } from "lucide-react";
 import { UserWithCounts } from "../types/profile-types";
 import { GoalCompletions } from "@/generated/prisma";
 
-
 export default function AccountStats({ detailUser }: { detailUser: UserWithCounts }) {
-  const accountAge = Math.floor((new Date().getTime() - detailUser.createdAt.getTime()) / (1000 * 60 * 60 * 24));
-  const lastUpdated = Math.floor((new Date().getTime() - detailUser.updatedAt.getTime()) / (1000 * 60 * 60 * 24));
+  const accountAge = Math.floor(
+    (new Date().getTime() - detailUser.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const lastUpdated = Math.floor(
+    (new Date().getTime() - detailUser.updatedAt.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
   const stats = [
     {
       icon: Calendar,
-      label: 'Membro desde',
-      value: detailUser.createdAt.toLocaleDateString('pt-BR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      label: "Membro desde",
+      value: detailUser.createdAt.toLocaleDateString("pt-BR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
       }),
       subtitle: `${accountAge} dias atrás`,
-      color: 'blue'
+      color: "blue"
     },
     {
       icon: Clock,
-      label: 'Última atualização',
-      value: detailUser.updatedAt.toLocaleDateString('pt-BR', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      label: "Última atualização",
+      value: detailUser.updatedAt.toLocaleDateString("pt-BR", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
       }),
-      subtitle: lastUpdated === 0 ? 'Hoje' : `${lastUpdated} dias atrás`,
-      color: 'green'
+      subtitle: lastUpdated === 0 ? "Hoje" : `${lastUpdated} dias atrás`,
+      color: "green"
     },
     {
       icon: Database,
-      label: 'ID do usuário',
-      value: detailUser.id.substring(0, 5) + '...',
-      subtitle: 'Identificador único do usuário no sistema',
-      color: 'purple'
+      label: "ID do usuário",
+      value: detailUser.id.substring(0, 5) + "...",
+      subtitle: "Identificador único do usuário no sistema",
+      color: "purple"
     }
   ];
 
   const getColorClasses = (color: string) => {
     switch (color) {
-      case 'blue':
+      case "blue":
         return {
-          icon: 'text-blue-600',
-          text: 'text-blue-900'
+          icon: "text-blue-600",
+          text: "text-blue-900"
         };
-      case 'green':
+      case "green":
         return {
-          icon: 'text-green-600',
-          text: 'text-green-900'
+          icon: "text-green-600",
+          text: "text-green-900"
         };
-      case 'purple':
+      case "purple":
         return {
-          icon: 'text-purple-600',
-          text: 'text-purple-900'
+          icon: "text-purple-600",
+          text: "text-purple-900"
         };
       default:
         return {
-          icon: 'text-slate-600',
-          text: 'text-slate-900'
+          icon: "text-slate-600",
+          text: "text-slate-900"
         };
     }
   };
@@ -70,7 +73,6 @@ export default function AccountStats({ detailUser }: { detailUser: UserWithCount
   for (let i = 0; i < detailUser.goals.length; i++) {
     goalCompleted += detailUser.goals[i].goalCompletions.length;
   }
-
 
   return (
     <div className="space-y-4 w-full max-w-sm mx-auto">
@@ -90,15 +92,9 @@ export default function AccountStats({ detailUser }: { detailUser: UserWithCount
                 <Icon className={`w-6 h-6 ${colors.icon}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">
-                  {stat.label}
-                </p>
-                <p className={`font-bold text-lg ${colors.text} truncate`}>
-                  {stat.value}
-                </p>
-                <p className="text-sm">
-                  {stat.subtitle}
-                </p>
+                <p className="text-sm font-medium">{stat.label}</p>
+                <p className={`font-bold text-lg ${colors.text} truncate`}>{stat.value}</p>
+                <p className="text-sm">{stat.subtitle}</p>
               </div>
             </div>
           </div>
@@ -127,4 +123,4 @@ export default function AccountStats({ detailUser }: { detailUser: UserWithCount
       </div>
     </div>
   );
-};
+}

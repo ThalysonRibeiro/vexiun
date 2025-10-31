@@ -5,9 +5,9 @@ export type TeamUser = {
   name: string | null;
   image: string | null;
   email: string;
-}
+};
 
-export type EditingField = 'title' | 'notes' | 'description' | 'term' | null;
+export type EditingField = "title" | "notes" | "description" | "term" | null;
 
 export interface EditingState {
   itemId: string | null;
@@ -25,5 +25,5 @@ export interface ItemsTablesProps {
   groupId: string;
   team: TeamUser[];
   changeLayout: boolean;
-  workspaceId: string
+  workspaceId: string;
 }

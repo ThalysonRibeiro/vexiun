@@ -1,9 +1,9 @@
-"use client"
+"use client";
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -12,14 +12,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -50,11 +50,15 @@ interface DialogContentNewItemProps {
     status: Status;
     notes: string;
     description: string;
-  }
+  };
   status: Status;
 }
 
-export function DialogContentNewItem({ closeDialog, initialValues, status }: DialogContentNewItemProps) {
+export function DialogContentNewItem({
+  closeDialog,
+  initialValues,
+  status
+}: DialogContentNewItemProps) {
   const params = useParams();
   const workspaceId = params.id as string;
   const { data: session } = useSession();
@@ -65,10 +69,9 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
   const createItem = useCreateItem();
 
   async function onSubmit(formData: ItemFormData) {
-
     const response = await createItem.mutateAsync({
       workspaceId,
-      groupId: selectedGroupId || data?.group[0].id as string,
+      groupId: selectedGroupId || (data?.group[0].id as string),
       title: formData.title,
       term: formData.term,
       priority: formData.priority,
@@ -76,7 +79,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
       description: formData.description || "",
       status,
       assignedTo: formData.assignedTo ?? session?.user?.id,
-      details: formData.details,
+      details: formData.details
     });
     if (!isSuccessResponse(response)) {
       toast.error("Erro ao cadastrar item");
@@ -88,32 +91,34 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
   }
 
   if (isLoading) {
-    return <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 border-4 border-t-accent rounded-full animate-spin border-primary">
-    </div>
+    return (
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 border-4 border-t-accent rounded-full animate-spin border-primary"></div>
+    );
   }
 
   return (
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Criar novo item</DialogTitle>
-        <DialogDescription>
-        </DialogDescription>
+        <DialogDescription></DialogDescription>
       </DialogHeader>
-      <Select
-        onValueChange={setSelectedGroupId}
-        value={selectedGroupId}
-      >
+      <Select onValueChange={setSelectedGroupId} value={selectedGroupId}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={data?.group[0]?.title} />
         </SelectTrigger>
         <SelectContent>
-          {data?.group.map(group => (
-            <SelectItem key={group.id} value={group.id}>{group?.title}</SelectItem>
+          {data?.group.map((group) => (
+            <SelectItem key={group.id} value={group.id}>
+              {group?.title}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
       <Form {...form}>
-        <form className="flex flex-col justify-between items-center gap-4 px-2 max-h-120 overflow-y-scroll" onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          className="flex flex-col justify-between items-center gap-4 px-2 max-h-120 overflow-y-scroll"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <FormField
             control={form.control}
             name="title"
@@ -141,10 +146,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
               <FormItem className="w-full">
                 <FormLabel>Notas</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Descreva seu item"
-                  />
+                  <Input {...field} placeholder="Descreva seu item" />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />
@@ -159,11 +161,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
               <FormItem className="w-full">
                 <FormLabel>Descrição</FormLabel>
                 <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Descreva o item"
-                    className="max-h-30 h-15"
-                  />
+                  <Textarea {...field} placeholder="Descreva o item" className="max-h-30 h-15" />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />
@@ -179,14 +177,11 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                 <FormItem className="flex-1">
                   <FormLabel>Prioridade</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
                         <SelectValue>
                           {(() => {
-                            const p = priorityMap.find(p => p.key === field.value);
+                            const p = priorityMap.find((p) => p.key === field.value);
                             return p ? (
                               <div className="flex items-center gap-1.5">
                                 <p.icon className="h-3.5 w-3.5 text-white" />
@@ -227,7 +222,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                   <FormControl>
                     <CalendarTerm
                       onChange={(date) => {
-                        field.onChange(date)
+                        field.onChange(date);
                       }}
                     />
                   </FormControl>
@@ -236,7 +231,6 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                 </FormItem>
               )}
             />
-
           </div>
 
           {team && (
@@ -244,20 +238,19 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
               control={form.control}
               name="assignedTo"
               render={({ field }) => {
-                const selectedTeam = team.find(t => t.id === field.value) ?? team[0]
+                const selectedTeam = team.find((t) => t.id === field.value) ?? team[0];
                 return (
                   <FormItem className="mr-auto w-full">
                     <FormLabel>Responsável</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? undefined}
-                      >
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <SelectTrigger className="flex items-center gap-2 w-full">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-6 h-6">
                               <AvatarImage src={selectedTeam.image ?? undefined} />
-                              <AvatarFallback>{nameFallback(selectedTeam.name ?? undefined)}</AvatarFallback>
+                              <AvatarFallback>
+                                {nameFallback(selectedTeam.name ?? undefined)}
+                              </AvatarFallback>
                             </Avatar>
                             <span>{selectedTeam.name}</span>
                           </div>
@@ -267,7 +260,9 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                             <SelectItem key={user.id} value={user.id}>
                               <Avatar>
                                 <AvatarImage src={user.image ?? undefined} />
-                                <AvatarFallback>{nameFallback(user.name ?? undefined)}</AvatarFallback>
+                                <AvatarFallback>
+                                  {nameFallback(user.name ?? undefined)}
+                                </AvatarFallback>
                               </Avatar>
                               <span className="truncate min-w-0 max-w-50 sm:max-w-90">
                                 {user.name}
@@ -278,7 +273,7 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
                       </Select>
                     </FormControl>
                   </FormItem>
-                )
+                );
               }}
             />
           )}
@@ -289,25 +284,22 @@ export function DialogContentNewItem({ closeDialog, initialValues, status }: Dia
             render={({ field }) => {
               return (
                 <FormItem className="w-full">
-                  <FormLabel>
-                    Detalhes
-                  </FormLabel>
+                  <FormLabel>Detalhes</FormLabel>
                   <FormControl>
                     <div className="h-full min-h-80 max-h-100">
-                      <DetailsEditor
-                        content={field.value ?? {}}
-                        onContentChange={field.onChange}
-                      />
+                      <DetailsEditor content={field.value ?? {}} onContentChange={field.onChange} />
                     </div>
                   </FormControl>
                 </FormItem>
-              )
+              );
             }}
           />
 
-          <Button type="submit" className="mt-3.5 w-full">Cadastrar</Button>
+          <Button type="submit" className="mt-3.5 w-full">
+            Cadastrar
+          </Button>
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }

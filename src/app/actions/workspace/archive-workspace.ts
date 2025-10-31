@@ -2,7 +2,6 @@
 
 import { changeWorkspaceStatus } from "./change-status";
 
-
 export async function archiveWorkspace(workspaceId: string) {
   return changeWorkspaceStatus({
     workspaceId,

@@ -41,7 +41,7 @@ import {
   EditorTableRowBefore,
   EditorTableRowDelete,
   EditorTableRowMenu,
-  EditorTableSplitCell,
+  EditorTableSplitCell
 } from "@/components/kibo-ui/editor";
 import { useEffect, useState } from "react";
 
@@ -57,11 +57,10 @@ export function DetailsEditor({
   editable = true,
   content = null,
   onContentChange
-}: DetailsEditorProps
-) {
+}: DetailsEditorProps) {
   const [key, setKey] = useState(0);
   useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, [editable]);
 
   const handleUpdate = ({ editor }: { editor: Editor }) => {
@@ -134,4 +133,4 @@ export function DetailsEditor({
       {/* <EditorCharacterCount.Words>Palavras: </EditorCharacterCount.Words> */}
     </EditorProvider>
   );
-};
+}

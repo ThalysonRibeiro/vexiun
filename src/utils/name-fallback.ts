@@ -1,5 +1,8 @@
 export function nameFallback(value = "CATALYST"): string {
-  const nameArray = value.trim().split(" ").filter(n => n.length > 0);
+  const nameArray = value
+    .trim()
+    .split(" ")
+    .filter((n) => n.length > 0);
 
   if (nameArray.length === 0) {
     return "CA";

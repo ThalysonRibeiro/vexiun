@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { memo } from "react";
@@ -25,8 +25,6 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 
-
-
 interface ItemCardProps {
   item: ItemWhitCreatedAssignedUser;
   team: TeamUser[];
@@ -37,12 +35,18 @@ interface ItemCardProps {
   onStartEditing: (item: ItemWhitCreatedAssignedUser, field: EditingField) => void;
   onCancelEditing: () => void;
   onSaveField: (item: ItemWhitCreatedAssignedUser) => void;
-  onSelectChange: (item: ItemWhitCreatedAssignedUser, field: 'priority' | 'status', value: Priority | Status) => void;
+  onSelectChange: (
+    item: ItemWhitCreatedAssignedUser,
+    field: "priority" | "status",
+    value: Priority | Status
+  ) => void;
   onDeleteItem: (itemId: string) => void;
   onMoveToTrash: (itemId: string) => void;
   onSaveDetails: (item: ItemWhitCreatedAssignedUser) => void;
   setEditingData: (data: ItemWhitCreatedAssignedUser | null) => void;
-  setDialogState: (state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)) => void;
+  setDialogState: (
+    state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)
+  ) => void;
   onArchiveItem: (itemId: string) => void;
   onRestoreItem: (itemId: string) => void;
 }
@@ -75,7 +79,7 @@ export const ItemCard = memo(function ItemCard(props: ItemCardProps) {
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: workspace?.workspace.status as EntityStatus,
     isOwner
   });
@@ -93,10 +97,7 @@ export const ItemCard = memo(function ItemCard(props: ItemCardProps) {
             item={item}
             field={"title"}
             value={titleCapitalized}
-            isEditing={
-              (itemId, field) =>
-                (editing.itemId === itemId && editing.field === field)
-            }
+            isEditing={(itemId, field) => editing.itemId === itemId && editing.field === field}
             permissionsEdit={permissions.canCreateOrEditItem}
             onStartEditing={onStartEditing}
             onCancelEditing={onCancelEditing}
@@ -153,9 +154,9 @@ export const ItemCard = memo(function ItemCard(props: ItemCardProps) {
       </CardHeader>
 
       <CardContent className="flex-1 space-y-3 pt-0">
-
         <ItemResponsible
-          item={item} label="Responsável"
+          item={item}
+          label="Responsável"
           permissionsEdit={permissions.canEdit}
           className="p-2 bg-muted/50 rounded-md hover:bg-muted transition-colors"
         />
@@ -206,4 +207,4 @@ export const ItemCard = memo(function ItemCard(props: ItemCardProps) {
       </CardFooter>
     </Card>
   );
-})
+});

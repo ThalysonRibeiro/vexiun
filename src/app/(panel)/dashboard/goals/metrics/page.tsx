@@ -8,7 +8,7 @@ export default async function MetricsPage() {
   const session = await getSession();
 
   if (!session) {
-    redirect('/')
+    redirect("/");
   }
   const metrics = await getGoalsMetrics(session?.user?.id as string).then(unwrapServerData);
 

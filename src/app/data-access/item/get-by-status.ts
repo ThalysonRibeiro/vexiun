@@ -1,25 +1,16 @@
 "use server";
 import { validateWorkspaceAccess } from "@/lib/db/validators";
-import {
-  ERROR_MESSAGES,
-  PermissionError,
-  successResponse,
-  withAuth
-} from "@/lib/errors";
+import { ERROR_MESSAGES, PermissionError, successResponse, withAuth } from "@/lib/errors";
 import prisma from "@/lib/prisma";
 
-export const getItemsByStatus = withAuth(async (
-  userId,
-  session,
-  workspaceId: string) => {
-
+export const getItemsByStatus = withAuth(async (userId, session, workspaceId: string) => {
   if (!workspaceId) {
     return successResponse({
       response: [],
       statusDone: [],
       statusNotStarted: [],
       statusInProgress: [],
-      statusStoped: [],
+      statusStoped: []
     });
   }
   const hasAccess = await validateWorkspaceAccess(workspaceId, userId);
@@ -37,8 +28,8 @@ export const getItemsByStatus = withAuth(async (
           name: true,
           image: true,
           email: true,
-          createdBy: true,
-        },
+          createdBy: true
+        }
       },
       createdByUser: {
         select: {
@@ -46,13 +37,13 @@ export const getItemsByStatus = withAuth(async (
           name: true,
           image: true,
           email: true,
-          createdBy: true,
-        },
-      },
+          createdBy: true
+        }
+      }
     },
     orderBy: {
-      updatedAt: "desc",
-    },
+      updatedAt: "desc"
+    }
   });
 
   const categorized = response.reduce(
@@ -77,12 +68,12 @@ export const getItemsByStatus = withAuth(async (
       statusDone: [] as typeof response,
       statusNotStarted: [] as typeof response,
       statusInProgress: [] as typeof response,
-      statusStoped: [] as typeof response,
+      statusStoped: [] as typeof response
     }
   );
 
   return successResponse({
     response,
-    ...categorized,
+    ...categorized
   });
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

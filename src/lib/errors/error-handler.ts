@@ -5,7 +5,7 @@ import {
   NotFoundError,
   ValidationError,
   DuplicateError,
-  RelationError,
+  RelationError
 } from "./custom-errors";
 
 /**
@@ -40,55 +40,55 @@ function handlePrismaError(error: Prisma.PrismaClientKnownRequestError): ErrorRe
       const field = (error.meta?.target as string[])?.[0] || "campo";
       return {
         error: `Já existe um registro com este ${field}`,
-        code: "DUPLICATE",
+        code: "DUPLICATE"
       };
     }
     case "P2025": {
       // Record not found
       return {
         error: "Registro não encontrado",
-        code: "NOT_FOUND",
+        code: "NOT_FOUND"
       };
     }
     case "P2003": {
       // Foreign key constraint violation
       return {
         error: "Relacionamento inválido ou registro relacionado não existe",
-        code: "RELATION_ERROR",
+        code: "RELATION_ERROR"
       };
     }
     case "P2014": {
       // Required relation violation
       return {
         error: "Violação de relacionamento obrigatório",
-        code: "RELATION_ERROR",
+        code: "RELATION_ERROR"
       };
     }
     case "P2021": {
       // Table does not exist
       return {
         error: "Erro de configuração do banco de dados",
-        code: "DATABASE_ERROR",
+        code: "DATABASE_ERROR"
       };
     }
     case "P2022": {
       // Column does not exist
       return {
         error: "Erro de configuração do banco de dados",
-        code: "DATABASE_ERROR",
+        code: "DATABASE_ERROR"
       };
     }
     default:
       return {
         error: "Erro no banco de dados",
-        code: "DATABASE_ERROR",
+        code: "DATABASE_ERROR"
       };
   }
 }
 
 /**
  * Handler principal de erros
- * 
+ *
  * @param error - Erro capturado
  * @param defaultMessage - Mensagem padrão caso não seja possível identificar
  * @param context - Contexto adicional para logging (opcional)
@@ -99,7 +99,6 @@ export function handleError(
   defaultMessage: string = "Erro ao processar operação",
   context?: Record<string, unknown>
 ): ErrorResponse {
-
   // Suprime log de PermissionError (comum quando recursos são deletados durante navegação)
   const shouldLog = !(error instanceof PermissionError);
 
@@ -109,7 +108,7 @@ export function handleError(
     console.error(`[${timestamp}] ${defaultMessage}:`, {
       error,
       context,
-      stack: error instanceof Error ? error.stack : undefined,
+      stack: error instanceof Error ? error.stack : undefined
     });
   }
 
@@ -146,14 +145,14 @@ export function handleError(
   if (error instanceof Prisma.PrismaClientValidationError) {
     return {
       error: "Dados inválidos fornecidos",
-      code: "VALIDATION_ERROR",
+      code: "VALIDATION_ERROR"
     };
   }
 
   if (error instanceof Prisma.PrismaClientInitializationError) {
     return {
       error: "Erro ao conectar ao banco de dados",
-      code: "DATABASE_CONNECTION_ERROR",
+      code: "DATABASE_CONNECTION_ERROR"
     };
   }
 
@@ -173,17 +172,13 @@ export function handleError(
 /**
  * Helper para criar resposta de sucesso padronizada
  */
-export function successResponse<T>(
-  data: T,
-  message?: string
-): SuccessResponse<T> {
+export function successResponse<T>(data: T, message?: string): SuccessResponse<T> {
   return {
     success: true,
     data,
-    ...(message && { message }),
+    ...(message && { message })
   };
 }
-
 
 /**
  * Wrapper para try/catch em actions
@@ -219,7 +214,7 @@ export function withErrorHandler<TArgs extends any[], TReturn>(
 export function errorResponse(message: string, code?: string): ErrorResponse {
   return {
     error: message,
-    ...(code && { code }),
+    ...(code && { code })
   };
 }
 
@@ -233,8 +228,6 @@ export function isErrorResponse(response: ActionResponse): response is ErrorResp
 /**
  * Type guard para verificar se é uma resposta de sucesso
  */
-export function isSuccessResponse<T>(
-  response: ActionResponse<T>
-): response is SuccessResponse<T> {
+export function isSuccessResponse<T>(response: ActionResponse<T>): response is SuccessResponse<T> {
   return "success" in response && response.success === true;
 }

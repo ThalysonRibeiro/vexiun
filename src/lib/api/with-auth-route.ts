@@ -49,7 +49,6 @@ export function withAuthRoute(handler: AuthRouteHandler) {
       const session = req.auth as Session;
 
       return await handler(req, userId, session, context);
-
     } catch (error) {
       console.error("Erro na rota:", error);
 
@@ -60,7 +59,7 @@ export function withAuthRoute(handler: AuthRouteHandler) {
         NotFoundError: 404,
         ValidationError: 400,
         DuplicateError: 409,
-        RelationError: 400,
+        RelationError: 400
       };
 
       if (error instanceof AppError) {

@@ -20,7 +20,6 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-
 export function useNotifications() {
   const previousNotifications = useRef<Notification[]>([]);
   const isFirstFetch = useRef(true);
@@ -36,14 +35,14 @@ export function useNotifications() {
     },
 
     refetchInterval: (query) => {
-      if (typeof document === 'undefined') return false;
-      if (document.visibilityState === 'hidden') return false;
+      if (typeof document === "undefined") return false;
+      if (document.visibilityState === "hidden") return false;
       return 30 * 1000; // 30 segundos
     },
 
     refetchOnWindowFocus: true,
     staleTime: 0,
-    gcTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5
   });
 
   useEffect(() => {
@@ -55,9 +54,9 @@ export function useNotifications() {
       return;
     }
 
-    const previousIds = previousNotifications.current.map(n => n.id);
+    const previousIds = previousNotifications.current.map((n) => n.id);
     const newNotifications = query.data.filter(
-      notification => !previousIds.includes(notification.id)
+      (notification) => !previousIds.includes(notification.id)
     );
 
     if (newNotifications.length > 0) {
@@ -103,7 +102,7 @@ export function useMarkNotificationAsRead() {
     },
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["notifications", variables.notificationId] });
-    },
+    }
   });
 }
 
@@ -121,7 +120,7 @@ export function useMarkAllAsRead() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -140,7 +139,7 @@ export function useDeleteNotification() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -159,7 +158,7 @@ export function useDeleteAllNotifications() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -178,7 +177,7 @@ export function useDeleteMultipleNotifications() {
     },
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["notifications", variables.notificationIds] });
-    },
+    }
   });
 }
 
@@ -197,7 +196,7 @@ export function useDeleteReadNotifications() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -215,7 +214,7 @@ export function useSmartCleanup() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -233,7 +232,7 @@ export function useSendBroadcastNotification() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -249,56 +248,59 @@ function showNotificationToast(notification: Notification) {
   ];
 
   if (profileTypes.includes(type)) {
-    toast.custom((t) => (
-      <div
-        className="flex items-start gap-3 bg-card p-4 rounded-lg shadow-lg border min-w-[300px] max-w-md animate-in slide-in-from-right cursor-pointer hover:shadow-xl transition-shadow"
-        onClick={() => toast.dismiss(t)}
-      >
-        <div className="relative">
-          <Image
-            src={notification.image || "/default-avatar.png"}
-            alt={notification.nameReference || "Usuário"}
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-          />
-          <span className="absolute -bottom-1 -right-1 text-sm bg-background rounded-full w-5 h-5 flex items-center justify-center border border-border">
-            {getNotificationEmoji(type)}
-          </span>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-foreground">
-            {notification.nameReference || "Usuário"}
-          </p>
-
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
-            {getTruncatedMessage(notification)}
-          </p>
-
-          <p className="text-xs text-muted-foreground/70 mt-1">
-            {getTimeAgo(notification.createdAt)}
-          </p>
-        </div>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toast.dismiss(t);
-          }}
-          className="text-muted-foreground/50 hover:text-muted-foreground flex-shrink-0 transition-colors"
+    toast.custom(
+      (t) => (
+        <div
+          className="flex items-start gap-3 bg-card p-4 rounded-lg shadow-lg border min-w-[300px] max-w-md animate-in slide-in-from-right cursor-pointer hover:shadow-xl transition-shadow"
+          onClick={() => toast.dismiss(t)}
         >
-          ✕
-        </button>
-      </div>
-    ), {
-      duration: 5000,
-      position: 'top-right',
-    });
+          <div className="relative">
+            <Image
+              src={notification.image || "/default-avatar.png"}
+              alt={notification.nameReference || "Usuário"}
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+            />
+            <span className="absolute -bottom-1 -right-1 text-sm bg-background rounded-full w-5 h-5 flex items-center justify-center border border-border">
+              {getNotificationEmoji(type)}
+            </span>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-foreground">
+              {notification.nameReference || "Usuário"}
+            </p>
+
+            <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+              {getTruncatedMessage(notification)}
+            </p>
+
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              {getTimeAgo(notification.createdAt)}
+            </p>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toast.dismiss(t);
+            }}
+            className="text-muted-foreground/50 hover:text-muted-foreground flex-shrink-0 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+      ),
+      {
+        duration: 5000,
+        position: "top-right"
+      }
+    );
   } else {
     const emoji = getNotificationEmoji(type);
     toast(`${emoji} ${notification.message}`, {
-      duration: 4000,
+      duration: 4000
     });
   }
 }
@@ -309,9 +311,7 @@ function getTruncatedMessage(notification: Notification): string {
   switch (notification.type) {
     case "CHAT_MESSAGE":
       const message = notification.message || "Enviou uma mensagem";
-      return message.length > maxLength
-        ? `${message.substring(0, maxLength)}...`
-        : message;
+      return message.length > maxLength ? `${message.substring(0, maxLength)}...` : message;
     case "WORKSPACE_INVITE":
       return "Convidou você para uma workspace";
     case "WORKSPACE_ACCEPTED":
@@ -344,7 +344,7 @@ function getNotificationEmoji(type: string): string {
     ITEM_COMPLETED: "✔️",
     CHAT_MESSAGE: "💬",
     SISTEM_MESSAGE: "📢",
-    NOTICES_MESSAGE: "🔔",
+    NOTICES_MESSAGE: "🔔"
   };
 
   return emojis[type] || "🔔";

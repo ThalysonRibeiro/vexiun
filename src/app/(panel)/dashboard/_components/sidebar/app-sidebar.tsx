@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Sidebar,
   SidebarContent,
@@ -9,44 +9,41 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import {
-  Dock, Globe, Home
-} from "lucide-react"
-import Link from "next/link"
-import { Menu } from "./menu"
-import { Session } from "next-auth"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { FaTasks } from "react-icons/fa"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { CatalystLogo } from "@/components/catalyst-logo"
-import { SharedWorkspacesData, WorkspaceSummaryData } from "@/app/data-access/workspace"
-import { Prisma } from "@/generated/prisma"
-import { BadgeWorkspace } from "@/components/badge-workspace"
-
+  SidebarMenuItem
+} from "@/components/ui/sidebar";
+import { Dock, Globe, Home } from "lucide-react";
+import Link from "next/link";
+import { Menu } from "./menu";
+import { Session } from "next-auth";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { FaTasks } from "react-icons/fa";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { CatalystLogo } from "@/components/catalyst-logo";
+import { SharedWorkspacesData, WorkspaceSummaryData } from "@/app/data-access/workspace";
+import { Prisma } from "@/generated/prisma";
+import { BadgeWorkspace } from "@/components/badge-workspace";
 
 type NavigationLink =
   | {
-    title: string;
-    url: string;
-    icon: React.ElementType;
-  }
-  | {
-    title: string;
-    icon: React.ElementType;
-    sublinks: {
       title: string;
       url: string;
-    }[];
-  };
+      icon: React.ElementType;
+    }
+  | {
+      title: string;
+      icon: React.ElementType;
+      sublinks: {
+        title: string;
+        url: string;
+      }[];
+    };
 
 const navigationLinks: NavigationLink[] = [
   {
     title: "Home",
     url: "/dashboard",
-    icon: Home,
+    icon: Home
   },
   {
     title: "Metas",
@@ -54,13 +51,13 @@ const navigationLinks: NavigationLink[] = [
     sublinks: [
       {
         title: "Visão Geral",
-        url: "/dashboard/goals",
+        url: "/dashboard/goals"
       },
       {
         title: "Métricas",
-        url: "/dashboard/goals/metrics",
-      },
-    ],
+        url: "/dashboard/goals/metrics"
+      }
+    ]
   },
   {
     title: "Workspaces",
@@ -84,7 +81,7 @@ type WorkspacesMenberWithWorkspace = Prisma.WorkspaceMemberGetPayload<{
 type Workspace = {
   id: string;
   title: string;
-}
+};
 
 export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSidebarProps) {
   const pathname = usePathname();
@@ -109,7 +106,7 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
             <SidebarMenu>
               {navigationLinks.map((link) => (
                 <div key={link.title}>
-                  {('sublinks' in link) ? (
+                  {"sublinks" in link ? (
                     <Collapsible>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="w-full justify-start cursor-pointer">
@@ -122,8 +119,10 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
                           {link.sublinks.map((sublink) => (
                             <SidebarMenuItem
                               key={sublink.title}
-                              className={cn("",
-                                pathname === sublink.url && "bg-primary rounded-md")}
+                              className={cn(
+                                "",
+                                pathname === sublink.url && "bg-primary rounded-md"
+                              )}
                             >
                               <SidebarMenuButton asChild>
                                 <Link href={sublink.url}>
@@ -137,8 +136,7 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
                     </Collapsible>
                   ) : (
                     <SidebarMenuItem
-                      className={cn("",
-                        pathname === link.url && "bg-primary rounded-md")}
+                      className={cn("", pathname === link.url && "bg-primary rounded-md")}
                     >
                       <SidebarMenuButton asChild>
                         <Link href={link.url}>
@@ -158,14 +156,16 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
         <SidebarGroup>
           <SidebarGroupLabel>Workspaces Compartilhadas</SidebarGroupLabel>
           <SidebarGroupContent>
-
             <SidebarMenu>
               {sharedWorkspaces?.map((shared) => (
                 <div key={shared.id}>
                   <SidebarMenuItem>
-                    <div className={cn("flex items-center w-full",
-                      pathname === `/dashboard/workspace/${shared.id}` && "bg-primary rounded-md")
-                    }>
+                    <div
+                      className={cn(
+                        "flex items-center w-full",
+                        pathname === `/dashboard/workspace/${shared.id}` && "bg-primary rounded-md"
+                      )}
+                    >
                       <SidebarMenuButton asChild className="flex-1">
                         <Link href={`/dashboard/workspace/${shared.id}`}>
                           <Dock className="h-4 w-4" />
@@ -175,7 +175,6 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
                           )}
                         </Link>
                       </SidebarMenuButton>
-
                     </div>
                   </SidebarMenuItem>
                 </div>
@@ -183,7 +182,6 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
       </SidebarContent>
 
       <SidebarFooter>

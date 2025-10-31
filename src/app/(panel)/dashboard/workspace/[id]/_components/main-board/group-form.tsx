@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -6,7 +6,7 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -16,14 +16,13 @@ import { GroupFormData } from "@/app/actions/group";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
 
-
 interface CreateGroupFormProps {
   setAddGroup: (value: boolean) => boolean;
   groupId?: string;
   initialValues?: {
     title: string;
     textColor: string;
-  }
+  };
   workspaceId: string;
 }
 
@@ -41,8 +40,8 @@ export function GroupForm(props: CreateGroupFormProps) {
         setAddGroup(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setAddGroup]);
 
   async function onSubmit(formData: GroupFormData) {
@@ -57,11 +56,10 @@ export function GroupForm(props: CreateGroupFormProps) {
         revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
       });
       setIsLoading(false);
-      setAddGroup(false)
+      setAddGroup(false);
       toast.success("Grupo atualizado com sucesso!");
       return;
     }
-
 
     const response = await createGroup.mutateAsync({
       workspaceId,
@@ -79,9 +77,7 @@ export function GroupForm(props: CreateGroupFormProps) {
   }
 
   if (isLoading) {
-    return (
-      <p>carregando...</p>
-    )
+    return <p>carregando...</p>;
   }
   return (
     <div ref={formRef}>
@@ -147,5 +143,5 @@ export function GroupForm(props: CreateGroupFormProps) {
         </form>
       </Form>
     </div>
-  )
+  );
 }

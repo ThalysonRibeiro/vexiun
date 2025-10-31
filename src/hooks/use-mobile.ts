@@ -1,34 +1,34 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-const BREAKPOINT: number = 768
+const BREAKPOINT: number = 768;
 
 export function useMobile(breakpoint = BREAKPOINT) {
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < (breakpoint))
-    }
+      setIsMobile(window.innerWidth < breakpoint);
+    };
 
-    checkMobile()
-    window.addEventListener("resize", checkMobile)
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
 
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [breakpoint])
+    return () => window.removeEventListener("resize", checkMobile);
+  }, [breakpoint]);
 
-  return isMobile
+  return isMobile;
 }
 
 export function getDeviceInfo() {
-  if (typeof window === 'undefined' || !window.navigator) {
+  if (typeof window === "undefined" || !window.navigator) {
     return {
-      userAgent: 'Desconhecido',
-      platform: 'Desconhecido',
-      language: 'pt-BR',
-      screenResolution: 'Desconhecido',
-      timezone: 'America/Sao_Paulo'
+      userAgent: "Desconhecido",
+      platform: "Desconhecido",
+      language: "pt-BR",
+      screenResolution: "Desconhecido",
+      timezone: "America/Sao_Paulo"
     };
   }
 
@@ -39,23 +39,22 @@ export function getDeviceInfo() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Detectar dispositivo
-  let deviceType = 'Workspace';
+  let deviceType = "Workspace";
   if (/iPad/i.test(userAgent)) {
-    deviceType = 'Tablet';
+    deviceType = "Tablet";
   } else if (/Android/i.test(userAgent) && !/Mobile/i.test(userAgent)) {
-    deviceType = 'Tablet';
+    deviceType = "Tablet";
   } else if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
-    deviceType = 'Mobile';
+    deviceType = "Mobile";
   }
 
   // Detectar navegador
-  let browser = 'Desconhecido';
-  if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
-  else if (userAgent.includes('Edg')) browser = 'Edge';
-  else if (userAgent.includes('CriOS') || userAgent.includes('Chrome')) browser = 'Chrome';
-  else if (userAgent.includes('Firefox')) browser = 'Firefox';
-  else if (userAgent.includes('Safari')) browser = 'Safari';
-
+  let browser = "Desconhecido";
+  if (userAgent.includes("Opera") || userAgent.includes("OPR")) browser = "Opera";
+  else if (userAgent.includes("Edg")) browser = "Edge";
+  else if (userAgent.includes("CriOS") || userAgent.includes("Chrome")) browser = "Chrome";
+  else if (userAgent.includes("Firefox")) browser = "Firefox";
+  else if (userAgent.includes("Safari")) browser = "Safari";
 
   return {
     userAgent: `${browser} em ${deviceType}`,

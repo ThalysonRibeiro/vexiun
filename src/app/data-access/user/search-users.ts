@@ -2,14 +2,10 @@
 import { ERROR_MESSAGES, successResponse, withAuth } from "@/lib/errors";
 import prisma from "@/lib/prisma";
 
-export const searchUsers = withAuth(async (
-  userId,
-  session,
-  query: string) => {
-
+export const searchUsers = withAuth(async (userId, session, query: string) => {
   if (!query || query.trim().length < 2) {
     return successResponse([]);
-  };
+  }
 
   const users = await prisma.user.findMany({
     where: {
@@ -20,13 +16,13 @@ export const searchUsers = withAuth(async (
         {
           name: {
             contains: query,
-            mode: 'insensitive'
+            mode: "insensitive"
           }
         },
         {
           email: {
             contains: query,
-            mode: 'insensitive'
+            mode: "insensitive"
           }
         }
       ]

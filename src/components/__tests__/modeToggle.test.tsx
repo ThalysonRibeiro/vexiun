@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 
 // Mock the next-themes useTheme hook
 jest.mock("next-themes", () => ({
-  useTheme: jest.fn(),
+  useTheme: jest.fn()
 }));
 
 describe("ModeToggle", () => {
@@ -17,7 +17,7 @@ describe("ModeToggle", () => {
     (useTheme as jest.Mock).mockReturnValue({
       setTheme: mockSetTheme,
       theme: mockTheme,
-      resolvedTheme: mockTheme,
+      resolvedTheme: mockTheme
     });
   });
 

@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,6 @@ import { useAddWorkspaceMember } from "@/hooks/use-workspace";
 import { ItemsAssociatedWithMember } from "./items-associated-with-member";
 import { usePrefetchMemberItems } from "@/hooks/use-items";
 
-
 export function Team({ workspaceId }: { workspaceId: string }) {
   const [selectedUsers, setSelectedUsers] = useState<UserSearchType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,13 +31,13 @@ export function Team({ workspaceId }: { workspaceId: string }) {
 
   const handlePrefetch = (userId: string) => {
     prefetch(workspaceId, userId);
-    setPrefetchedIds(prev => new Set(prev).add(userId));
+    setPrefetchedIds((prev) => new Set(prev).add(userId));
   };
 
-  const existingMemberIds = data?.map(member => member.id) || [];
+  const existingMemberIds = data?.map((member) => member.id) || [];
 
   const onSubmit = async () => {
-    const ids = selectedUsers.map(user => user.id);
+    const ids = selectedUsers.map((user) => user.id);
 
     if (ids.length <= 0) {
       toast("Nenhum usuário selecionado");
@@ -61,15 +60,13 @@ export function Team({ workspaceId }: { workspaceId: string }) {
     setSelectedUsers([]);
     userSearchRef.current?.reset();
     setLoading(false);
-  }
+  };
 
   return (
     <section className="mt-6 mb-6 flex flex-col">
       <Dialog>
         <DialogTrigger asChild className="mr-auto">
-          <Button variant={"outline"}>
-            Convidar
-          </Button>
+          <Button variant={"outline"}>Convidar</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -91,11 +88,7 @@ export function Team({ workspaceId }: { workspaceId: string }) {
             </div>
 
             {selectedUsers.length > 0 && (
-              <Button
-                disabled={loading}
-                onClick={onSubmit}
-                className="cursor-pointer"
-              >
+              <Button disabled={loading} onClick={onSubmit} className="cursor-pointer">
                 {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Enviar"}
               </Button>
             )}
@@ -108,7 +101,7 @@ export function Team({ workspaceId }: { workspaceId: string }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
           {data?.map((user) => (
-            <Dialog key={user.id} >
+            <Dialog key={user.id}>
               <DialogTrigger
                 className="text-left cursor-pointer"
                 onMouseEnter={() => handlePrefetch(user.id)}
@@ -131,4 +124,4 @@ export function Team({ workspaceId }: { workspaceId: string }) {
       )}
     </section>
   );
-};
+}

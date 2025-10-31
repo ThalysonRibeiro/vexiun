@@ -3,11 +3,7 @@ import { validateWorkspaceAccess } from "@/lib/db/validators";
 import { ERROR_MESSAGES, PermissionError, successResponse, withAuth } from "@/lib/errors";
 import prisma from "@/lib/prisma";
 
-export const getTeam = withAuth(async (
-  userId,
-  session,
-  workspaceId: string) => {
-
+export const getTeam = withAuth(async (userId, session, workspaceId: string) => {
   if (!workspaceId) {
     return successResponse([]);
   }
@@ -19,7 +15,7 @@ export const getTeam = withAuth(async (
 
   const team = await prisma.workspaceMember.findMany({
     where: {
-      workspaceId,
+      workspaceId
     },
     select: {
       user: {
@@ -27,10 +23,10 @@ export const getTeam = withAuth(async (
           id: true,
           name: true,
           email: true,
-          image: true,
-        },
-      },
-    },
+          image: true
+        }
+      }
+    }
   });
-  return successResponse(team.map(member => member.user));
+  return successResponse(team.map((member) => member.user));
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

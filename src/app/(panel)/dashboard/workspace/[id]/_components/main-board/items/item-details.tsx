@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,11 +8,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Eye } from "lucide-react";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { JSONContent } from "@tiptap/core";
@@ -20,25 +16,19 @@ import { memo } from "react";
 import { DetailsEditor } from "../details-editor";
 import { DialogStateProps } from "./types";
 
-
 interface ItemCardFooterProps {
   item: ItemWhitCreatedAssignedUser;
   isLoading: string | null;
   dialogState: DialogStateProps;
   onSaveDetails: (item: ItemWhitCreatedAssignedUser) => void;
-  setDialogState: (state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)) => void;
+  setDialogState: (
+    state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)
+  ) => void;
   permissionsEdit: boolean;
 }
 
 export const ItemDetails = memo(function ItemDetails(props: ItemCardFooterProps) {
-  const {
-    item,
-    isLoading,
-    dialogState,
-    onSaveDetails,
-    setDialogState,
-    permissionsEdit,
-  } = props;
+  const { item, isLoading, dialogState, onSaveDetails, setDialogState, permissionsEdit } = props;
 
   return (
     <Dialog
@@ -77,7 +67,7 @@ export const ItemDetails = memo(function ItemDetails(props: ItemCardFooterProps)
           <DialogDescription>
             {dialogState.isEditing
               ? "Editando detalhes - suas alterações não foram salvas"
-              : `Visualizando detalhes de ${item.title || 'item'}`}
+              : `Visualizando detalhes de ${item.title || "item"}`}
           </DialogDescription>
         </DialogHeader>
         <div className="pb-6 w-full overflow-y-scroll min-h-50 max-h-120">
@@ -86,14 +76,14 @@ export const ItemDetails = memo(function ItemDetails(props: ItemCardFooterProps)
             editable={dialogState.isEditing}
             content={dialogState.content ?? {}}
             onContentChange={(newContent) => {
-              setDialogState(prev => ({ ...prev, content: newContent }));
+              setDialogState((prev) => ({ ...prev, content: newContent }));
             }}
           />
         </div>
         {permissionsEdit && (
           <div className="flex justify-end gap-2 border-t pt-4">
             {!dialogState.isEditing ? (
-              <Button onClick={() => setDialogState(prev => ({ ...prev, isEditing: true }))}>
+              <Button onClick={() => setDialogState((prev) => ({ ...prev, isEditing: true }))}>
                 Editar
               </Button>
             ) : (
@@ -101,7 +91,7 @@ export const ItemDetails = memo(function ItemDetails(props: ItemCardFooterProps)
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setDialogState(prev => ({
+                    setDialogState((prev) => ({
                       ...prev,
                       isEditing: false,
                       content: (item.details as JSONContent) ?? {}
@@ -110,10 +100,7 @@ export const ItemDetails = memo(function ItemDetails(props: ItemCardFooterProps)
                 >
                   Cancelar
                 </Button>
-                <Button
-                  onClick={() => onSaveDetails(item)}
-                  disabled={isLoading === item.id}
-                >
+                <Button onClick={() => onSaveDetails(item)} disabled={isLoading === item.id}>
                   Salvar
                 </Button>
               </>

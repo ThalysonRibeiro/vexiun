@@ -22,7 +22,10 @@ export async function POST(request: NextRequest) {
         if (geoResponse.ok) {
           const geoData = await geoResponse.json();
           if (geoData.status === "success") {
-            location = `${geoData.city || ""}, ${geoData.regionName || ""}, ${geoData.country || ""}`.replace(/^,\s*/, "").replace(/,\s*$/, "");
+            location =
+              `${geoData.city || ""}, ${geoData.regionName || ""}, ${geoData.country || ""}`
+                .replace(/^,\s*/, "")
+                .replace(/,\s*$/, "");
           }
         }
       }
@@ -59,11 +62,13 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "Alerta de login enviado com sucesso"
     });
-
   } catch (error) {
     console.error("Erro ao enviar alerta de login:", error);
-    return NextResponse.json({
-      error: "Erro interno do servidor"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Erro interno do servidor"
+      },
+      { status: 500 }
+    );
   }
 }

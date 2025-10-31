@@ -4,7 +4,7 @@ interface GroupProgressBarProps {
   items: {
     id: string;
     status: Status;
-    priority: Priority
+    priority: Priority;
   }[];
 }
 
@@ -16,22 +16,28 @@ export function GroupProgressBar({ items }: GroupProgressBarProps) {
 
   const statusCounts = Object.fromEntries(
     Object.entries(
-      items.reduce((acc, item) => {
-        acc[item.status] = (acc[item.status] || 0) + 1;
-        return acc;
-      }, {} as Record<Status, number>)
+      items.reduce(
+        (acc, item) => {
+          acc[item.status] = (acc[item.status] || 0) + 1;
+          return acc;
+        },
+        {} as Record<Status, number>
+      )
     ).sort(([a], [b]) => a.localeCompare(b))
   );
 
   return (
-    <div data-testid="progress-bar-container" className="flex w-full max-w-75 h-2 rounded-md overflow-hidden">
+    <div
+      data-testid="progress-bar-container"
+      className="flex w-full max-w-75 h-2 rounded-md overflow-hidden"
+    >
       {Object.entries(statusCounts).map(([status, count]) => (
         <div
           key={status}
           className={`h-full`}
           style={{
             width: `${(count / total) * 100}%`,
-            backgroundColor: getStatusColor(status as Status),
+            backgroundColor: getStatusColor(status as Status)
           }}
         />
       ))}
@@ -46,22 +52,28 @@ export function GroupPriorityBar({ items }: GroupProgressBarProps) {
 
   const priorityCounts = Object.fromEntries(
     Object.entries(
-      items.reduce((acc, item) => {
-        acc[item.priority] = (acc[item.priority] || 0) + 1;
-        return acc;
-      }, {} as Record<Priority, number>)
+      items.reduce(
+        (acc, item) => {
+          acc[item.priority] = (acc[item.priority] || 0) + 1;
+          return acc;
+        },
+        {} as Record<Priority, number>
+      )
     ).sort(([a], [b]) => a.localeCompare(b))
   );
 
   return (
-    <div data-testid="progress-bar-container" className="flex w-full max-w-75 h-2 rounded-md overflow-hidden">
+    <div
+      data-testid="progress-bar-container"
+      className="flex w-full max-w-75 h-2 rounded-md overflow-hidden"
+    >
       {Object.entries(priorityCounts).map(([priority, count]) => (
         <div
           key={priority}
           className={`h-full`}
           style={{
             width: `${(count / total) * 100}%`,
-            backgroundColor: getPriorityColor(priority as Priority),
+            backgroundColor: getPriorityColor(priority as Priority)
           }}
         />
       ))}

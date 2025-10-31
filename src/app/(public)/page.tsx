@@ -4,18 +4,60 @@ import Link from "next/link";
 import { TestimonialsSectionMultipleRows } from "@/components/testimonials";
 import { CatalystLogo } from "@/components/catalyst-logo";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowRight, BarChart3, Briefcase, CheckCircle, Clock, Code, Command, FileText, FolderGit2, Globe, Layers, LayoutDashboard, MessageSquare, Rocket, Settings, Share2, Shield, Users, Calendar, Zap, HelpCircle, Twitter, Linkedin, Github, Instagram, Target, TrendingUp, Workflow, BookOpen } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@/components/ui/accordion";
+import {
+  ArrowRight,
+  BarChart3,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  Code,
+  Command,
+  FileText,
+  FolderGit2,
+  Globe,
+  Layers,
+  LayoutDashboard,
+  MessageSquare,
+  Rocket,
+  Settings,
+  Share2,
+  Shield,
+  Users,
+  Calendar,
+  Zap,
+  HelpCircle,
+  Twitter,
+  Linkedin,
+  Github,
+  Instagram,
+  Target,
+  TrendingUp,
+  Workflow,
+  BookOpen
+} from "lucide-react";
 
 export default async function Home() {
   const session = await getSession();
 
   if (session) {
-    redirect('/dashboard');
+    redirect("/dashboard");
   }
 
   return (
@@ -26,12 +68,18 @@ export default async function Home() {
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[44px_44px]" />
 
       {/* Hero Section */}
-      <section id="hero" className="relative container mx-auto px-4 pt-16 md:pt-24 pb-16 md:pb-20 flex flex-col items-center">
+      <section
+        id="hero"
+        className="relative container mx-auto px-4 pt-16 md:pt-24 pb-16 md:pb-20 flex flex-col items-center"
+      >
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary/5 to-transparent -z-10 rounded-3xl"></div>
 
         <div className="flex flex-col lg:flex-row justify-between gap-8 md:gap-10 items-center w-full max-w-7xl">
           <div className="flex-1 flex flex-col text-left">
-            <Badge variant="outline" className="w-fit mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20">
+            <Badge
+              variant="outline"
+              className="w-fit mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20"
+            >
               Plataforma de Gerenciamento de Projetos
             </Badge>
 
@@ -40,7 +88,8 @@ export default async function Home() {
             </h2>
 
             <p className="text-lg md:text-xl text-muted-foreground text-left mb-6 md:mb-8 max-w-2xl">
-              O Catalyst é uma plataforma para definir metas pessoais semanais, organizar projetos em workspaces colaborativos e acompanhar seu progresso de forma visual e motivadora.
+              O Catalyst é uma plataforma para definir metas pessoais semanais, organizar projetos
+              em workspaces colaborativos e acompanhar seu progresso de forma visual e motivadora.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6 md:mb-8">
@@ -87,58 +136,75 @@ export default async function Home() {
                     <p className="text-xs text-muted-foreground">3 metas ativas</p>
                   </div>
                 </div>
-                <Badge className="bg-green-500/20 text-green-700 border-green-300">Esta semana</Badge>
+                <Badge className="bg-green-500/20 text-green-700 border-green-300">
+                  Esta semana
+                </Badge>
               </div>
 
               <div className="space-y-3 md:space-y-4">
                 <div className="bg-background border rounded-md p-3 hover:bg-primary/5 transition-colors">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-md bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold text-sm">📚</div>
+                      <div className="h-8 w-8 rounded-md bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold text-sm">
+                        📚
+                      </div>
                       <h4 className="font-medium">Estudar React</h4>
                     </div>
-                    <Badge variant="outline" className="text-xs">3x/semana</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      3x/semana
+                    </Badge>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-2">
                     <span>2/3 completas</span>
                     <span>67% da semana</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '67%' }}></div>
+                    <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: "67%" }}></div>
                   </div>
                 </div>
 
                 <div className="bg-background border rounded-md p-3 hover:bg-primary/5 transition-colors">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-md bg-green-500/20 flex items-center justify-center text-green-500 font-bold text-sm">🏃</div>
+                      <div className="h-8 w-8 rounded-md bg-green-500/20 flex items-center justify-center text-green-500 font-bold text-sm">
+                        🏃
+                      </div>
                       <h4 className="font-medium">Exercitar-se</h4>
                     </div>
-                    <Badge variant="outline" className="text-xs">5x/semana</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      5x/semana
+                    </Badge>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-2">
                     <span>4/5 completas</span>
                     <span>80% da semana</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '80%' }}></div>
+                    <div className="bg-green-500 h-1.5 rounded-full" style={{ width: "80%" }}></div>
                   </div>
                 </div>
 
                 <div className="bg-background border rounded-md p-3 hover:bg-primary/5 transition-colors">
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-md bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold text-sm">📖</div>
+                      <div className="h-8 w-8 rounded-md bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold text-sm">
+                        📖
+                      </div>
                       <h4 className="font-medium">Ler Livros</h4>
                     </div>
-                    <Badge variant="outline" className="text-xs">2x/semana</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      2x/semana
+                    </Badge>
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-2">
                     <span>1/2 completas</span>
                     <span>50% da semana</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-purple-500 h-1.5 rounded-full" style={{ width: '50%' }}></div>
+                    <div
+                      className="bg-purple-500 h-1.5 rounded-full"
+                      style={{ width: "50%" }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -201,7 +267,8 @@ export default async function Home() {
       <section id="features" className="container mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold text-center mb-4">Como o Catalyst Funciona</h2>
         <p className="text-xl text-muted-foreground text-center max-w-3xl mx-auto mb-16">
-          Uma plataforma focada em metas pessoais semanais e gerenciamento de projetos em workspaces colaborativos
+          Uma plataforma focada em metas pessoais semanais e gerenciamento de projetos em workspaces
+          colaborativos
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -216,11 +283,14 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Crie metas pessoais com frequência semanal, acompanhe seu progresso e mantenha a motivação para alcançar seus objetivos.
+                Crie metas pessoais com frequência semanal, acompanhe seu progresso e mantenha a
+                motivação para alcançar seus objetivos.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Crescimento</Badge>
+              <Badge variant="outline" className="text-xs">
+                Crescimento
+              </Badge>
             </CardFooter>
           </Card>
 
@@ -235,11 +305,14 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Crie workspaces para cada projeto, convide membros da equipe e organize tarefas em grupos para colaboração eficiente.
+                Crie workspaces para cada projeto, convide membros da equipe e organize tarefas em
+                grupos para colaboração eficiente.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Projetos</Badge>
+              <Badge variant="outline" className="text-xs">
+                Projetos
+              </Badge>
             </CardFooter>
           </Card>
 
@@ -254,11 +327,14 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Crie grupos dentro dos workspaces para organizar tarefas por categoria, prioridade ou equipe responsável.
+                Crie grupos dentro dos workspaces para organizar tarefas por categoria, prioridade
+                ou equipe responsável.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Organização</Badge>
+              <Badge variant="outline" className="text-xs">
+                Organização
+              </Badge>
             </CardFooter>
           </Card>
 
@@ -273,11 +349,14 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Acompanhe seu progresso semanal nas metas com gráficos e estatísticas que te motivam a continuar.
+                Acompanhe seu progresso semanal nas metas com gráficos e estatísticas que te motivam
+                a continuar.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Motivação</Badge>
+              <Badge variant="outline" className="text-xs">
+                Motivação
+              </Badge>
             </CardFooter>
           </Card>
 
@@ -292,11 +371,14 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Convide membros para seus workspaces, defina níveis de acesso e trabalhe em equipe de forma eficiente.
+                Convide membros para seus workspaces, defina níveis de acesso e trabalhe em equipe
+                de forma eficiente.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Colaboração</Badge>
+              <Badge variant="outline" className="text-xs">
+                Colaboração
+              </Badge>
             </CardFooter>
           </Card>
 
@@ -311,11 +393,14 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Visualize gráficos de progresso, relatórios semanais e métricas que mostram sua evolução ao longo do tempo.
+                Visualize gráficos de progresso, relatórios semanais e métricas que mostram sua
+                evolução ao longo do tempo.
               </p>
             </CardContent>
             <CardFooter>
-              <Badge variant="outline" className="text-xs">Analytics</Badge>
+              <Badge variant="outline" className="text-xs">
+                Analytics
+              </Badge>
             </CardFooter>
           </Card>
         </div>
@@ -324,12 +409,18 @@ export default async function Home() {
       {/* Demo Section */}
       <section id="demo" className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20">
+          <Badge
+            variant="outline"
+            className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20"
+          >
             Como Funciona
           </Badge>
-          <h2 className="text-3xl font-bold mb-4">Defina metas pessoais e gerencie projetos em equipe</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Defina metas pessoais e gerencie projetos em equipe
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Veja como o Catalyst combina metas pessoais semanais com gerenciamento de projetos em workspaces colaborativos.
+            Veja como o Catalyst combina metas pessoais semanais com gerenciamento de projetos em
+            workspaces colaborativos.
           </p>
         </div>
 
@@ -372,7 +463,9 @@ export default async function Home() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Projeto</Button>
+                    <Button variant="ghost" size="sm">
+                      Gerenciar Projeto
+                    </Button>
                   </CardFooter>
                 </Card>
 
@@ -398,7 +491,9 @@ export default async function Home() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Projeto</Button>
+                    <Button variant="ghost" size="sm">
+                      Gerenciar Projeto
+                    </Button>
                   </CardFooter>
                 </Card>
 
@@ -424,7 +519,9 @@ export default async function Home() {
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Gerenciar Projeto</Button>
+                    <Button variant="ghost" size="sm">
+                      Gerenciar Projeto
+                    </Button>
                   </CardFooter>
                 </Card>
               </div>
@@ -450,7 +547,12 @@ export default async function Home() {
                   <CardHeader>
                     <div className="flex justify-between items-center">
                       <CardTitle>Desenvolvimento Frontend</CardTitle>
-                      <Badge variant="outline" className="bg-green-500/20 text-green-700 border-green-300">Ativo</Badge>
+                      <Badge
+                        variant="outline"
+                        className="bg-green-500/20 text-green-700 border-green-300"
+                      >
+                        Ativo
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -480,7 +582,9 @@ export default async function Home() {
                       <span className="text-muted-foreground">Tarefas: </span>
                       <span className="font-medium">8 concluídas</span>
                     </div>
-                    <Button variant="ghost" size="sm">Ver grupo</Button>
+                    <Button variant="ghost" size="sm">
+                      Ver grupo
+                    </Button>
                   </CardFooter>
                 </Card>
 
@@ -488,7 +592,12 @@ export default async function Home() {
                   <CardHeader>
                     <div className="flex justify-between items-center">
                       <CardTitle>Testes e QA</CardTitle>
-                      <Badge variant="outline" className="bg-yellow-500/20 text-yellow-700 border-yellow-300">Em andamento</Badge>
+                      <Badge
+                        variant="outline"
+                        className="bg-yellow-500/20 text-yellow-700 border-yellow-300"
+                      >
+                        Em andamento
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -515,7 +624,9 @@ export default async function Home() {
                       <span className="text-muted-foreground">Tarefas: </span>
                       <span className="font-medium">3 concluídas</span>
                     </div>
-                    <Button variant="ghost" size="sm">Ver grupo</Button>
+                    <Button variant="ghost" size="sm">
+                      Ver grupo
+                    </Button>
                   </CardFooter>
                 </Card>
               </div>
@@ -554,7 +665,10 @@ export default async function Home() {
                         <span>2/3</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '67%' }}></div>
+                        <div
+                          className="bg-blue-500 h-2 rounded-full"
+                          style={{ width: "67%" }}
+                        ></div>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -562,7 +676,9 @@ export default async function Home() {
                     </p>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Ver detalhes</Button>
+                    <Button variant="ghost" size="sm">
+                      Ver detalhes
+                    </Button>
                   </CardFooter>
                 </Card>
 
@@ -588,7 +704,10 @@ export default async function Home() {
                         <span>4/5</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '80%' }}></div>
+                        <div
+                          className="bg-purple-500 h-2 rounded-full"
+                          style={{ width: "80%" }}
+                        ></div>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -596,7 +715,9 @@ export default async function Home() {
                     </p>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Ver detalhes</Button>
+                    <Button variant="ghost" size="sm">
+                      Ver detalhes
+                    </Button>
                   </CardFooter>
                 </Card>
 
@@ -622,7 +743,10 @@ export default async function Home() {
                         <span>1/2</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-green-500 h-2 rounded-full" style={{ width: '50%' }}></div>
+                        <div
+                          className="bg-green-500 h-2 rounded-full"
+                          style={{ width: "50%" }}
+                        ></div>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -630,7 +754,9 @@ export default async function Home() {
                     </p>
                   </CardContent>
                   <CardFooter className="flex justify-end">
-                    <Button variant="ghost" size="sm">Ver detalhes</Button>
+                    <Button variant="ghost" size="sm">
+                      Ver detalhes
+                    </Button>
                   </CardFooter>
                 </Card>
               </div>
@@ -642,12 +768,16 @@ export default async function Home() {
       {/* FAQ Section */}
       <section id="faq" className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20">
+          <Badge
+            variant="outline"
+            className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20"
+          >
             Perguntas Frequentes
           </Badge>
           <h2 className="text-3xl font-bold mb-4">Tire suas dúvidas sobre o Catalyst</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Encontre respostas para as perguntas mais comuns sobre nossa plataforma de gerenciamento de projetos.
+            Encontre respostas para as perguntas mais comuns sobre nossa plataforma de gerenciamento
+            de projetos.
           </p>
         </div>
 
@@ -659,11 +789,14 @@ export default async function Home() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-muted-foreground mb-2">
-                  O Catalyst utiliza um sistema de workspaces que permite organizar múltiplos projetos e atribuir equipes específicas a cada um deles. Você pode:
+                  O Catalyst utiliza um sistema de workspaces que permite organizar múltiplos
+                  projetos e atribuir equipes específicas a cada um deles. Você pode:
                 </p>
                 <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
                   <li>Criar workspaces para diferentes departamentos ou clientes</li>
-                  <li>Configurar projetos dentro de cada workspace com suas próprias metas e prazos</li>
+                  <li>
+                    Configurar projetos dentro de cada workspace com suas próprias metas e prazos
+                  </li>
                   <li>Formar equipes personalizadas com membros específicos para cada projeto</li>
                   <li>Definir permissões e níveis de acesso para cada membro da equipe</li>
                   <li>Acompanhar o progresso de todos os projetos em um único dashboard</li>
@@ -677,7 +810,10 @@ export default async function Home() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-muted-foreground">
-                  O Catalyst oferece planos flexíveis que se adaptam ao tamanho da sua empresa. No plano básico, você pode gerenciar até 5 projetos com 10 membros. Nos planos Profissional e Empresarial, não há limites para o número de projetos ou membros que você pode adicionar, permitindo que sua equipe cresça sem restrições.
+                  O Catalyst oferece planos flexíveis que se adaptam ao tamanho da sua empresa. No
+                  plano básico, você pode gerenciar até 5 projetos com 10 membros. Nos planos
+                  Profissional e Empresarial, não há limites para o número de projetos ou membros
+                  que você pode adicionar, permitindo que sua equipe cresça sem restrições.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -688,7 +824,12 @@ export default async function Home() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-muted-foreground">
-                  O Catalyst possui um sistema avançado de controle de permissões que permite definir exatamente o que cada membro pode ver e editar. Você pode atribuir papéis como Administrador, Gerente de Projeto, Membro da Equipe ou Visualizador, cada um com diferentes níveis de acesso. Além disso, é possível personalizar permissões específicas para cada projeto, garantindo que as informações sensíveis sejam acessadas apenas por quem precisa.
+                  O Catalyst possui um sistema avançado de controle de permissões que permite
+                  definir exatamente o que cada membro pode ver e editar. Você pode atribuir papéis
+                  como Administrador, Gerente de Projeto, Membro da Equipe ou Visualizador, cada um
+                  com diferentes níveis de acesso. Além disso, é possível personalizar permissões
+                  específicas para cada projeto, garantindo que as informações sensíveis sejam
+                  acessadas apenas por quem precisa.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -699,7 +840,11 @@ export default async function Home() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-muted-foreground">
-                  Sim, o Catalyst oferece integrações nativas com mais de 30 ferramentas populares, incluindo GitHub, Slack, Microsoft Teams, Google Workspace, Jira e muitas outras. Nossa API aberta também permite criar integrações personalizadas para ferramentas específicas do seu fluxo de trabalho. Isso garante que o Catalyst se adapte perfeitamente ao ecossistema de ferramentas que sua equipe já utiliza.
+                  Sim, o Catalyst oferece integrações nativas com mais de 30 ferramentas populares,
+                  incluindo GitHub, Slack, Microsoft Teams, Google Workspace, Jira e muitas outras.
+                  Nossa API aberta também permite criar integrações personalizadas para ferramentas
+                  específicas do seu fluxo de trabalho. Isso garante que o Catalyst se adapte
+                  perfeitamente ao ecossistema de ferramentas que sua equipe já utiliza.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -710,17 +855,23 @@ export default async function Home() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-muted-foreground mb-2">
-                  O Catalyst foi projetado para eliminar obstáculos e otimizar o fluxo de trabalho das equipes através de:
+                  O Catalyst foi projetado para eliminar obstáculos e otimizar o fluxo de trabalho
+                  das equipes através de:
                 </p>
                 <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-                  <li>Centralização de todas as informações e recursos do projeto em um único lugar</li>
+                  <li>
+                    Centralização de todas as informações e recursos do projeto em um único lugar
+                  </li>
                   <li>Automação de tarefas repetitivas e notificações</li>
                   <li>Visualização clara do progresso e gargalos em tempo real</li>
-                  <li>Ferramentas de colaboração que reduzem a necessidade de reuniões excessivas</li>
+                  <li>
+                    Ferramentas de colaboração que reduzem a necessidade de reuniões excessivas
+                  </li>
                   <li>Relatórios e métricas que ajudam a identificar oportunidades de melhoria</li>
                 </ul>
                 <p className="text-muted-foreground mt-2">
-                  Nossos clientes relatam um aumento médio de 35% na produtividade após três meses de uso da plataforma.
+                  Nossos clientes relatam um aumento médio de 35% na produtividade após três meses
+                  de uso da plataforma.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -731,7 +882,12 @@ export default async function Home() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-muted-foreground">
-                  Sim, o Catalyst suporta completamente metodologias ágeis como Scrum e Kanban. A plataforma inclui recursos como quadros Kanban personalizáveis, planejamento de sprints, backlogs de produto, estimativas de pontos de história, gráficos de burndown e retrospectivas. Você pode adaptar esses recursos para seguir rigorosamente uma metodologia específica ou criar um processo híbrido que melhor atenda às necessidades da sua equipe.
+                  Sim, o Catalyst suporta completamente metodologias ágeis como Scrum e Kanban. A
+                  plataforma inclui recursos como quadros Kanban personalizáveis, planejamento de
+                  sprints, backlogs de produto, estimativas de pontos de história, gráficos de
+                  burndown e retrospectivas. Você pode adaptar esses recursos para seguir
+                  rigorosamente uma metodologia específica ou criar um processo híbrido que melhor
+                  atenda às necessidades da sua equipe.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -744,12 +900,16 @@ export default async function Home() {
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary/5 to-transparent -z-10 rounded-3xl"></div>
 
         <div className="text-center mb-16">
-          <Badge variant="outline" className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20">
+          <Badge
+            variant="outline"
+            className="mb-4 px-4 py-1 text-sm bg-primary/10 border-primary/20"
+          >
             Vantagens Exclusivas
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Por que escolher o Catalyst?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Nossa plataforma foi projetada para equipes que gerenciam múltiplos projetos e precisam de organização e eficiência.
+            Nossa plataforma foi projetada para equipes que gerenciam múltiplos projetos e precisam
+            de organização e eficiência.
           </p>
         </div>
 
@@ -763,7 +923,8 @@ export default async function Home() {
             <div>
               <h3 className="text-xl font-semibold mb-2">Aumento de Produtividade</h3>
               <p className="text-muted-foreground">
-                Reduza o tempo gasto em gerenciamento de tarefas e aumente o foco no desenvolvimento com ferramentas otimizadas.
+                Reduza o tempo gasto em gerenciamento de tarefas e aumente o foco no desenvolvimento
+                com ferramentas otimizadas.
               </p>
             </div>
           </div>
@@ -777,7 +938,8 @@ export default async function Home() {
             <div>
               <h3 className="text-xl font-semibold mb-2">Colaboração Eficiente</h3>
               <p className="text-muted-foreground">
-                Facilite a comunicação entre equipes e mantenha todos alinhados com os objetivos do projeto.
+                Facilite a comunicação entre equipes e mantenha todos alinhados com os objetivos do
+                projeto.
               </p>
             </div>
           </div>
@@ -825,18 +987,27 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section id="cta" className="container mx-auto px-4 py-24 text-center relative overflow-hidden">
+      <section
+        id="cta"
+        className="container mx-auto px-4 py-24 text-center relative overflow-hidden"
+      >
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl -z-10"></div>
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10"></div>
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10"></div>
 
         <div className="max-w-3xl mx-auto">
-          <Badge variant="outline" className="mb-6 px-4 py-1 text-sm bg-primary/10 border-primary/20">
+          <Badge
+            variant="outline"
+            className="mb-6 px-4 py-1 text-sm bg-primary/10 border-primary/20"
+          >
             Comece Hoje
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Comece a acompanhar suas metas e colaborar em equipe</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Comece a acompanhar suas metas e colaborar em equipe
+          </h2>
           <p className="text-muted-foreground mb-10 text-lg max-w-2xl mx-auto">
-            Junte-se a usuários que já transformaram seus hábitos com metas semanais e organizaram projetos em equipe.
+            Junte-se a usuários que já transformaram seus hábitos com metas semanais e organizaram
+            projetos em equipe.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/login">
@@ -851,7 +1022,8 @@ export default async function Home() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-6">
-            Não é necessário cartão de crédito • Plano gratuito disponível • Cancelamento a qualquer momento
+            Não é necessário cartão de crédito • Plano gratuito disponível • Cancelamento a qualquer
+            momento
           </p>
         </div>
       </section>
@@ -866,8 +1038,8 @@ export default async function Home() {
                 <span className="text-xl font-bold">Catalyst</span>
               </div>
               <p className="text-muted-foreground mb-6 max-w-md">
-                Plataforma completa para gerenciamento de projetos em equipe,
-                permitindo colaboração eficiente e visibilidade em tempo real.
+                Plataforma completa para gerenciamento de projetos em equipe, permitindo colaboração
+                eficiente e visibilidade em tempo real.
               </p>
               <div className="flex gap-4">
                 <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
@@ -888,33 +1060,138 @@ export default async function Home() {
             <div>
               <h3 className="font-semibold mb-6 text-lg">Produto</h3>
               <ul className="space-y-4">
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Funcionalidades</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Preços</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Integrações</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Roadmap</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Atualizações</Link></li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Funcionalidades
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Preços
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Integrações
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Roadmap
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Atualizações
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div>
               <h3 className="font-semibold mb-6 text-lg">Recursos</h3>
               <ul className="space-y-4">
-                <li><Link href="/docs" className="text-muted-foreground hover:text-primary transition-colors">Documentação</Link></li>
-                <li><Link href="/docs/tutoriais" className="text-muted-foreground hover:text-primary transition-colors">Tutoriais</Link></li>
-                <li><Link href="/docs/faq" className="text-muted-foreground hover:text-primary transition-colors">FAQ</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Comunidade</Link></li>
+                <li>
+                  <Link
+                    href="/docs"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Documentação
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/docs/tutoriais"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Tutoriais
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/docs/faq"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Comunidade
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div>
               <h3 className="font-semibold mb-6 text-lg">Empresa</h3>
               <ul className="space-y-4">
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Sobre nós</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Carreiras</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Contato</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Imprensa</Link></li>
-                <li><Link href="#" className="text-muted-foreground hover:text-primary transition-colors">Parceiros</Link></li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Sobre nós
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Carreiras
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Contato
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Imprensa
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Parceiros
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -923,16 +1200,27 @@ export default async function Home() {
 
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <span className="text-sm text-muted-foreground">© {new Date().getFullYear()} Catalyst. Todos os direitos reservados.</span>
+              <span className="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} Catalyst. Todos os direitos reservados.
+              </span>
             </div>
             <div className="flex gap-6">
-              <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
                 Termos de Serviço
               </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
                 Política de Privacidade
               </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
                 Preferências de Cookies
               </Link>
             </div>

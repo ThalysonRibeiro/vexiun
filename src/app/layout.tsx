@@ -10,25 +10,39 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin"]
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin"]
 });
 
 export const metadata: Metadata = {
   title: "Catalyst - Accelerate Your Team",
   description: "Collaborative task management platform that accelerates team productivity",
-  keywords: ["task management", "collaboration", "productivity", "team work", "dev", "tasks", "task", "tarefas", "produtividade", "metas", "lista de metas", "kanban", "calendario",],
+  keywords: [
+    "task management",
+    "collaboration",
+    "productivity",
+    "team work",
+    "dev",
+    "tasks",
+    "task",
+    "tarefas",
+    "produtividade",
+    "metas",
+    "lista de metas",
+    "kanban",
+    "calendario"
+  ],
   authors: [{ name: "Thalyson Ribeiro" }],
   openGraph: {
     title: "Catalyst",
     description: "Accelerate your team's productivity",
     images: [``],
     locale: "pt_BR",
-    type: "website",
+    type: "website"
   },
   robots: {
     index: true,
@@ -37,27 +51,25 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: true,
-    },
+      noimageindex: true
+    }
   },
   twitter: {
     card: "summary_large_image",
     title: "Catalyst - Accelerate Your Team",
     description: "Collaborative task management platform that accelerates team productivity",
-    images: [``],
-  },
+    images: [``]
+  }
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
         <SessionAuthProvider>
           <Providers>
             <ThemeProvider
@@ -70,9 +82,7 @@ export default function RootLayout({
               <div className="absolute top-4 right-4 z-50">
                 <ModeToggle />
               </div>
-              <TooltipProvider delayDuration={300}>
-                {children}
-              </TooltipProvider>
+              <TooltipProvider delayDuration={300}>{children}</TooltipProvider>
             </ThemeProvider>
           </Providers>
         </SessionAuthProvider>

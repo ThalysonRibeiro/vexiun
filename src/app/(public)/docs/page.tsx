@@ -27,8 +27,9 @@ import {
 
 export const metadata: Metadata = {
   title: "Documentação - Catalyst",
-  description: "Aprenda a usar o Catalyst para gerenciar projetos e metas pessoais de forma eficiente",
-  keywords: ["documentação", "tutorial", "guia", "ajuda", "catalyst", "projetos", "metas"],
+  description:
+    "Aprenda a usar o Catalyst para gerenciar projetos e metas pessoais de forma eficiente",
+  keywords: ["documentação", "tutorial", "guia", "ajuda", "catalyst", "projetos", "metas"]
 };
 
 export default function DocsPage() {
@@ -50,9 +51,7 @@ export default function DocsPage() {
                 Buscar
               </Button>
               <Link href="/login">
-                <Button size="sm">
-                  Começar agora
-                </Button>
+                <Button size="sm">Começar agora</Button>
               </Link>
             </div>
           </div>
@@ -68,13 +67,22 @@ export default function DocsPage() {
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
                   Começando
                 </h3>
-                <Link href="#primeiros-passos" className="block text-sm hover:text-primary transition-colors">
+                <Link
+                  href="#primeiros-passos"
+                  className="block text-sm hover:text-primary transition-colors"
+                >
                   Primeiros passos
                 </Link>
-                <Link href="#criando-workspace" className="block text-sm hover:text-primary transition-colors">
+                <Link
+                  href="#criando-workspace"
+                  className="block text-sm hover:text-primary transition-colors"
+                >
                   Criando workspace
                 </Link>
-                <Link href="#primeira-meta" className="block text-sm hover:text-primary transition-colors">
+                <Link
+                  href="#primeira-meta"
+                  className="block text-sm hover:text-primary transition-colors"
+                >
                   Primeira meta
                 </Link>
               </div>
@@ -85,7 +93,10 @@ export default function DocsPage() {
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
                   Funcionalidades
                 </h3>
-                <Link href="#workspaces" className="block text-sm hover:text-primary transition-colors">
+                <Link
+                  href="#workspaces"
+                  className="block text-sm hover:text-primary transition-colors"
+                >
                   Workspaces
                 </Link>
                 <Link href="#grupos" className="block text-sm hover:text-primary transition-colors">
@@ -94,7 +105,10 @@ export default function DocsPage() {
                 <Link href="#metas" className="block text-sm hover:text-primary transition-colors">
                   Metas pessoais
                 </Link>
-                <Link href="#equipes" className="block text-sm hover:text-primary transition-colors">
+                <Link
+                  href="#equipes"
+                  className="block text-sm hover:text-primary transition-colors"
+                >
                   Colaboração
                 </Link>
               </div>
@@ -105,7 +119,10 @@ export default function DocsPage() {
                 <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
                   Tutoriais
                 </h3>
-                <Link href="#casos-uso" className="block text-sm hover:text-primary transition-colors">
+                <Link
+                  href="#casos-uso"
+                  className="block text-sm hover:text-primary transition-colors"
+                >
                   Casos de uso
                 </Link>
                 <Link href="#dicas" className="block text-sm hover:text-primary transition-colors">
@@ -123,11 +140,10 @@ export default function DocsPage() {
                 <BookOpen className="h-4 w-4" />
                 Centro de Ajuda
               </div>
-              <h2 className="text-4xl font-bold mb-4">
-                Aprenda a usar o Catalyst
-              </h2>
+              <h2 className="text-4xl font-bold mb-4">Aprenda a usar o Catalyst</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-                Guias completos para dominar todas as funcionalidades da plataforma e maximizar sua produtividade
+                Guias completos para dominar todas as funcionalidades da plataforma e maximizar sua
+                produtividade
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="gap-2">
@@ -159,7 +175,8 @@ export default function DocsPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Aprenda a criar workspaces, organizar grupos e começar a gerenciar seu primeiro projeto.
+                      Aprenda a criar workspaces, organizar grupos e começar a gerenciar seu
+                      primeiro projeto.
                     </p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
@@ -187,7 +204,8 @@ export default function DocsPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Configure suas metas semanais e acompanhe seu progresso de forma visual e motivadora.
+                      Configure suas metas semanais e acompanhe seu progresso de forma visual e
+                      motivadora.
                     </p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
@@ -347,12 +365,15 @@ export default function DocsPage() {
               <div className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Como funciona o sistema de workspaces?</CardTitle>
+                    <CardTitle className="text-lg">
+                      Como funciona o sistema de workspaces?
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      Workspaces são espaços dedicados para cada projeto. Você pode criar múltiplos workspaces,
-                      convidar membros específicos para cada um e organizar tarefas em grupos personalizados.
+                      Workspaces são espaços dedicados para cada projeto. Você pode criar múltiplos
+                      workspaces, convidar membros específicos para cada um e organizar tarefas em
+                      grupos personalizados.
                     </p>
                   </CardContent>
                 </Card>
@@ -363,8 +384,8 @@ export default function DocsPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      No plano gratuito você pode ter até 3 workspaces. Nos planos pagos, não há limite para
-                      o número de projetos que você pode gerenciar.
+                      No plano gratuito você pode ter até 3 workspaces. Nos planos pagos, não há
+                      limite para o número de projetos que você pode gerenciar.
                     </p>
                   </CardContent>
                 </Card>
@@ -375,8 +396,9 @@ export default function DocsPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      As metas pessoais são objetivos semanais que você define para si mesmo.
-                      Você pode acompanhar seu progresso visualmente e manter a motivação para alcançar seus objetivos.
+                      As metas pessoais são objetivos semanais que você define para si mesmo. Você
+                      pode acompanhar seu progresso visualmente e manter a motivação para alcançar
+                      seus objetivos.
                     </p>
                   </CardContent>
                 </Card>
@@ -388,7 +410,8 @@ export default function DocsPage() {
               <div className="max-w-2xl mx-auto">
                 <h3 className="text-2xl font-bold mb-4">Precisa de mais ajuda?</h3>
                 <p className="text-muted-foreground mb-6">
-                  Nossa equipe de suporte está pronta para ajudar você a maximizar o uso do Catalyst.
+                  Nossa equipe de suporte está pronta para ajudar você a maximizar o uso do
+                  Catalyst.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button className="gap-2">

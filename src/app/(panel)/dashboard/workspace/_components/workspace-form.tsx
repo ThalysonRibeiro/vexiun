@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Input } from "@/components/ui/input";
 import {
   Form,
@@ -7,18 +7,12 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  useUpdateWorkspace,
-  useWorkspaceForm,
-} from "@/hooks/use-workspace";
+import { useUpdateWorkspace, useWorkspaceForm } from "@/hooks/use-workspace";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Tag } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
@@ -35,7 +29,7 @@ interface WorkspaceFormProps {
     invitationUsersId: string[];
     description?: string;
     categories?: WorkspaceCategory[];
-  }
+  };
 }
 
 export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps) {
@@ -53,7 +47,7 @@ export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps
         workspaceId: workspaceId,
         title: formData.title,
         description: formData.description,
-        categories: formData.categories,
+        categories: formData.categories
       });
       if (!isSuccessResponse(response)) {
         return;
@@ -67,17 +61,13 @@ export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps
   return (
     <div ref={formRef}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Titulo
-                </FormLabel>
+                <FormLabel>Titulo</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -99,9 +89,7 @@ export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Descrição
-                </FormLabel>
+                <FormLabel>Descrição</FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
@@ -123,20 +111,19 @@ export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps
             name="categories"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Categorias
-                </FormLabel>
+                <FormLabel>Categorias</FormLabel>
                 <FormControl>
                   <ToggleGroup
                     type="multiple"
-                    spacing={2} size={"sm"}
+                    spacing={2}
+                    size={"sm"}
                     variant={"outline"}
                     value={field.value || []}
                     onValueChange={field.onChange}
                     className="grid grid-cols-4 gap-2 justify-start"
                   >
-                    {CATEGORIES_ARRAY.map(category => {
-                      const Icon = category.icon
+                    {CATEGORIES_ARRAY.map((category) => {
+                      const Icon = category.icon;
                       return (
                         <ToggleGroupItem
                           key={category.id}
@@ -146,7 +133,7 @@ export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps
                           <Icon className="h-4 w-4" />
                           {category.label}
                         </ToggleGroupItem>
-                      )
+                      );
                     })}
                   </ToggleGroup>
                 </FormControl>
@@ -165,5 +152,5 @@ export function WorkspaceForm({ workspaceId, initialValues }: WorkspaceFormProps
         </form>
       </Form>
     </div>
-  )
+  );
 }

@@ -4,21 +4,15 @@ import { WorkspaceContent } from "./_components/workspace-content";
 
 export const revalidate = 120;
 
-export default async function WorkspacePage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function WorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
   if (!session) {
-    redirect('/')
+    redirect("/");
   }
   const workspaceId = (await params).id;
   return (
     <main className="container mx-auto px-6 pt-6">
-      <WorkspaceContent
-        workspaceId={workspaceId}
-      />
+      <WorkspaceContent workspaceId={workspaceId} />
     </main>
   );
 }

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,10 +6,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { memo } from "react"
+import { memo } from "react";
 import { CreateOrEditItemForm } from "../create-or-edit-item-form";
 import { TeamUser } from "../items/types";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ export const NewItem = memo(function NewItem(props: NewItemProps) {
     <Dialog
       open={openDialogs.has(groupId)}
       onOpenChange={(open) => {
-        setOpenDialogs(prev => {
+        setOpenDialogs((prev) => {
           const newSet = new Set(prev);
           if (open) {
             newSet.add(groupId);
@@ -40,11 +40,7 @@ export const NewItem = memo(function NewItem(props: NewItemProps) {
       }}
     >
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn("mt-4",)}
-        >
+        <Button variant="outline" size="sm" className={cn("mt-4")}>
           <Plus className="h-4 w-4 mr-2" />
           Novo item
         </Button>
@@ -61,7 +57,7 @@ export const NewItem = memo(function NewItem(props: NewItemProps) {
           workspaceId={workspaceId}
           groupId={groupId}
           closeForm={() => {
-            setOpenDialogs(prev => {
+            setOpenDialogs((prev) => {
               const newSet = new Set(prev);
               newSet.delete(groupId);
               return newSet;
@@ -72,5 +68,5 @@ export const NewItem = memo(function NewItem(props: NewItemProps) {
         />
       </DialogContent>
     </Dialog>
-  )
+  );
 });

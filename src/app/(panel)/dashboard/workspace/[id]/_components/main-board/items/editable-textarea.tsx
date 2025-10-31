@@ -1,16 +1,12 @@
-"use client"
+"use client";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { memo } from "react";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
-import { EditingField } from "./types"
+import { EditingField } from "./types";
 
 interface EditableTextareaProps {
   item: ItemWhitCreatedAssignedUser;
@@ -57,7 +53,9 @@ export const EditableTextarea = memo(function EditableTextarea(props: EditableTe
           <div className="flex-1 space-y-2">
             <Textarea
               value={editingData?.[field] || ""}
-              onChange={(e) => setEditingData(editingData ? { ...editingData, [field]: e.target.value } : null)}
+              onChange={(e) =>
+                setEditingData(editingData ? { ...editingData, [field]: e.target.value } : null)
+              }
               onKeyDown={(e) => {
                 if (e.key === "Escape") onCancelEditing();
                 if (e.key === "Enter" && e.ctrlKey) onSaveField(item);
@@ -69,12 +67,16 @@ export const EditableTextarea = memo(function EditableTextarea(props: EditableTe
               maxLength={1000}
             />
             <div className="flex justify-end">
-              <span className={cn(
-                "text-xs",
-                (editingData?.[field] || "").length > 900 && "text-red-500",
-                (editingData?.[field] || "").length > 800 && (editingData?.[field] || "").length <= 900 && "text-yellow-500",
-                (editingData?.[field] || "").length <= 800 && "text-gray-500"
-              )}>
+              <span
+                className={cn(
+                  "text-xs",
+                  (editingData?.[field] || "").length > 900 && "text-red-500",
+                  (editingData?.[field] || "").length > 800 &&
+                    (editingData?.[field] || "").length <= 900 &&
+                    "text-yellow-500",
+                  (editingData?.[field] || "").length <= 800 && "text-gray-500"
+                )}
+              >
                 {(editingData?.[field] || "").length}/1000
               </span>
             </div>
@@ -110,19 +112,20 @@ export const EditableTextarea = memo(function EditableTextarea(props: EditableTe
             className="cursor-pointer hover:bg-accent p-1 rounded transition-colors group w-full text-left"
           >
             {value ? (
-              <p className="overflow-hidden line-clamp-2 text-ellipsis" style={{
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                lineHeight: "1.4em",
-                maxHeight: "2.8em"
-              }}>
+              <p
+                className="overflow-hidden line-clamp-2 text-ellipsis"
+                style={{
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  lineHeight: "1.4em",
+                  maxHeight: "2.8em"
+                }}
+              >
                 {value}
               </p>
             ) : (
-              <span className="text-gray-400 italic">
-                {placeholder}
-              </span>
+              <span className="text-gray-400 italic">{placeholder}</span>
             )}
           </TooltipTrigger>
           <TooltipContent>

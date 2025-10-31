@@ -1,13 +1,10 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, LayoutGrid, Logs, Plus } from "lucide-react";
 import { useState } from "react";
 import { GroupForm } from "./group-form";
 import { ListItems } from "./list-items";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { GroupPriorityBar, GroupProgressBar } from "./group-progress-bar";
 import { useGroupActions, useGroups } from "@/hooks/use-groups";
@@ -20,11 +17,7 @@ import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 
-export function Groups({
-  workspaceId,
-}: {
-  workspaceId: string;
-}) {
+export function Groups({ workspaceId }: { workspaceId: string }) {
   const [changeLayout, setChangeLayout] = useState<boolean>(false);
   const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
   const { data: groups } = useGroups(workspaceId);
@@ -36,7 +29,7 @@ export function Groups({
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: workspace?.workspace.status as EntityStatus,
     isOwner
   });
@@ -63,10 +56,7 @@ export function Groups({
       {/* Botão/Formulário para adicionar novo grupo */}
       <div className="">
         {isAddingGroup && permissions.canCreateGroup ? (
-          <GroupForm
-            workspaceId={workspaceId}
-            setAddGroup={closeAddGroupForm}
-          />
+          <GroupForm workspaceId={workspaceId} setAddGroup={closeAddGroupForm} />
         ) : (
           <div className="flex gap-4">
             {permissions.canCreateGroup && (
@@ -81,7 +71,7 @@ export function Groups({
             )}
 
             <Button
-              onClick={() => setChangeLayout(prev => !prev)}
+              onClick={() => setChangeLayout((prev) => !prev)}
               variant="outline"
               className="cursor-pointer"
             >
@@ -94,12 +84,11 @@ export function Groups({
       </div>
       {/* Lista de grupos */}
       <div className="space-y-6">
-        {groups?.group.map(group => {
+        {groups?.group.map((group) => {
           const isGroupOpen = openGroups.has(group.id);
 
           return (
             <div key={group.id} className="space-y-4">
-
               <div className="flex items-center gap-3 mb-4 w-full">
                 <ActionGroup
                   status="ACTIVE"
@@ -128,18 +117,19 @@ export function Groups({
                     onEditGroup={handleEditGroup}
                   />
                 )}
-                <Badge
-                  style={{ background: group.textColor }}
-                >
+                <Badge style={{ background: group.textColor }}>
                   {group.doneCount}/{group.pendingCount}
                 </Badge>
                 <Button
                   className="cursor-pointer"
-                  variant="ghost" size="icon"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => toggleDropdown(group.id)}
                   style={{ color: group.textColor }}
                 >
-                  <ChevronDown className={cn("transition-all duration-300 ", !isGroupOpen && "-rotate-90")} />
+                  <ChevronDown
+                    className={cn("transition-all duration-300 ", !isGroupOpen && "-rotate-90")}
+                  />
                 </Button>
 
                 {group?.item.length > 1 && (
@@ -179,11 +169,10 @@ export function Groups({
                   )}
                 </CollapsibleContent>
               </Collapsible>
-
             </div>
           );
         })}
       </div>
-    </section >
+    </section>
   );
 }

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Card,
@@ -6,25 +6,25 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+  CardFooter
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 // Componente interno reutilizável para testes
 export const ErrorContent = ({
   error,
-  reset,
+  reset
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) => (
   <div className="flex min-h-screen items-center justify-center">
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Oops, algo deu errado!</CardTitle>
         <CardDescription>
-          Lamentamos, mas parece que ocorreu um erro inesperado. Por favor, tente novamente ou entre em contato com o
-          suporte se o problema persistir.
+          Lamentamos, mas parece que ocorreu um erro inesperado. Por favor, tente novamente ou entre
+          em contato com o suporte se o problema persistir.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
@@ -40,14 +40,14 @@ export const ErrorContent = ({
       </CardFooter>
     </Card>
   </div>
-)
+);
 
 export default function GlobalError({
   error,
-  reset,
+  reset
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   return (
     <html lang="pt-BR">
@@ -55,5 +55,5 @@ export default function GlobalError({
         <ErrorContent error={error} reset={reset} />
       </body>
     </html>
-  )
+  );
 }

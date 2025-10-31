@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Children,
-  HTMLAttributes,
-  ReactNode,
-  useState,
-  cloneElement,
-  isValidElement,
-} from "react";
+import { Children, HTMLAttributes, ReactNode, useState, cloneElement, isValidElement } from "react";
 import { Card, CardContent, CardHeader } from "./card";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -30,33 +23,33 @@ export function Stepper({
   onFinalStepCompleted,
   backButtonText = "Voltar",
   nextButtonText = "Próximo",
-  className,
+  className
 }: StepperProps) {
-  const stepsArray = Children.toArray(children)
-  const totalSteps = stepsArray.length
+  const stepsArray = Children.toArray(children);
+  const totalSteps = stepsArray.length;
 
-  const [currentStep, setCurrentStep] = useState(initialStep)
-  const [canProceed, setCanProceed] = useState(false)
+  const [currentStep, setCurrentStep] = useState(initialStep);
+  const [canProceed, setCanProceed] = useState(false);
 
   const handleNext = () => {
-    if (!canProceed) return
+    if (!canProceed) return;
 
     if (currentStep < totalSteps) {
-      const next = currentStep + 1
-      setCurrentStep(next)
-      onStepChange?.(next)
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      onStepChange?.(next);
     } else {
-      onFinalStepCompleted?.()
+      onFinalStepCompleted?.();
     }
-  }
+  };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      const prev = currentStep - 1
-      setCurrentStep(prev)
-      onStepChange?.(prev)
+      const prev = currentStep - 1;
+      setCurrentStep(prev);
+      onStepChange?.(prev);
     }
-  }
+  };
 
   return (
     <div className={cn("w-full space-y-4", className)}>
@@ -87,8 +80,7 @@ export function Stepper({
                     <div
                       className={cn(
                         "h-full transition-all duration-500",
-                        currentStep > step &&
-                        "bg-gradient-to-r from-primary to-orange-500"
+                        currentStep > step && "bg-gradient-to-r from-primary to-orange-500"
                       )}
                     />
                   </div>
@@ -101,7 +93,7 @@ export function Stepper({
 
       <div>
         {stepsArray.map((child, index) => {
-          if (index + 1 !== currentStep) return null
+          if (index + 1 !== currentStep) return null;
 
           if (isValidElement(child)) {
             return cloneElement(child as React.ReactElement<StepProps>, {
@@ -109,11 +101,11 @@ export function Stepper({
               back: handleBack,
               isFirst: currentStep === 1,
               isLast: currentStep === totalSteps,
-              canProceed: (valid: boolean) => setCanProceed(valid),
-            })
+              canProceed: (valid: boolean) => setCanProceed(valid)
+            });
           }
 
-          return child
+          return child;
         })}
 
         <div className="flex items-center mt-4">
@@ -132,20 +124,20 @@ export function Stepper({
 }
 
 interface StepChildProps {
-  next: () => void
-  back: () => void
-  isFirst: boolean
-  isLast: boolean
-  canProceed?: (valid: boolean) => void
+  next: () => void;
+  back: () => void;
+  isFirst: boolean;
+  isLast: boolean;
+  canProceed?: (valid: boolean) => void;
 }
 
 interface StepProps {
-  children: (props: StepChildProps) => ReactNode
-  next?: () => void
-  back?: () => void
-  isFirst?: boolean
-  isLast?: boolean
-  canProceed?: (valid: boolean) => void
+  children: (props: StepChildProps) => ReactNode;
+  next?: () => void;
+  back?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
+  canProceed?: (valid: boolean) => void;
 }
 
 export function Step({
@@ -154,7 +146,7 @@ export function Step({
   back,
   isFirst = false,
   isLast = false,
-  canProceed,
+  canProceed
 }: StepProps) {
-  return <>{children({ next: next!, back: back!, isFirst, isLast, canProceed })}</>
+  return <>{children({ next: next!, back: back!, isFirst, isLast, canProceed })}</>;
 }

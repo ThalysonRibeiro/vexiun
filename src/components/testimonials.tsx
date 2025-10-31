@@ -3,11 +3,7 @@ import { Card, CardContent } from "./ui/card";
 import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from "./ui/kibo-ui/marquee";
 import { TESTIMONIALS } from "@/lib/constants";
 
-export function TestimonialsSectionMultipleRows({
-  maxRows
-}: {
-  maxRows: number;
-}) {
+export function TestimonialsSectionMultipleRows({ maxRows }: { maxRows: number }) {
   // Função para dividir em chunks
   const chunkArray = <T,>(array: T[], size: number): T[][] => {
     const chunks: T[][] = [];
@@ -29,7 +25,7 @@ export function TestimonialsSectionMultipleRows({
           <MarqueeFade side="left" />
           <MarqueeFade side="right" />
           <MarqueeContent>
-            {chunk.map(item => (
+            {chunk.map((item) => (
               <MarqueeItem key={item.author} className="w-100">
                 <Card className="rounded-none bg-background/50 opacity-60 hover:opacity-100 transition-opacity border border-border">
                   <CardContent>

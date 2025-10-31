@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Select,
   SelectContent,
@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { colorPriority, colorStatus, priorityMap, statusMap, } from "@/utils/colorStatus";
+import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
 import { Priority, Status } from "@/generated/prisma";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
@@ -18,25 +18,21 @@ interface ItemPriorityStatusProps {
   type: "priority" | "status";
   item: ItemWhitCreatedAssignedUser;
   isLoading: string | null;
-  onSelectChange: (item: ItemWhitCreatedAssignedUser, field: "priority" | "status", value: Priority | Status) => void;
+  onSelectChange: (
+    item: ItemWhitCreatedAssignedUser,
+    field: "priority" | "status",
+    value: Priority | Status
+  ) => void;
   permissionsEdit: boolean;
 }
 
 export const ItemPriorityStatus = memo(function ItemPriorityStatus(props: ItemPriorityStatusProps) {
-  const {
-    className,
-    label,
-    type,
-    item,
-    isLoading,
-    onSelectChange,
-    permissionsEdit,
-  } = props;
+  const { className, label, type, item, isLoading, onSelectChange, permissionsEdit } = props;
 
   const isDisabled = isLoading === item.id || !permissionsEdit;
 
   if (type === "priority") {
-    const currentPriority = priorityMap.find(p => p.key === item.priority);
+    const currentPriority = priorityMap.find((p) => p.key === item.priority);
 
     return (
       <div>
@@ -83,7 +79,7 @@ export const ItemPriorityStatus = memo(function ItemPriorityStatus(props: ItemPr
     );
   }
 
-  const currentStatus = statusMap.find(s => s.key === item.status);
+  const currentStatus = statusMap.find((s) => s.key === item.status);
 
   return (
     <div>
@@ -105,7 +101,9 @@ export const ItemPriorityStatus = memo(function ItemPriorityStatus(props: ItemPr
           <SelectValue>
             {currentStatus && (
               <div className="flex items-center gap-1.5">
-                <currentStatus.icon className={cn("h-3.5 w-3.5 text-white", currentStatus.animate && "animate-spin")} />
+                <currentStatus.icon
+                  className={cn("h-3.5 w-3.5 text-white", currentStatus.animate && "animate-spin")}
+                />
                 <span className="text-white">{currentStatus.label}</span>
               </div>
             )}

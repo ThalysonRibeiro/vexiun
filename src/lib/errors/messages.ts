@@ -3,7 +3,7 @@ export const ERROR_MESSAGES = {
   AUTH: {
     NOT_AUTHENTICATED: "Você precisa estar logado",
     SESSION_EXPIRED: "Sua sessão expirou",
-    INVALID_CREDENTIALS: "Credenciais inválidas",
+    INVALID_CREDENTIALS: "Credenciais inválidas"
   },
 
   // Permissões
@@ -11,7 +11,7 @@ export const ERROR_MESSAGES = {
     NO_ACCESS: "Você não tem acesso a este recurso",
     INSUFFICIENT_ROLE: "Você não tem permissão para esta ação",
     OWNER_ONLY: "Apenas o proprietário pode realizar esta ação",
-    ADMIN_ONLY: "Apenas administradores podem realizar esta ação",
+    ADMIN_ONLY: "Apenas administradores podem realizar esta ação"
   },
 
   // Status de entidades
@@ -20,7 +20,7 @@ export const ERROR_MESSAGES = {
     GROUP_INACTIVE: "Grupo inativo ou deletado",
     ITEM_INACTIVE: "Item inativo ou deletado",
     ALREADY_DELETED: "Este recurso já foi deletado",
-    ALREADY_ACTIVE: "Este recurso já está ativo",
+    ALREADY_ACTIVE: "Este recurso já está ativo"
   },
 
   // Não encontrado
@@ -31,7 +31,7 @@ export const ERROR_MESSAGES = {
     GOAL: "Meta não encontrada",
     USER: "Usuário não encontrado",
     INVITATION: "Convite não encontrado",
-    NOTIFICATION: "Notificação não encontrada",
+    NOTIFICATION: "Notificação não encontrada"
   },
 
   // Validação
@@ -41,7 +41,7 @@ export const ERROR_MESSAGES = {
     INVALID_EMAIL: "Email inválido",
     INVALID_ID: "ID inválido",
     MIN_LENGTH: "Valor muito curto",
-    MAX_LENGTH: "Valor muito longo",
+    MAX_LENGTH: "Valor muito longo"
   },
 
   // Duplicação
@@ -50,7 +50,7 @@ export const ERROR_MESSAGES = {
     MEMBER: "Este usuário já é membro",
     MEMBERS: "Todos os usuários já são membros ou já têm convite pendente",
     INVITATION: "Já existe um convite pendente para este usuário",
-    WORKSPACE_NAME: "Já existe um workspace com este nome",
+    WORKSPACE_NAME: "Já existe um workspace com este nome"
   },
 
   // Regras de negócio
@@ -59,7 +59,7 @@ export const ERROR_MESSAGES = {
     CANNOT_CHANGE_OWN_ROLE: "Você não pode alterar seu próprio cargo",
     WORKSPACE_HAS_MEMBERS: "Não é possível deletar workspace com membros",
     INVITATION_ALREADY_PROCESSED: "Este convite já foi processado",
-    INVITATION_EXPIRED: "Este convite expirou",
+    INVITATION_EXPIRED: "Este convite expirou"
   },
 
   // Solicitações (convites, etc)
@@ -71,25 +71,25 @@ export const ERROR_MESSAGES = {
     INVALID_STATUS: "Status inválido",
     INVALID_TYPE: "Tipo inválido",
     CANNOT_SEND_TO_SELF: "Você não pode enviar solicitação para si mesmo",
-    EXPIRED: "Este convite expirou",
+    EXPIRED: "Este convite expirou"
   },
 
   // Operações CRUD
   WORKSPACE: {
     CREATE_ERROR: "Erro ao criar workspace",
     UPDATE_ERROR: "Erro ao atualizar workspace",
-    DELETE_ERROR: "Erro ao deletar workspace",
+    DELETE_ERROR: "Erro ao deletar workspace"
   },
 
   ITEM: {
     CREATE_ERROR: "Erro ao criar item",
     UPDATE_ERROR: "Erro ao atualizar item",
-    DELETE_ERROR: "Erro ao deletar item",
+    DELETE_ERROR: "Erro ao deletar item"
   },
 
   // Genéricos
   GENERIC: {
     UNKNOWN_ERROR: "Algo deu errado. Tente novamente",
-    SERVER_ERROR: "Erro interno do servidor",
-  },
+    SERVER_ERROR: "Erro interno do servidor"
+  }
 } as const;

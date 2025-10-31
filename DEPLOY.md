@@ -134,6 +134,7 @@ vercel --prod
 ### Problemas Comuns
 
 #### Pre-Deploy Checks Failing
+
 ```bash
 # Rodar checks localmente
 npm run test:ci
@@ -149,6 +150,7 @@ npm run type-check
 ```
 
 #### Build Fails
+
 ```bash
 # Verificar logs
 vercel logs
@@ -161,6 +163,7 @@ npm ci
 ```
 
 #### Database Connection
+
 ```bash
 # Verificar DATABASE_URL
 echo $DATABASE_URL
@@ -170,6 +173,7 @@ npx prisma db push
 ```
 
 #### Environment Variables
+
 ```bash
 # Listar variáveis
 vercel env ls
@@ -181,12 +185,14 @@ vercel env add DATABASE_URL
 ### Performance
 
 #### Otimizações
+
 - ✅ Imagens otimizadas
 - ✅ Bundle size reduzido
 - ✅ Lazy loading implementado
 - ✅ CDN configurado
 
 #### Métricas
+
 - **Core Web Vitals**: Monitorar no Vercel Analytics
 - **Bundle Size**: Verificar no build logs
 - **Function Duration**: Monitorar no dashboard
@@ -194,6 +200,7 @@ vercel env add DATABASE_URL
 ## 🚀 Deploy Checklist
 
 ### Antes do Deploy
+
 - [ ] ✅ Testes passando (`npm run test:ci`)
 - [ ] ✅ Build funcionando (`npm run build`)
 - [ ] ✅ Variáveis de ambiente configuradas
@@ -201,12 +208,14 @@ vercel env add DATABASE_URL
 - [ ] ✅ Performance verificada
 
 ### Durante o Deploy
+
 - [ ] ✅ Build sem erros
 - [ ] ✅ Funções deployadas
 - [ ] ✅ Assets otimizados
 - [ ] ✅ CDN configurado
 
 ### Após o Deploy
+
 - [ ] ✅ Aplicação funcionando
 - [ ] ✅ Autenticação testada
 - [ ] ✅ Banco de dados conectado
@@ -216,12 +225,14 @@ vercel env add DATABASE_URL
 ## 📈 Monitoramento Contínuo
 
 ### Métricas Importantes
+
 - **Uptime**: 99.9%+
 - **Response Time**: <200ms
 - **Error Rate**: <1%
 - **Build Time**: <5min
 
 ### Alertas Configurados
+
 - Build failures
 - Function timeouts
 - Database connection errors
@@ -230,6 +241,7 @@ vercel env add DATABASE_URL
 ## 🔒 Segurança
 
 ### Headers de Segurança
+
 ```json
 {
   "X-Content-Type-Options": "nosniff",
@@ -239,6 +251,7 @@ vercel env add DATABASE_URL
 ```
 
 ### Variáveis Sensíveis
+
 - ✅ Nunca commitar secrets
 - ✅ Usar Vercel Environment Variables
 - ✅ Rotacionar tokens regularmente

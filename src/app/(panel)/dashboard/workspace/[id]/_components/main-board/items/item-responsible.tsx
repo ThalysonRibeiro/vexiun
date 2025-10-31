@@ -1,9 +1,5 @@
-"use client"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage
-} from "@/components/ui/avatar";
+"use client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -12,17 +8,12 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { nameFallback } from "@/utils/name-fallback";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { memo, useState } from "react";
 import { ItemAssign } from "../../item-assign";
 import { cn } from "@/lib/utils";
-
 
 interface ItemResponsibleProps {
   item: ItemWhitCreatedAssignedUser;
@@ -36,7 +27,6 @@ export const ItemResponsible = memo(function ItemResponsible(props: ItemResponsi
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <div>
-
       {label && <div className="text-xs font-medium text-muted-foreground mb-1.5">{label}</div>}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <Tooltip>
@@ -46,11 +36,13 @@ export const ItemResponsible = memo(function ItemResponsible(props: ItemResponsi
               onClick={(e) => !permissionsEdit && e.preventDefault()}
               disabled={!permissionsEdit}
             >
-              <div className={cn(
-                "flex items-center gap-2",
-                permissionsEdit && "cursor-pointer hover:opacity-80 transition-opacity",
-                className
-              )}>
+              <div
+                className={cn(
+                  "flex items-center gap-2",
+                  permissionsEdit && "cursor-pointer hover:opacity-80 transition-opacity",
+                  className
+                )}
+              >
                 <Avatar className="h-7 w-7">
                   <AvatarImage src={item.assignedToUser?.image as string} />
                   <AvatarFallback className="text-xs">
@@ -78,10 +70,7 @@ export const ItemResponsible = memo(function ItemResponsible(props: ItemResponsi
                 Selecione um membro da equipe que será responsável por este item
               </DialogDescription>
             </DialogHeader>
-            <ItemAssign
-              itemId={item.id}
-              assignedToUser={item.assignedToUser}
-            />
+            <ItemAssign itemId={item.id} assignedToUser={item.assignedToUser} />
           </DialogContent>
         )}
       </Dialog>

@@ -11,7 +11,7 @@ import { WorkspaceListByStatus } from "./workspace-list-by-status";
 import { Archive, FolderOpen, Shield, Trash2, Users } from "lucide-react";
 
 interface WorkspacesPageClientProps {
-  workspaces: WorkspaceWithDetails[]
+  workspaces: WorkspaceWithDetails[];
   sharedWorkspaces: WorkspaceWithDetails[];
 }
 
@@ -34,13 +34,9 @@ export type WorkspaceWithDetails = {
     image: string | null;
   }>;
   menbersRole: WorkspaceRole | undefined;
-}
+};
 
-
-export function WorkspacesPageClient({
-  workspaces,
-  sharedWorkspaces,
-}: WorkspacesPageClientProps) {
+export function WorkspacesPageClient({ workspaces, sharedWorkspaces }: WorkspacesPageClientProps) {
   const archivedWorkspaces = useWorkspacesByStatus("ARCHIVED");
   const deletedWorkspaces = useWorkspacesByStatus("DELETED");
 
@@ -48,18 +44,12 @@ export function WorkspacesPageClient({
     <main className="container mx-auto pl-8 space-y-6 pt-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Workspaces
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie todos os seus espaços de trabalho
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">Workspaces</h1>
+          <p className="text-muted-foreground mt-1">Gerencie todos os seus espaços de trabalho</p>
         </div>
 
         <div className="w-fit mb-2">
-          <DialogCreateWorkspace
-            isNoWorkspace={workspaces.length === 0 ? true : false}
-          />
+          <DialogCreateWorkspace isNoWorkspace={workspaces.length === 0 ? true : false} />
         </div>
       </header>
 
@@ -68,12 +58,13 @@ export function WorkspacesPageClient({
           <TabsTrigger value="my-workspaces" className="gap-2 cursor-pointer hover:border-primary">
             <FolderOpen className="w-4 h-4" />
             <p className="hidden lg:block">Minhas</p>
-            {workspaces.length > 0 && (
-              <Badge variant="secondary">{workspaces.length}</Badge>
-            )}
+            {workspaces.length > 0 && <Badge variant="secondary">{workspaces.length}</Badge>}
           </TabsTrigger>
 
-          <TabsTrigger value="shared-workspaces" className="gap-2 cursor-pointer hover:border-primary">
+          <TabsTrigger
+            value="shared-workspaces"
+            className="gap-2 cursor-pointer hover:border-primary"
+          >
             <Users className="w-4 h-4" />
             <span className="hidden lg:block">Compartilhadas</span>
             {sharedWorkspaces.length > 0 && (
@@ -105,25 +96,18 @@ export function WorkspacesPageClient({
 
         <TabsContent value="my-workspaces" className="mt-6">
           <div className="overflow-y-auto">
-            <WorkspaceList
-              workspaces={workspaces}
-            />
+            <WorkspaceList workspaces={workspaces} />
           </div>
         </TabsContent>
 
         <TabsContent value="shared-workspaces" className="mt-6">
           <div className="overflow-y-auto">
-            <WorkspaceList
-              workspaces={sharedWorkspaces}
-            />
+            <WorkspaceList workspaces={sharedWorkspaces} />
           </div>
         </TabsContent>
 
         <TabsContent value="archived" className="mt-6">
-          <WorkspaceListByStatus
-            status="ARCHIVED"
-            emptyMessage="Nenhum workspace arquivado"
-          />
+          <WorkspaceListByStatus status="ARCHIVED" emptyMessage="Nenhum workspace arquivado" />
         </TabsContent>
 
         <TabsContent value="bin" className="mt-6">
@@ -147,21 +131,16 @@ export function WorkspacesPageClient({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-destructive">
-                    Atenção
-                  </h3>
+                  <h3 className="font-semibold text-destructive">Atenção</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Workspaces na lixeira serão deletados permanentemente em 30
-                    dias. Restaure-os antes disso para não perder seus dados.
+                    Workspaces na lixeira serão deletados permanentemente em 30 dias. Restaure-os
+                    antes disso para não perder seus dados.
                   </p>
                 </div>
               </div>
             </div>
 
-            <WorkspaceListByStatus
-              status="DELETED"
-              emptyMessage="A lixeira está vazia"
-            />
+            <WorkspaceListByStatus status="DELETED" emptyMessage="A lixeira está vazia" />
           </div>
         </TabsContent>
 

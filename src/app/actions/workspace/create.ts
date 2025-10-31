@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import prisma from "@/lib/prisma";
 import {
   ERROR_MESSAGES,
@@ -12,18 +12,12 @@ import { createAndSendNotification } from "../notification";
 import { notificationMessages } from "@/lib/notifications/messages";
 import { createWorkspaceSchema, CreateWorkspaceType } from "./workspace-schema";
 
-export const createWorkspace = withAuth(async (
-  userId,
-  session,
-  formData: CreateWorkspaceType
-) => {
-
+export const createWorkspace = withAuth(async (userId, session, formData: CreateWorkspaceType) => {
   const schema = createWorkspaceSchema.safeParse(formData);
   if (!schema.success) {
     throw new ValidationError(schema.error.issues[0].message);
-  };
+  }
   const newWorkspace = await prisma.$transaction(async (tx) => {
-
     const workspace = await tx.workspace.create({
       data: {
         userId,
@@ -33,9 +27,9 @@ export const createWorkspace = withAuth(async (
         members: {
           create: {
             userId,
-            role: "OWNER",
-          },
-        },
+            role: "OWNER"
+          }
+        }
       }
     });
 
@@ -48,25 +42,25 @@ export const createWorkspace = withAuth(async (
 
       if (existingUsers.length === 0) {
         throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.INVITATION);
-      };
+      }
 
       // Cria os convites
       await tx.workspaceInvitation.createMany({
-        data: existingUsers.map(user => ({
+        data: existingUsers.map((user) => ({
           workspaceId: workspace.id,
           userId: user.id,
           invitedBy: session?.user?.id as string,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         })),
-        skipDuplicates: true,
+        skipDuplicates: true
       });
-    };
+    }
 
     const group = await tx.group.create({
       data: {
         workspaceId: workspace.id,
         title: "🎯 Meu primeiro grupo",
-        textColor: "#ff3445",
+        textColor: "#ff3445"
       }
     });
 
@@ -79,15 +73,14 @@ export const createWorkspace = withAuth(async (
         assignedTo: userId,
         createdBy: userId,
         term: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // +7 dias
-        description: "Este é um item de exemplo. Explore as funcionalidades e depois delete ou edite!",
-        notes: "💡 Dica: Use as notas para informações importantes",
+        description:
+          "Este é um item de exemplo. Explore as funcionalidades e depois delete ou edite!",
+        notes: "💡 Dica: Use as notas para informações importantes"
       }
     });
 
     return workspace;
   });
-
-
 
   // Envia notificações APÓS a transação ser commitada
   if (formData.invitationUsersId && formData.invitationUsersId.length > 0) {
@@ -97,38 +90,41 @@ export const createWorkspace = withAuth(async (
     });
 
     const notificationResults = await Promise.allSettled(
-      existingUsers.map(user =>
+      existingUsers.map((user) =>
         createAndSendNotification({
           userId: user.id,
           referenceId: newWorkspace.id,
           nameReference: session?.user?.name as string,
           image: session?.user?.image as string,
-          message: notificationMessages.WORKSPACE_INVITE(session?.user?.name as string, newWorkspace.title),
-          type: "WORKSPACE_INVITE",
+          message: notificationMessages.WORKSPACE_INVITE(
+            session?.user?.name as string,
+            newWorkspace.title
+          ),
+          type: "WORKSPACE_INVITE"
         })
       )
     );
 
     const failedNotifications = notificationResults.filter(
-      result => result.status === 'rejected'
+      (result) => result.status === "rejected"
     );
 
     if (failedNotifications.length > 0) {
       console.error(`${failedNotifications.length} notificação(ões) falharam:`);
       failedNotifications.forEach((result, index) => {
-        if (result.status === 'rejected') {
+        if (result.status === "rejected") {
           console.error(`Notificação ${index + 1}:`, result.reason);
         }
       });
-    };
-  };
+    }
+  }
 
   // Revalida os paths especificados
   if (formData.revalidatePaths && formData.revalidatePaths.length > 0) {
-    formData.revalidatePaths.forEach(path => revalidatePath(path));
+    formData.revalidatePaths.forEach((path) => revalidatePath(path));
   } else {
     revalidatePath("/dashboard");
-  };
+  }
 
   return successResponse(newWorkspace, "Workspace criado com sucesso");
 }, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);

@@ -5,7 +5,7 @@ import { handleRegister } from "@/app/(public)/_action/signIn";
 
 // Mock the module that contains handleRegister
 jest.mock("@/app/(public)/_action/signIn", () => ({
-  handleRegister: jest.fn(),
+  handleRegister: jest.fn()
 }));
 
 describe("CardSignIn component", () => {

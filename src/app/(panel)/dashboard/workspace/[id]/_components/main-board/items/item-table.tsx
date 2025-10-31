@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
-import { memo } from "react"
+import { memo } from "react";
 import { EntityStatus, Priority, Status, WorkspaceRole } from "@/generated/prisma";
 import {
   Table,
@@ -25,7 +25,6 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 
-
 interface ItemTableProps {
   currentItems: ItemWhitCreatedAssignedUser[];
   team: TeamUser[];
@@ -36,12 +35,18 @@ interface ItemTableProps {
   onStartEditing: (item: ItemWhitCreatedAssignedUser, field: EditingField) => void;
   onCancelEditing: () => void;
   onSaveField: (item: ItemWhitCreatedAssignedUser) => void;
-  onSelectChange: (item: ItemWhitCreatedAssignedUser, field: 'priority' | 'status', value: Priority | Status) => void;
+  onSelectChange: (
+    item: ItemWhitCreatedAssignedUser,
+    field: "priority" | "status",
+    value: Priority | Status
+  ) => void;
   onDeleteItem: (itemId: string) => void;
   onMoveToTrash: (itemId: string) => void;
   onSaveDetails: (item: ItemWhitCreatedAssignedUser) => void;
   setEditingData: (data: ItemWhitCreatedAssignedUser | null) => void;
-  setDialogState: (state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)) => void;
+  setDialogState: (
+    state: DialogStateProps | ((prev: DialogStateProps) => DialogStateProps)
+  ) => void;
   onArchiveItem: (itemId: string) => void;
   onRestoreItem: (itemId: string) => void;
 }
@@ -74,7 +79,7 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: workspace?.workspace.status as EntityStatus,
     isOwner
   });
@@ -86,7 +91,9 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
           <TableHead className="w-fit">Ações</TableHead>
           <TableHead className="border-x">Titulo</TableHead>
           <TableHead>Notas</TableHead>
-          <TableHead className="max-w-25 overflow-hidden border-x text-center">Responsável</TableHead>
+          <TableHead className="max-w-25 overflow-hidden border-x text-center">
+            Responsável
+          </TableHead>
           <TableHead>Prazo</TableHead>
           <TableHead className="w-20 border-x">Prioridade</TableHead>
           <TableHead className="w-20">Status</TableHead>
@@ -95,11 +102,10 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {currentItems.map(item => {
+        {currentItems.map((item) => {
           const titleCapitalized = item.title[0].toUpperCase() + item.title.slice(1);
           return (
-            <TableRow key={item.id} className={isLoading === item.id ? 'opacity-50' : ''}>
-
+            <TableRow key={item.id} className={isLoading === item.id ? "opacity-50" : ""}>
               <TableCell className="py-0.5">
                 <ActionItem
                   item={item}
@@ -118,7 +124,9 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
                     item={item}
                     field={"title"}
                     value={titleCapitalized}
-                    isEditing={(itemId, field) => editing.itemId === itemId && editing.field === field}
+                    isEditing={(itemId, field) =>
+                      editing.itemId === itemId && editing.field === field
+                    }
                     permissionsEdit={permissions.canCreateOrEditItem}
                     onStartEditing={onStartEditing}
                     onCancelEditing={onCancelEditing}
@@ -147,7 +155,8 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
                 />
               </TableCell>
 
-              <TableCell className="border-x py-0.5"
+              <TableCell
+                className="border-x py-0.5"
                 title="Para trocar de responsável edite o item"
               >
                 <ItemResponsible item={item} label="" permissionsEdit={permissions.canEdit} />
@@ -169,7 +178,6 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
               </TableCell>
 
               <TableCell className={cn("py-0.5", colorPriority(item.priority))}>
-
                 <ItemPriorityStatus
                   className="w-full p-0 border-0 shadow-none"
                   type="priority"
@@ -227,5 +235,5 @@ export const ItemTable = memo(function ItemTable(props: ItemTableProps) {
         })}
       </TableBody>
     </Table>
-  )
-})
+  );
+});

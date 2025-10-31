@@ -6,11 +6,11 @@ import { ERROR_MESSAGES } from "@/lib/errors/messages";
 /**
  * Verifica se o usuário existe
  * @throws Error se não existir
-*/
+ */
 export async function validateUserExists(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, name: true, image: true, email: true },
+    select: { id: true, name: true, image: true, email: true }
   });
   if (!user) {
     throw new NotFoundError(ERROR_MESSAGES.NOT_FOUND.USER);
@@ -25,7 +25,7 @@ export async function validateUserExists(userId: string) {
 export async function validateGroupExists(groupId: string) {
   const group = await prisma.group.findUnique({
     where: { id: groupId },
-    select: { id: true, status: true },
+    select: { id: true, status: true }
   });
 
   if (!group) {
@@ -42,7 +42,7 @@ export async function validateGroupExists(groupId: string) {
 export async function validateWorkspaceExists(workspaceId: string) {
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
-    select: { id: true, title: true, status: true, userId: true },
+    select: { id: true, title: true, status: true, userId: true }
   });
 
   if (!workspace) {
@@ -59,7 +59,7 @@ export async function validateWorkspaceExists(workspaceId: string) {
 export async function validateItemExists(itemId: string) {
   const item = await prisma.item.findUnique({
     where: { id: itemId },
-    select: { id: true, entityStatus: true },
+    select: { id: true, entityStatus: true }
   });
 
   if (!item) {
@@ -69,33 +69,29 @@ export async function validateItemExists(itemId: string) {
   return item;
 }
 
-export async function validateWorkspaceAccess(
-  workspaceId: string,
-  userId: string
-) {
-
+export async function validateWorkspaceAccess(workspaceId: string, userId: string) {
   try {
     const member = await prisma.workspaceMember.findUnique({
       where: {
         workspaceId_userId: {
           workspaceId,
-          userId,
-        },
+          userId
+        }
       },
       include: {
         workspace: {
           select: {
             status: true,
-            userId: true,
+            userId: true
           }
         },
         user: {
           select: {
             id: true,
-            role: true,
-          },
-        },
-      },
+            role: true
+          }
+        }
+      }
     });
 
     if (!member) {
@@ -103,7 +99,6 @@ export async function validateWorkspaceAccess(
     }
 
     return member;
-
   } catch (error) {
     throw error;
   }
@@ -129,7 +124,7 @@ export async function validateWorkspacePermission(
     VIEWER: 0,
     MEMBER: 1,
     ADMIN: 2,
-    OWNER: 3,
+    OWNER: 3
   };
 
   if (roleHierarchy[member.role] < roleHierarchy[requiredRole]) {
@@ -149,10 +144,10 @@ export async function getGroupWithWorkspace(groupId: string) {
       workspace: {
         select: {
           id: true,
-          title: true,
-        },
-      },
-    },
+          title: true
+        }
+      }
+    }
   });
 
   if (!group) {
@@ -165,25 +160,22 @@ export async function getGroupWithWorkspace(groupId: string) {
 /**
  * Verifica se usuário pode editar item
  */
-export async function validateItemEditPermission(
-  itemId: string,
-  userId: string
-) {
+export async function validateItemEditPermission(itemId: string, userId: string) {
   const item = await prisma.item.findUnique({
-    where: { id: itemId, },
+    where: { id: itemId },
     include: {
       group: {
         include: {
           workspace: {
             include: {
               members: {
-                where: { userId },
-              },
-            },
-          },
-        },
-      },
-    },
+                where: { userId }
+              }
+            }
+          }
+        }
+      }
+    }
   });
 
   if (!item) {

@@ -19,15 +19,8 @@ import {
   WorkspaceFormData,
   workspaceSchema
 } from "@/app/actions/workspace";
-import {
-  deleteWorkspace,
-} from "@/app/actions/workspace/delete";
-import {
-  EntityStatus,
-  Prisma,
-  WorkspaceCategory,
-  WorkspaceRole
-} from "@/generated/prisma";
+import { deleteWorkspace } from "@/app/actions/workspace/delete";
+import { EntityStatus, Prisma, WorkspaceCategory, WorkspaceRole } from "@/generated/prisma";
 import { changeWorkspaceStatus } from "@/app/actions/workspace/change-status";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -42,7 +35,7 @@ export interface UseWorkspaceProps {
     invitationUsersId: string[];
     description?: string;
     categories?: WorkspaceCategory[];
-  }
+  };
 }
 
 export function useWorkspaceForm({ initialValues }: UseWorkspaceProps) {
@@ -52,9 +45,8 @@ export function useWorkspaceForm({ initialValues }: UseWorkspaceProps) {
       title: "",
       invitationUsersId: []
     }
-  })
+  });
 }
-
 
 export function useCreateWorkspace() {
   const queryClient = useQueryClient();
@@ -72,7 +64,7 @@ export function useCreateWorkspace() {
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["workspace"] });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -205,7 +197,7 @@ export function useAddWorkspaceMember() {
         queryKey: ["workspace", variables.workspaceId, "invitations"]
       });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -251,10 +243,12 @@ export function useCancelWorkspaceInvitation() {
       return result.data;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace", variables.invitationId, "invitations"] });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", variables.invitationId, "invitations"]
+      });
 
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    }
   });
 }
 
@@ -272,29 +266,30 @@ export function useDeclineWorkspaceInvitation() {
       return result.data;
     },
     onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace", variables.workspaceId, "invitations"] });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", variables.workspaceId, "invitations"]
+      });
     },
     retry: 1
   });
 }
 
-
 export type WorkspaceByStatus = Prisma.WorkspaceGetPayload<{
   include: {
     _count: {
       select: {
-        groups: true,
-        members: true,
-      },
-    },
+        groups: true;
+        members: true;
+      };
+    };
     statusChanger: {
       select: {
-        name: true,
-        email: true
-      }
-    }
-  },
-}>
+        name: true;
+        email: true;
+      };
+    };
+  };
+}>;
 
 export function useWorkspacesByStatus(status: EntityStatus) {
   return useQuery<WorkspaceByStatus[]>({
@@ -309,27 +304,27 @@ export function useWorkspacesByStatus(status: EntityStatus) {
 
       return result.data;
     },
-    enabled: !!status,
+    enabled: !!status
   });
 }
 
-
-type WorkspaceMemberDataResult = {
-  success: true;
-  data: {
-    workspace: { status: string; userId: string };
-    member: { role: string; userId: string };
-  };
-} | {
-  success: false;
-  error: string;
-};
+type WorkspaceMemberDataResult =
+  | {
+      success: true;
+      data: {
+        workspace: { status: string; userId: string };
+        member: { role: string; userId: string };
+      };
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 export function useWorkspaceMemberData(workspaceId: string) {
   return useQuery({
     queryKey: ["workspaces", "workspace-member", workspaceId],
     queryFn: async () => {
-
       const response = await fetch(`/api/workspace/${workspaceId}/member`);
       const result: WorkspaceMemberDataResult = await response.json();
 
@@ -340,7 +335,7 @@ export function useWorkspaceMemberData(workspaceId: string) {
       return result.data;
     },
     enabled: !!workspaceId,
-    staleTime: CACHE_TIMES.MEDIUM,
+    staleTime: CACHE_TIMES.MEDIUM
   });
 }
 
@@ -351,28 +346,34 @@ export function useActionsWorkspaceList() {
   const archive = useArchiveWorkspace();
   const deleteWs = useMoveWorkspaceToTrash();
 
-  const handleArchive = useCallback(async (workspaceId: string) => {
-    const result = await archive.mutateAsync(workspaceId);
-    if (!isSuccessResponse(result)) {
-      toast.error("Erro ao arquivar");
-    }
-    toast.success(result.message);
-  }, [archive]);
+  const handleArchive = useCallback(
+    async (workspaceId: string) => {
+      const result = await archive.mutateAsync(workspaceId);
+      if (!isSuccessResponse(result)) {
+        toast.error("Erro ao arquivar");
+      }
+      toast.success(result.message);
+    },
+    [archive]
+  );
 
-  const handleDelete = useCallback(async (workspaceId: string) => {
-    if (
-      !confirm(
-        "Deseja realmente mover para lixeira? Todos os grupos e items serão movidos para lixeira."
-      )
-    ) {
-      return;
-    }
-    const result = await deleteWs.mutateAsync(workspaceId);
-    if (!isSuccessResponse(result)) {
-      toast.error("Erro ao deletar");
-    }
-    toast.success(result.message);
-  }, [deleteWs]);
+  const handleDelete = useCallback(
+    async (workspaceId: string) => {
+      if (
+        !confirm(
+          "Deseja realmente mover para lixeira? Todos os grupos e items serão movidos para lixeira."
+        )
+      ) {
+        return;
+      }
+      const result = await deleteWs.mutateAsync(workspaceId);
+      if (!isSuccessResponse(result)) {
+        toast.error("Erro ao deletar");
+      }
+      toast.success(result.message);
+    },
+    [deleteWs]
+  );
 
   const handleSelectForEdit = useCallback((workspace: WorkspaceWithDetails) => {
     setSelectedWorkspace({
@@ -388,7 +389,7 @@ export function useActionsWorkspaceList() {
       statusChangedAt: workspace.statusChangedAt,
       description: workspace.description,
       statusChangedBy: workspace.statusChangedBy,
-      lastActivityAt: workspace.lastActivityAt,
+      lastActivityAt: workspace.lastActivityAt
     });
     setDropdownOpen(null);
     setTimeout(() => setIsOpen(true), 0);
@@ -407,7 +408,7 @@ export function useActionsWorkspaceList() {
     handleArchive,
     handleDelete,
     handleSelectForEdit
-  }
+  };
 }
 
 interface UseWorkspacePermissionsProps {
@@ -421,7 +422,6 @@ export function useWorkspacePermissions({
   workspaceStatus,
   isOwner
 }: UseWorkspacePermissionsProps) {
-
   const canArchive = () => {
     // MEMBER e VIEWER não podem
     if (["MEMBER", "VIEWER"].includes(userRole)) return false;
@@ -495,6 +495,6 @@ export function useWorkspacePermissions({
 
     // Helpers
     isReadOnly: userRole === "VIEWER",
-    isLimitedAccess: ["MEMBER", "VIEWER"].includes(userRole),
+    isLimitedAccess: ["MEMBER", "VIEWER"].includes(userRole)
   };
 }

@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import prisma from "@/lib/prisma";
 import {
   validateItemExists,
@@ -7,7 +7,6 @@ import {
 } from "@/lib/db/validators";
 import { ERROR_MESSAGES, handleError } from "@/lib/errors";
 import { CreateNotificationInput, notificationFormSchema } from "./notification-schema";
-
 
 /**
  * Função helper para criar notificações.
@@ -18,7 +17,7 @@ export async function createAndSendNotification(formData: CreateNotificationInpu
     const schema = notificationFormSchema.safeParse(formData);
     if (!schema.success) {
       return { error: schema.error.issues[0].message };
-    };
+    }
 
     await validateUserExists(formData.userId);
 
@@ -29,7 +28,7 @@ export async function createAndSendNotification(formData: CreateNotificationInpu
         return await createNotification({
           ...formData,
           image: userReferenceExists.image ?? undefined,
-          nameReference: userReferenceExists.name ?? undefined,
+          nameReference: userReferenceExists.name ?? undefined
         });
 
       case "WORKSPACE_INVITE":
@@ -39,17 +38,17 @@ export async function createAndSendNotification(formData: CreateNotificationInpu
 
       case "ITEM_ASSIGNED":
       case "ITEM_COMPLETED":
-        await validateItemExists(formData.referenceId)
+        await validateItemExists(formData.referenceId);
         return await createNotification(formData);
 
       default:
-        return { error: ERROR_MESSAGES.REQUESTS.INVALID_TYPE }
-    };
+        return { error: ERROR_MESSAGES.REQUESTS.INVALID_TYPE };
+    }
   } catch (error) {
     console.error(error);
     return handleError(error, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
-  };
-};
+  }
+}
 
 async function createNotification(formData: CreateNotificationInput) {
   return await prisma.notification.create({
@@ -62,4 +61,4 @@ async function createNotification(formData: CreateNotificationInput) {
       referenceId: formData.referenceId
     }
   });
-};
+}

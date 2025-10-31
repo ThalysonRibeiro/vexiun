@@ -29,12 +29,14 @@ Clone parcial do Monday.com - Sistema de gestão de projetos e metas
 ### Passos para instalação
 
 1. **Clone o repositório**
+
    ```bash
    git clone https://github.com/ThalysonRibeiro/dev-tasks.git
    cd dev-tasks
    ```
 
 2. **Instale as dependências**
+
    ```bash
    npm install
    # ou
@@ -46,6 +48,7 @@ Clone parcial do Monday.com - Sistema de gestão de projetos e metas
    ```
 
 3. **Execute o servidor de desenvolvimento**
+
    ```bash
    npm run dev
    # ou
@@ -57,7 +60,7 @@ Clone parcial do Monday.com - Sistema de gestão de projetos e metas
    ```
 
 4. **Acesse a aplicação**
-   
+
    Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
 ## 📁 Estrutura do Projeto
@@ -87,11 +90,13 @@ dev-tasks/
 ## 🚀 Quick Start
 
 ### Setup Automático
+
 ```bash
 npm run setup
 ```
 
 ### Setup Manual
+
 ```bash
 # 1. Instalar dependências
 npm install
@@ -109,6 +114,7 @@ npm run dev
 ## 📚 Scripts Disponíveis
 
 ### 🛠️ Desenvolvimento
+
 ```bash
 npm run dev              # Servidor de desenvolvimento
 npm run dev:test         # Servidor com ambiente de teste
@@ -120,6 +126,7 @@ npm run type-check       # Verificar tipos TypeScript
 ```
 
 ### 🗄️ Banco de Dados
+
 ```bash
 npm run db:up            # Iniciar bancos de dados
 npm run db:down          # Parar bancos de dados
@@ -131,6 +138,7 @@ npm run db:studio:test   # Abrir Prisma Studio (teste)
 ```
 
 ### 🧪 Testes
+
 ```bash
 npm run test:unit        # Testes unitários (Jest)
 npm run test:e2e         # Testes E2E (Playwright)
@@ -140,6 +148,7 @@ npm run test:coverage    # Cobertura de testes
 ```
 
 ### 🚀 Deploy
+
 ```bash
 npm run build            # Build para produção
 vercel                   # Deploy para Vercel (preview)
@@ -147,6 +156,7 @@ vercel --prod           # Deploy para produção
 ```
 
 ### 🧹 Utilitários
+
 ```bash
 npm run clean            # Limpar arquivos temporários
 npm run setup            # Setup completo do ambiente
@@ -157,16 +167,19 @@ npm run setup            # Setup completo do ambiente
 Este projeto possui uma suite completa de testes:
 
 ### Testes Unitários (Jest)
+
 - **Componentes**: Testes de componentes React isolados
 - **Utilitários**: Testes de funções e lógica de negócio
 - **Cobertura**: Relatórios detalhados de cobertura
 
 ### Testes E2E (Playwright)
+
 - **Fluxos de usuário**: Testes de autenticação e dashboard
 - **Integração**: Testes de componentes conectados
 - **Relatórios**: Screenshots, vídeos e traces em falhas
 
 ### Estrutura de Testes
+
 ```
 src/
 ├── __tests__/                    # Testes unitários
@@ -182,11 +195,13 @@ tests/                           # Testes E2E
 Este projeto está configurado para deploy automático na **Vercel** com **pre-deploy checks**:
 
 ### Fluxo de Deploy
+
 1. **Push para `main`** → GitHub Actions roda testes
 2. **Testes passam** → Vercel faz deploy automático
 3. **Testes falham** → Deploy é bloqueado
 
 ### Pre-Deploy Checks
+
 - ✅ **Lint & Type Check** - Verifica qualidade do código
 - ✅ **Testes Unitários** - Valida componentes e lógica
 - ✅ **Build Test** - Garante que a aplicação compila
@@ -194,6 +209,7 @@ Este projeto está configurado para deploy automático na **Vercel** com **pre-d
 - ✅ **Database Migrations** - Verifica migrações
 
 ### Configuração
+
 - **Framework**: Next.js 15
 - **Build Command**: `npm run build`
 - **Environment**: Production otimizada
@@ -201,6 +217,7 @@ Este projeto está configurado para deploy automático na **Vercel** com **pre-d
 - **Pre-Deploy**: GitHub Actions
 
 ### Links
+
 - **Produção**: [https://dev-tasks.vercel.app](https://dev-tasks.vercel.app)
 - **Documentação**: [DEPLOY.md](./DEPLOY.md)
 
@@ -282,6 +299,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## 👨‍💻 Autor
 
 **Thalyson Ribeiro**
+
 - GitHub: [@ThalysonRibeiro](https://github.com/ThalysonRibeiro)
 
 ---

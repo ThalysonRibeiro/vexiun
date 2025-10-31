@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Dialog,
   DialogContent,
@@ -6,17 +6,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog"
-import { Plus } from "lucide-react"
-import { useState } from "react"
-import { CreateWorkspace } from "../../../_components/utility-action-dashboard/create-workspace"
+} from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { CreateWorkspace } from "../../../_components/utility-action-dashboard/create-workspace";
 
-export function DialogCreateWorkspace({
-  isNoWorkspace = false,
-}: {
-  isNoWorkspace?: boolean;
-}) {
-  const [isOpen, setIsOpen] = useState<boolean>(isNoWorkspace)
+export function DialogCreateWorkspace({ isNoWorkspace = false }: { isNoWorkspace?: boolean }) {
+  const [isOpen, setIsOpen] = useState<boolean>(isNoWorkspace);
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="w-full">
@@ -37,5 +33,5 @@ export function DialogCreateWorkspace({
         <CreateWorkspace setClose={() => setIsOpen(!isOpen)} />
       </DialogContent>
     </Dialog>
-  )
+  );
 }

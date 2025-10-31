@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import { endOfWeek, format, startOfWeek } from "date-fns";
 import { enUS, ptBR } from "date-fns/locale";
 import { DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Plus } from "lucide-react";
 import { Progress, ProgressIndicator } from "@/components/ui/progress-bar";
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator";
 import { PedingGoals } from "./peding-goals";
 import { toast } from "sonner";
 import { goalUndo } from "@/app/actions/goals";
@@ -44,7 +44,9 @@ export function Summary({ data, summaryData, timeZone, language }: SummaryProps)
   return (
     <article className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="text-lg font-semibold capitalize">{firstDayOfWeek} - {lastDayOfWeek}</span>
+        <span className="text-lg font-semibold capitalize">
+          {firstDayOfWeek} - {lastDayOfWeek}
+        </span>
         <div className="flex gap-2">
           <DialogTrigger asChild>
             <Button size="sm">
@@ -77,64 +79,71 @@ export function Summary({ data, summaryData, timeZone, language }: SummaryProps)
           {summaryData.summary.goalsPerDay.map(({ date, dayOfWeek, goals }) => {
             const localeMap = {
               "pt-BR": ptBR,
-              "en-US": enUS,
+              "en-US": enUS
             };
-            const dateInTimezone = new Date(new Date(date).toLocaleString("en-US", { timeZone: timeZone }));
-            const formatPattern = language === "pt-BR" ? "d 'de' MMMM" : "MMMM d";
-            const formattedDate = format(
-              dateInTimezone,
-              formatPattern,
-              { locale: localeMap[language as "pt-BR" | "en-US"] }
+            const dateInTimezone = new Date(
+              new Date(date).toLocaleString("en-US", { timeZone: timeZone })
             );
+            const formatPattern = language === "pt-BR" ? "d 'de' MMMM" : "MMMM d";
+            const formattedDate = format(dateInTimezone, formatPattern, {
+              locale: localeMap[language as "pt-BR" | "en-US"]
+            });
             return (
               <div key={date} className="flex flex-col gap-4">
                 <h3 className="font-medium">
-                  <span className="capitalize">{dayOfWeek}</span>{' '}
+                  <span className="capitalize">{dayOfWeek}</span>{" "}
                   <span className="text-xs">({formattedDate})</span>
                 </h3>
                 <ul className="flex flex-col gap-3">
-                  {goals.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()).map(goal => {
-                    const timeInTimezone = new Date(new Date(goal.completedAt).toLocaleString("en-US", { timeZone: timeZone }));
-                    const time = format(timeInTimezone, 'HH:mm', { locale: localeMap[language as "pt-BR" | "en-US"] });
-                    return (
-                      <li key={goal.id} className="flex items-center gap-2 justify-between border-b">
-                        <div className="flex gap-2">
-                          <CheckCircle2 className="size-4 text-primary" />
-                          <p className="text-sm inline-flex">
-                            &ldquo;
-                            <span className="truncate text-ellipsis max-w-60 lg:max-w-140 inline-block font-semibold">
-                              <span className="capitalize">{goal.title.slice(0, 1)}</span>
-                              {goal.title.slice(1)}</span>
-                            &ldquo; -
-                            <span className="font-thin text-primary ml-1">{time}</span>
-                          </p>
-                        </div>
-                        <button
-                          className="text-sm cursor-pointer underline"
-                          onClick={() => handleUndo(goal.id)}
-                        >Desfazer
-                        </button>
-                      </li>
+                  {goals
+                    .sort(
+                      (a, b) =>
+                        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
                     )
-                  })}
+                    .map((goal) => {
+                      const timeInTimezone = new Date(
+                        new Date(goal.completedAt).toLocaleString("en-US", { timeZone: timeZone })
+                      );
+                      const time = format(timeInTimezone, "HH:mm", {
+                        locale: localeMap[language as "pt-BR" | "en-US"]
+                      });
+                      return (
+                        <li
+                          key={goal.id}
+                          className="flex items-center gap-2 justify-between border-b"
+                        >
+                          <div className="flex gap-2">
+                            <CheckCircle2 className="size-4 text-primary" />
+                            <p className="text-sm inline-flex">
+                              &ldquo;
+                              <span className="truncate text-ellipsis max-w-60 lg:max-w-140 inline-block font-semibold">
+                                <span className="capitalize">{goal.title.slice(0, 1)}</span>
+                                {goal.title.slice(1)}
+                              </span>
+                              &ldquo; -<span className="font-thin text-primary ml-1">{time}</span>
+                            </p>
+                          </div>
+                          <button
+                            className="text-sm cursor-pointer underline"
+                            onClick={() => handleUndo(goal.id)}
+                          >
+                            Desfazer
+                          </button>
+                        </li>
+                      );
+                    })}
                 </ul>
                 <Separator />
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </article>
-  )
+  );
 }
 
-export function ProgressGoals({
-  total,
-  completed
-}: {
-  total: number;
-  completed: number;
-}) {
+export function ProgressGoals({ total, completed }: { total: number; completed: number }) {
   const completedPercentage = total === 0 ? 0 : Math.round((completed * 100) / total);
 
   return (
@@ -143,9 +152,11 @@ export function ProgressGoals({
         <ProgressIndicator style={{ width: `${completedPercentage}%` }} />
       </Progress>
       <div className="flex items-center justify-between text-xs">
-        <span>Você completou <span>{completed}</span> de <span>{total}</span> metas nessa semana.</span>
+        <span>
+          Você completou <span>{completed}</span> de <span>{total}</span> metas nessa semana.
+        </span>
         <span>{completedPercentage}%</span>
       </div>
     </div>
-  )
+  );
 }

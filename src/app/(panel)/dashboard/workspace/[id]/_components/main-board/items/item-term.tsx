@@ -1,10 +1,6 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, X, CircleAlert, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -27,7 +23,6 @@ interface ItemTermProps {
   setEditingData: (data: ItemWhitCreatedAssignedUser | null) => void;
 }
 
-
 export const ItemTerm = memo(function ItemTerm(props: ItemTermProps) {
   const {
     item,
@@ -42,9 +37,9 @@ export const ItemTerm = memo(function ItemTerm(props: ItemTermProps) {
     label,
     className
   } = props;
-  const isEditing = editing.itemId === item.id && editing.field === 'term';
-  const isOverdue = new Date(item.term) < new Date() && item.status !== 'DONE';
-  const isCompleted = new Date(item.term) < new Date() && item.status === 'DONE';
+  const isEditing = editing.itemId === item.id && editing.field === "term";
+  const isOverdue = new Date(item.term) < new Date() && item.status !== "DONE";
+  const isCompleted = new Date(item.term) < new Date() && item.status === "DONE";
 
   return (
     <div>
@@ -79,12 +74,10 @@ export const ItemTerm = memo(function ItemTerm(props: ItemTermProps) {
       ) : (
         <Tooltip>
           <TooltipTrigger
-            onClick={() => onStartEditing(item, 'term')}
+            onClick={() => onStartEditing(item, "term")}
             className={cn(
               "flex items-center justify-center gap-2 py-1 px-3 rounded-md font-medium text-sm cursor-pointer transition-colors",
-              isOverdue
-                ? "text-red-800 hover:bg-red-600/20"
-                : "text-foreground hover:bg-muted",
+              isOverdue ? "text-red-800 hover:bg-red-600/20" : "text-foreground hover:bg-muted"
             )}
           >
             {isOverdue && <CircleAlert className="h-4 w-4" />}
@@ -93,9 +86,7 @@ export const ItemTerm = memo(function ItemTerm(props: ItemTermProps) {
             <span>{format(item.term, "dd/MM/yyyy")}</span>
           </TooltipTrigger>
           <TooltipContent>
-            {permissionsEdit
-              ? "Clique para editar"
-              : "Você não tem permissão para alterar"}
+            {permissionsEdit ? "Clique para editar" : "Você não tem permissão para alterar"}
           </TooltipContent>
         </Tooltip>
       )}

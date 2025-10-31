@@ -1,5 +1,14 @@
 import { NotificationType } from "@/generated/prisma";
-import { AlertCircle, ArrowDown, ArrowUp, CheckCircle2, Circle, Loader2, Minus, PauseCircle } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  Circle,
+  Loader2,
+  Minus,
+  PauseCircle
+} from "lucide-react";
 
 export function colorStatus(status: string): string {
   switch (status) {
@@ -54,7 +63,7 @@ export const statusMap = [
     icon: Circle,
     color: "text-gray-600",
     animate: false
-  },
+  }
 ] as const;
 
 export function colorPriority(status: string): string {
@@ -91,7 +100,7 @@ export const priorityMap = [
   { key: "HIGH", label: "ALTO", icon: ArrowUp, color: "text-orange-600" },
   { key: "MEDIUM", label: "MÉDIO", icon: Minus, color: "text-yellow-600" },
   { key: "LOW", label: "BAIXO", icon: ArrowDown, color: "text-green-600" },
-  { key: "STANDARD", label: "PADRÃO", icon: Circle, color: "text-gray-600" },
+  { key: "STANDARD", label: "PADRÃO", icon: Circle, color: "text-gray-600" }
 ];
 
 export const notificationMap = {
@@ -101,7 +110,7 @@ export const notificationMap = {
   ITEM_COMPLETED: "ITEM CONCLUÍDO",
   CHAT_MESSAGE: "MENSAGEM DE BATE-PAPO",
   SISTEM_MESSAGE: "MENSAGEM DO SISTEMA",
-  NOTICES_MESSAGE: "NOTÍCIAS",
+  NOTICES_MESSAGE: "NOTÍCIAS"
 };
 
 export const notificationColor = (notification: NotificationType) => {
@@ -121,4 +130,4 @@ export const notificationColor = (notification: NotificationType) => {
     default:
       return "border border-zinc-400 text-zinc-400";
   }
-}
+};

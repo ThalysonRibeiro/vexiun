@@ -8,24 +8,29 @@ import {
   updateSettings,
   UpdateSettingsType
 } from "@/app/actions/user";
-import { NameFormData, nameFormSchema, SettingsFormData, settingsFormSchema, UpdateNameType } from "@/app/actions/user/user-schema";
+import {
+  NameFormData,
+  nameFormSchema,
+  SettingsFormData,
+  settingsFormSchema,
+  UpdateNameType
+} from "@/app/actions/user/user-schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 
 export interface UseNameFormProps {
   initialValues?: {
     name: string;
-  }
+  };
 }
 
 export function UseNameForm({ initialValues }: UseNameFormProps) {
   return useForm<NameFormData>({
     resolver: zodResolver(nameFormSchema),
     defaultValues: initialValues || {
-      name: "",
+      name: ""
     }
-  })
+  });
 }
 
 export interface UseSettingsFormProps {
@@ -34,7 +39,7 @@ export interface UseSettingsFormProps {
     pushNotifications: boolean;
     language: string;
     timezone: string;
-  }
+  };
 }
 
 export function UseSettingsForm({ initialValues }: UseSettingsFormProps) {
@@ -44,13 +49,13 @@ export function UseSettingsForm({ initialValues }: UseSettingsFormProps) {
       emailNotifications: true,
       pushNotifications: true,
       language: "pt-BR",
-      timezone: "America/Sao_Paulo",
+      timezone: "America/Sao_Paulo"
     }
-  })
+  });
 }
 
 type UserResult = Awaited<ReturnType<typeof searchUsers>>;
-type UserData = Extract<UserResult, { success: true }>['data'];
+type UserData = Extract<UserResult, { success: true }>["data"];
 
 export function useUserSearch(query: string, excludeUserIds: string[] = []) {
   return useQuery<UserData>({
@@ -63,10 +68,10 @@ export function useUserSearch(query: string, excludeUserIds: string[] = []) {
       }
 
       return excludeUserIds.length > 0
-        ? result?.data?.filter(user => !excludeUserIds.includes(user.id))
+        ? result?.data?.filter((user) => !excludeUserIds.includes(user.id))
         : result.data;
     },
-    enabled: query.trim().length >= 2,
+    enabled: query.trim().length >= 2
   });
 }
 

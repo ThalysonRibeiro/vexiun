@@ -12,10 +12,10 @@ export const getAssociatedWithMember = withAuth(
       where: {
         workspaceId_userId: {
           workspaceId,
-          userId: memberId,
-        },
+          userId: memberId
+        }
       },
-      select: { joinedAt: true, }
+      select: { joinedAt: true }
     });
 
     if (!member) {

@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import prisma from "@/lib/prisma";
 import {
   ActionResponse,
@@ -11,31 +11,39 @@ import { NotificationType } from "@/generated/prisma";
 import { BroadcastNotificationType, broadcastSchema } from "./notification-schema";
 import { revalidatePath } from "next/cache";
 
-export const sendBroadcastNotification = withAuth(async (
-  userId,
-  session,
-  formData: BroadcastNotificationType
-): Promise<ActionResponse<{
-  success: boolean;
-  totalSend: number;
-} | string>> => {
-
-  const schema = broadcastSchema.safeParse(formData);
-  if (!schema.success) {
-    throw new ValidationError(schema.error.issues[0].message);
-  };
-  const result = await sendNotificationAllUsers({
-    type: formData.type,
-    message: formData.message,
-    referenceId: formData.referenceId
-  });
-  revalidatePath("/dashboard");
-  return successResponse(result, "Notificação enviada com sucesso");
-
-}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
+export const sendBroadcastNotification = withAuth(
+  async (
+    userId,
+    session,
+    formData: BroadcastNotificationType
+  ): Promise<
+    ActionResponse<
+      | {
+          success: boolean;
+          totalSend: number;
+        }
+      | string
+    >
+  > => {
+    const schema = broadcastSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    }
+    const result = await sendNotificationAllUsers({
+      type: formData.type,
+      message: formData.message,
+      referenceId: formData.referenceId
+    });
+    revalidatePath("/dashboard");
+    return successResponse(result, "Notificação enviada com sucesso");
+  },
+  ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR
+);
 
 async function sendNotificationAllUsers({
-  type, message, referenceId
+  type,
+  message,
+  referenceId
 }: {
   type: NotificationType;
   message: string;
@@ -46,21 +54,20 @@ async function sendNotificationAllUsers({
   });
 
   const result = await prisma.notification.createMany({
-    data: users.map(user => ({
+    data: users.map((user) => ({
       userId: user.id,
       type,
       message,
-      referenceId: referenceId || null,
+      referenceId: referenceId || null
     })),
-    skipDuplicates: true,
+    skipDuplicates: true
   });
 
   return {
     success: true,
-    totalSend: result.count,
+    totalSend: result.count
   };
-};
-
+}
 
 //  const handleSendAllUsers = async () => {
 //     const result = await sendBroadcastNotification({

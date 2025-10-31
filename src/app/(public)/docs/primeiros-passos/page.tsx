@@ -21,7 +21,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Primeiros Passos - Documentação Catalyst",
-  description: "Aprenda os conceitos básicos do Catalyst e configure sua primeira conta",
+  description: "Aprenda os conceitos básicos do Catalyst e configure sua primeira conta"
 };
 
 export default function PrimeirosPassosPage() {
@@ -53,8 +53,8 @@ export default function PrimeirosPassosPage() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-4">Bem-vindo ao Catalyst!</h2>
             <p className="text-lg text-muted-foreground mb-6">
-              O Catalyst é uma plataforma completa para gerenciar projetos em equipe e acompanhar suas metas pessoais.
-              Este guia vai te ajudar a configurar tudo em poucos minutos.
+              O Catalyst é uma plataforma completa para gerenciar projetos em equipe e acompanhar
+              suas metas pessoais. Este guia vai te ajudar a configurar tudo em poucos minutos.
             </p>
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
               <div className="flex items-start gap-3">
@@ -64,7 +64,8 @@ export default function PrimeirosPassosPage() {
                 <div>
                   <h3 className="font-semibold mb-1">Dica importante</h3>
                   <p className="text-sm text-muted-foreground">
-                    Reserve 10-15 minutos para completar este guia. Isso vai te dar uma base sólida para usar todas as funcionalidades.
+                    Reserve 10-15 minutos para completar este guia. Isso vai te dar uma base sólida
+                    para usar todas as funcionalidades.
                   </p>
                 </div>
               </div>
@@ -86,9 +87,7 @@ export default function PrimeirosPassosPage() {
                   <Users className="h-5 w-5" />
                   Configuração inicial
                 </CardTitle>
-                <CardDescription>
-                  Primeiro passo para começar a usar o Catalyst
-                </CardDescription>
+                <CardDescription>Primeiro passo para começar a usar o Catalyst</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
@@ -143,19 +142,27 @@ export default function PrimeirosPassosPage() {
                     <h4 className="font-semibold">Passo a passo:</h4>
                     <ol className="space-y-2 text-sm">
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">1</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          1
+                        </span>
                         <span>Clique em "Novo Workspace" no dashboard</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">2</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          2
+                        </span>
                         <span>Escolha um nome descritivo (ex: "Projeto Website")</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">3</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          3
+                        </span>
                         <span>Adicione uma descrição opcional</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">4</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          4
+                        </span>
                         <span>Defina a cor do workspace</span>
                       </li>
                     </ol>
@@ -243,7 +250,8 @@ export default function PrimeirosPassosPage() {
                   Metas semanais
                 </CardTitle>
                 <CardDescription>
-                  As metas pessoais são objetivos que você define para si mesmo e acompanha semanalmente
+                  As metas pessoais são objetivos que você define para si mesmo e acompanha
+                  semanalmente
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -254,16 +262,24 @@ export default function PrimeirosPassosPage() {
                       <div className="p-3 border rounded-lg">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium">Estudar React</span>
-                          <Badge variant="outline" className="text-xs">3x/semana</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            3x/semana
+                          </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">Meta: Estudar React 3 vezes por semana</p>
+                        <p className="text-xs text-muted-foreground">
+                          Meta: Estudar React 3 vezes por semana
+                        </p>
                       </div>
                       <div className="p-3 border rounded-lg">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium">Exercitar-se</span>
-                          <Badge variant="outline" className="text-xs">5x/semana</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            5x/semana
+                          </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">Meta: Exercitar-se 5 vezes por semana</p>
+                        <p className="text-xs text-muted-foreground">
+                          Meta: Exercitar-se 5 vezes por semana
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -307,19 +323,27 @@ export default function PrimeirosPassosPage() {
                     <h4 className="font-semibold mb-3">Como convidar:</h4>
                     <ol className="space-y-2 text-sm">
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">1</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          1
+                        </span>
                         <span>Vá para "Configurações do Workspace"</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">2</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          2
+                        </span>
                         <span>Clique em "Convidar Membros"</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">3</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          3
+                        </span>
                         <span>Digite o email do membro</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">4</span>
+                        <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                          4
+                        </span>
                         <span>Defina o nível de permissão</span>
                       </li>
                     </ol>
@@ -328,9 +352,15 @@ export default function PrimeirosPassosPage() {
                   <div className="bg-muted/50 rounded-lg p-4">
                     <h4 className="font-semibold mb-2">🔐 Níveis de permissão:</h4>
                     <ul className="space-y-1 text-sm text-muted-foreground">
-                      <li>• <strong>Admin:</strong> Controle total</li>
-                      <li>• <strong>Editor:</strong> Criar e editar</li>
-                      <li>• <strong>Membro:</strong> Apenas visualizar</li>
+                      <li>
+                        • <strong>Admin:</strong> Controle total
+                      </li>
+                      <li>
+                        • <strong>Editor:</strong> Criar e editar
+                      </li>
+                      <li>
+                        • <strong>Membro:</strong> Apenas visualizar
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -343,8 +373,8 @@ export default function PrimeirosPassosPage() {
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-4">🎉 Parabéns!</h3>
               <p className="text-muted-foreground mb-6">
-                Você configurou sua conta e está pronto para começar a usar o Catalyst.
-                Agora você pode explorar funcionalidades mais avançadas.
+                Você configurou sua conta e está pronto para começar a usar o Catalyst. Agora você
+                pode explorar funcionalidades mais avançadas.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/docs/funcionalidades">

@@ -16,21 +16,16 @@ export function PaginationControls({
   handlePrevPage,
   handleNextPage,
   setCurrentPage,
-  getPageNumbers,
+  getPageNumbers
 }: PaginationControlsProps) {
   return (
     <div className="flex justify-center items-center gap-2 py-4">
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={handlePrevPage}
-        disabled={currentPage === 1}
-      >
+      <Button size="icon" variant="ghost" onClick={handlePrevPage} disabled={currentPage === 1}>
         <ChevronLeft />
       </Button>
 
       {getPageNumbers().map((page, index) => {
-        if (typeof page === 'number') {
+        if (typeof page === "number") {
           return (
             <Button
               key={page}

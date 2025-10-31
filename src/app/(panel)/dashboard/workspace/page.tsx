@@ -3,7 +3,7 @@ import { unwrapServerData } from "@/utils/server-helpers";
 import { WorkspacesPageClient } from "./_components/workspaces-page-client";
 import { getSharedWorkspaces } from "@/app/data-access/workspace/get-shared-workspaces";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function WorkspacesPage() {
   const workspaces = await getMyWorkspaces().then(unwrapServerData);

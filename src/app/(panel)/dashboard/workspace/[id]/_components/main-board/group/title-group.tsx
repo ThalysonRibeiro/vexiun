@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { memo } from "react";
 
@@ -12,7 +12,7 @@ export const TitleGroup = memo(function TitleGroup({
   groupId,
   textColor,
   title,
-  onEditGroup,
+  onEditGroup
 }: TitleGroupProps) {
   return (
     <h3
@@ -21,10 +21,8 @@ export const TitleGroup = memo(function TitleGroup({
       onClick={() => onEditGroup(groupId)}
       title="Clique para editar"
     >
-      <span className="capitalize">
-        {title[0]}
-      </span>
+      <span className="capitalize">{title[0]}</span>
       {title.slice(1)}
     </h3>
-  )
-},);
+  );
+});

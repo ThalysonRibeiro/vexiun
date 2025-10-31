@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { WorkspaceRole } from "@/generated/prisma";
 import { Crown, Shield, Users, Eye } from "lucide-react";

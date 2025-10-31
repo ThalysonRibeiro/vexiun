@@ -5,7 +5,7 @@ import { mockFetch } from "@/test-utils/global-mocks";
 
 // Mock a dependência sendLoginAlertEmail
 jest.mock("@/services/email.service", () => ({
-  sendLoginAlertEmail: jest.fn(),
+  sendLoginAlertEmail: jest.fn()
 }));
 
 describe("API Route: /api/auth/login-alert", () => {
@@ -21,11 +21,11 @@ describe("API Route: /api/auth/login-alert", () => {
         email: "test@example.com",
         name: "Test User",
         userAgent: "Test Agent",
-        deviceInfo: { userAgent: "Device Agent" },
+        deviceInfo: { userAgent: "Device Agent" }
       }),
       headers: new Headers({
-        "x-forwarded-for": "123.123.123.123",
-      }),
+        "x-forwarded-for": "123.123.123.123"
+      })
     } as unknown as NextRequest;
 
     // Mock da resposta da API de geolocalização
@@ -35,8 +35,8 @@ describe("API Route: /api/auth/login-alert", () => {
         status: "success",
         city: "Test City",
         regionName: "Test Region",
-        country: "Test Country",
-      }),
+        country: "Test Country"
+      })
     });
 
     const response = await POST(mockRequest);
@@ -45,7 +45,7 @@ describe("API Route: /api/auth/login-alert", () => {
     expect(response.status).toBe(200);
     expect(responseBody).toEqual({
       success: true,
-      message: "Alerta de login enviado com sucesso",
+      message: "Alerta de login enviado com sucesso"
     });
 
     expect(sendLoginAlertEmail).toHaveBeenCalledTimes(1);
@@ -55,7 +55,7 @@ describe("API Route: /api/auth/login-alert", () => {
       expect.objectContaining({
         ip: "123.123.123.123",
         location: "Test City, Test Region, Test Country",
-        userAgent: "Device Agent",
+        userAgent: "Device Agent"
       })
     );
   });
@@ -63,9 +63,9 @@ describe("API Route: /api/auth/login-alert", () => {
   it("should return 400 if email is not provided", async () => {
     const mockRequest = {
       json: async () => ({
-        name: "Test User",
+        name: "Test User"
       }),
-      headers: new Headers(),
+      headers: new Headers()
     } as unknown as NextRequest;
 
     const response = await POST(mockRequest);
@@ -80,16 +80,16 @@ describe("API Route: /api/auth/login-alert", () => {
     const mockRequest = {
       json: async () => ({
         email: "test@example.com",
-        name: "Test User",
+        name: "Test User"
       }),
       headers: new Headers({
-        "x-real-ip": "123.123.123.123",
-      }),
+        "x-real-ip": "123.123.123.123"
+      })
     } as unknown as NextRequest;
 
     // Mock de falha na API de geolocalização
     mockFetch.mockResolvedValueOnce({
-      ok: false,
+      ok: false
     });
 
     const response = await POST(mockRequest);
@@ -100,7 +100,7 @@ describe("API Route: /api/auth/login-alert", () => {
       "test@example.com",
       "Test User",
       expect.objectContaining({
-        location: "Desconhecida",
+        location: "Desconhecida"
       })
     );
   });
@@ -109,9 +109,9 @@ describe("API Route: /api/auth/login-alert", () => {
     const mockRequest = {
       json: async () => ({
         email: "test@example.com",
-        name: "Test User",
+        name: "Test User"
       }),
-      headers: new Headers(),
+      headers: new Headers()
     } as unknown as NextRequest;
 
     // Força um erro no serviço de email

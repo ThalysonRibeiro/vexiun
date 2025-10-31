@@ -9,5 +9,5 @@ export async function Priorities({ workspaceId }: { workspaceId: string }) {
     <div className="w-full mt-auto">
       <PrioritiesBar priorities={data} label={false} />
     </div>
-  )
+  );
 }

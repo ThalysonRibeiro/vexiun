@@ -28,7 +28,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Funcionalidades - Documentação Catalyst",
-  description: "Explore todas as funcionalidades do Catalyst para maximizar sua produtividade",
+  description: "Explore todas as funcionalidades do Catalyst para maximizar sua produtividade"
 };
 
 export default function FuncionalidadesPage() {
@@ -61,7 +61,8 @@ export default function FuncionalidadesPage() {
             <h2 className="text-2xl font-bold mb-4">Funcionalidades Principais</h2>
             <p className="text-lg text-muted-foreground mb-6">
               O Catalyst oferece um conjunto completo de ferramentas para gerenciar projetos,
-              colaborar em equipe e acompanhar metas pessoais. Conheça cada funcionalidade em detalhes.
+              colaborar em equipe e acompanhar metas pessoais. Conheça cada funcionalidade em
+              detalhes.
             </p>
           </div>
 
@@ -114,9 +115,7 @@ export default function FuncionalidadesPage() {
                       <Layers className="h-5 w-5" />
                       Organização com Grupos
                     </CardTitle>
-                    <CardDescription>
-                      Estruture tarefas em grupos personalizados
-                    </CardDescription>
+                    <CardDescription>Estruture tarefas em grupos personalizados</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -191,9 +190,7 @@ export default function FuncionalidadesPage() {
                       <Target className="h-5 w-5" />
                       Metas Pessoais
                     </CardTitle>
-                    <CardDescription>
-                      Defina e acompanhe objetivos semanais
-                    </CardDescription>
+                    <CardDescription>Defina e acompanhe objetivos semanais</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -223,9 +220,7 @@ export default function FuncionalidadesPage() {
                       <TrendingUp className="h-5 w-5" />
                       Acompanhamento
                     </CardTitle>
-                    <CardDescription>
-                      Visualize seu progresso e evolução
-                    </CardDescription>
+                    <CardDescription>Visualize seu progresso e evolução</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -321,9 +316,7 @@ export default function FuncionalidadesPage() {
                       <Users className="h-5 w-5" />
                       Gerenciamento de Equipe
                     </CardTitle>
-                    <CardDescription>
-                      Convide e gerencie membros da equipe
-                    </CardDescription>
+                    <CardDescription>Convide e gerencie membros da equipe</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -353,9 +346,7 @@ export default function FuncionalidadesPage() {
                       <Shield className="h-5 w-5" />
                       Controle de Acesso
                     </CardTitle>
-                    <CardDescription>
-                      Sistema robusto de permissões
-                    </CardDescription>
+                    <CardDescription>Sistema robusto de permissões</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -383,9 +374,7 @@ export default function FuncionalidadesPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Níveis de Permissão</CardTitle>
-                  <CardDescription>
-                    Entenda as diferentes permissões disponíveis
-                  </CardDescription>
+                  <CardDescription>Entenda as diferentes permissões disponíveis</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -430,9 +419,7 @@ export default function FuncionalidadesPage() {
                       <BarChart3 className="h-5 w-5" />
                       Relatórios de Projeto
                     </CardTitle>
-                    <CardDescription>
-                      Acompanhe o progresso dos projetos
-                    </CardDescription>
+                    <CardDescription>Acompanhe o progresso dos projetos</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -462,9 +449,7 @@ export default function FuncionalidadesPage() {
                       <TrendingUp className="h-5 w-5" />
                       Métricas Pessoais
                     </CardTitle>
-                    <CardDescription>
-                      Acompanhe seu desenvolvimento pessoal
-                    </CardDescription>
+                    <CardDescription>Acompanhe seu desenvolvimento pessoal</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -492,9 +477,7 @@ export default function FuncionalidadesPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Tipos de Relatórios</CardTitle>
-                  <CardDescription>
-                    Diferentes visualizações para analisar dados
-                  </CardDescription>
+                  <CardDescription>Diferentes visualizações para analisar dados</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -552,9 +535,7 @@ export default function FuncionalidadesPage() {
                     <MessageSquare className="h-5 w-5" />
                     Comentários
                   </CardTitle>
-                  <CardDescription>
-                    Colabore através de comentários nas tarefas
-                  </CardDescription>
+                  <CardDescription>Colabore através de comentários nas tarefas</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-muted-foreground">
@@ -572,9 +553,7 @@ export default function FuncionalidadesPage() {
                     <Calendar className="h-5 w-5" />
                     Prazos
                   </CardTitle>
-                  <CardDescription>
-                    Gerencie prazos e datas importantes
-                  </CardDescription>
+                  <CardDescription>Gerencie prazos e datas importantes</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-muted-foreground">
@@ -593,7 +572,8 @@ export default function FuncionalidadesPage() {
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-4">Próximos Passos</h3>
               <p className="text-muted-foreground mb-6">
-                Agora que você conhece as funcionalidades, explore tutoriais práticos e casos de uso.
+                Agora que você conhece as funcionalidades, explore tutoriais práticos e casos de
+                uso.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/docs/tutoriais">

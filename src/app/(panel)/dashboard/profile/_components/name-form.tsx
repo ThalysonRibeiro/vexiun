@@ -1,6 +1,13 @@
-"use client"
+"use client";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { User } from "next-auth";
 import { useState } from "react";
@@ -48,10 +55,7 @@ export function NameForme({ user }: { user: User }) {
       </button>
       {isAdding && (
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-4 space-y-2 p-2"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-2 p-2">
             <FormField
               control={form.control}
               name="name"
@@ -59,27 +63,18 @@ export function NameForme({ user }: { user: User }) {
                 <FormItem>
                   <FormLabel>Editar nome</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Digite seu nome"
-                      {...field}
-                    />
+                    <Input placeholder="Digite seu nome" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              size={"sm"}
-              className=""
-            >
+            <Button type="submit" size={"sm"} className="">
               Salvar
             </Button>
           </form>
         </Form>
-      )
-      }
-
-    </div >
-  )
+      )}
+    </div>
+  );
 }

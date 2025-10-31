@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Form,
   FormControl,
@@ -6,14 +6,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -37,7 +37,7 @@ import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 interface CreateItemFormProps {
   workspaceId: string;
   closeForm: (value: boolean) => void;
-  initialValues?: UseItemFormProps['initialValues'];
+  initialValues?: UseItemFormProps["initialValues"];
   groupId: string;
   itemId?: string;
   editingItem: boolean;
@@ -49,7 +49,7 @@ type TeamUser = {
   name: string | null;
   image: string | null;
   email: string;
-}
+};
 
 export function CreateOrEditItemForm(props: CreateItemFormProps) {
   const { closeForm, initialValues, groupId, itemId, editingItem, team } = props;
@@ -64,7 +64,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: workspace?.workspace.status as EntityStatus,
     isOwner
   });
@@ -84,20 +84,18 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
         description: formData?.description,
         assignedTo: formData?.assignedTo ?? session?.user?.id,
         details: formData?.details,
-        revalidatePaths: ["/dashboard/workspace"],
+        revalidatePaths: ["/dashboard/workspace"]
       });
 
       if (isErrorResponse(response)) {
         toast.error("Erro ao atualizar item");
       } else {
-        ;
         toast.success("Item atualizado com sucesso!");
       }
       closeForm(false);
       form.reset();
       setIsLoading(false);
       return;
-
     } else {
       const response = await createItem.mutateAsync({
         workspaceId: workspaceId as string,
@@ -110,7 +108,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
         status: "NOT_STARTED",
         assignedTo: formData.assignedTo ?? session?.user?.id,
         details: formData.details,
-        revalidatePaths: ["/dashboard/workspace"],
+        revalidatePaths: ["/dashboard/workspace"]
       });
       if (!isSuccessResponse(response)) {
         toast.error("Erro ao cadastrar item");
@@ -127,14 +125,16 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
   if (isLoading) {
     return (
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 border-4 border-t-accent rounded-full animate-spin border-primary" />
-    )
+    );
   }
 
   return (
     <Form {...form}>
-      <form className={cn("grid grid-cols-1 gap-4 w-full",
-        editingItem ? "lg:grid-cols-1" : "lg:grid-cols-2"
-      )}
+      <form
+        className={cn(
+          "grid grid-cols-1 gap-4 w-full",
+          editingItem ? "lg:grid-cols-1" : "lg:grid-cols-2"
+        )}
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <div className="flex-1 w-full">
@@ -211,14 +211,14 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                   <FormItem className="flex-1">
                     <FormLabel>Prioridade</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className={cn("w-full", colorPriority(field.value))} size="sm">
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger
+                          className={cn("w-full", colorPriority(field.value))}
+                          size="sm"
+                        >
                           <SelectValue>
                             {(() => {
-                              const p = priorityMap.find(p => p.key === field.value);
+                              const p = priorityMap.find((p) => p.key === field.value);
                               return p ? (
                                 <div className="flex items-center gap-1.5">
                                   <p.icon className="h-3.5 w-3.5 text-white" />
@@ -259,17 +259,19 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                   <FormItem>
                     <FormLabel>Status</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className={colorStatus(field.value)} size="sm" >
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className={colorStatus(field.value)} size="sm">
                           <SelectValue>
                             {(() => {
-                              const s = statusMap.find(s => s.key === field.value);
+                              const s = statusMap.find((s) => s.key === field.value);
                               return s ? (
                                 <div className="flex items-center gap-1.5">
-                                  <s.icon className={cn("h-3.5 w-3.5 text-white", s.animate && "animate-spin")} />
+                                  <s.icon
+                                    className={cn(
+                                      "h-3.5 w-3.5 text-white",
+                                      s.animate && "animate-spin"
+                                    )}
+                                  />
                                   <span className="text-white">{s.label}</span>
                                 </div>
                               ) : null;
@@ -284,7 +286,9 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                               className={cn("cursor-pointer", colorStatus(s.key))}
                             >
                               <div className="flex items-center gap-2">
-                                <s.icon className={cn("h-4 w-4 text-white", s.animate && "animate-spin")} />
+                                <s.icon
+                                  className={cn("h-4 w-4 text-white", s.animate && "animate-spin")}
+                                />
                                 <span>{s.label}</span>
                               </div>
                             </SelectItem>
@@ -309,7 +313,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                     <FormControl>
                       <CalendarTerm
                         onChange={(date) => {
-                          field.onChange(date)
+                          field.onChange(date);
                         }}
                         initialDate={field.value || new Date()} // Adiciona esta linha
                       />
@@ -327,20 +331,19 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
               control={form.control}
               name="assignedTo"
               render={({ field }) => {
-                const selectedTeam = team.find(t => t.id === field.value) ?? team[0]
+                const selectedTeam = team.find((t) => t.id === field.value) ?? team[0];
                 return (
                   <FormItem>
                     <FormLabel>Responsável</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? undefined}
-                      >
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <SelectTrigger className="flex items-center gap-2 w-full">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-6 h-6">
                               <AvatarImage src={selectedTeam.image ?? undefined} />
-                              <AvatarFallback>{nameFallback(selectedTeam.name ?? undefined)}</AvatarFallback>
+                              <AvatarFallback>
+                                {nameFallback(selectedTeam.name ?? undefined)}
+                              </AvatarFallback>
                             </Avatar>
                             <span>{selectedTeam.name}</span>
                           </div>
@@ -350,7 +353,9 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                             <SelectItem key={user.id} value={user.id}>
                               <Avatar>
                                 <AvatarImage src={user.image ?? undefined} />
-                                <AvatarFallback>{nameFallback(user.name ?? undefined)}</AvatarFallback>
+                                <AvatarFallback>
+                                  {nameFallback(user.name ?? undefined)}
+                                </AvatarFallback>
                               </Avatar>
                               <span>{user.name?.split(" ")[0]}</span>
                             </SelectItem>
@@ -359,7 +364,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                       </Select>
                     </FormControl>
                   </FormItem>
-                )
+                );
               }}
             />
           )}
@@ -372,26 +377,26 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
             render={({ field }) => {
               return (
                 <FormItem>
-                  <FormLabel>
-                    Detalhes
-                  </FormLabel>
+                  <FormLabel>Detalhes</FormLabel>
                   <FormControl>
                     <div className="h-full min-h-80 max-h-80">
                       <DetailsEditor
-                        content={field.value && Object.keys(field.value).length ? field.value : null}
+                        content={
+                          field.value && Object.keys(field.value).length ? field.value : null
+                        }
                         onContentChange={field.onChange}
                       />
                     </div>
                   </FormControl>
                 </FormItem>
-              )
+              );
             }}
           />
         )}
         <Button type="submit" className={cn("mt-3.5 w-fit px-10")}>
-          {editingItem ? 'Salvar' : 'Cadastrar'}
+          {editingItem ? "Salvar" : "Cadastrar"}
         </Button>
       </form>
     </Form>
-  )
+  );
 }

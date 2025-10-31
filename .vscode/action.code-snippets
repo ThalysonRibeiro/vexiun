@@ -373,7 +373,7 @@
     ],
     "description": "Create a GET route handler with authentication"
   },
-  
+
   "Route Handler GET with Dynamic Params": {
     "prefix": "route-get-params",
     "body": [

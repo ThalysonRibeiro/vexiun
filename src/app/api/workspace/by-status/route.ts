@@ -1,13 +1,11 @@
-
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { withAuthRoute } from "@/lib/api/with-auth-route";
 import { EntityStatus } from "@/generated/prisma";
 
 export const GET = withAuthRoute(async (req, userId, session) => {
-
   const searchParams = req.nextUrl.searchParams;
-  const status = searchParams.get("status") as EntityStatus || "ACTIVE";
+  const status = (searchParams.get("status") as EntityStatus) || "ACTIVE";
 
   const workspaces = await prisma.workspace.findMany({
     where: {
@@ -18,8 +16,8 @@ export const GET = withAuthRoute(async (req, userId, session) => {
       _count: {
         select: {
           groups: true,
-          members: true,
-        },
+          members: true
+        }
       },
       statusChanger: {
         select: {
@@ -29,9 +27,9 @@ export const GET = withAuthRoute(async (req, userId, session) => {
       }
     },
     orderBy: {
-      statusChangedAt: status === 'ACTIVE' ? undefined : 'desc',
-      lastActivityAt: status === 'ACTIVE' ? 'desc' : undefined
-    },
+      statusChangedAt: status === "ACTIVE" ? undefined : "desc",
+      lastActivityAt: status === "ACTIVE" ? "desc" : undefined
+    }
   });
 
   return NextResponse.json({

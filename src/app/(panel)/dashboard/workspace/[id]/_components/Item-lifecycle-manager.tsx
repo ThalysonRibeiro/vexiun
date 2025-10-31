@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useGroupActions, useGroupItemByEntityStatus } from "@/hooks/use-groups";
 import { useState } from "react";
@@ -22,12 +22,12 @@ interface ItemLifecycleManagerProps {
   entityStatus: EntityStatus;
 }
 
-export function ItemLifecycleManager({
-  workspaceId,
-  entityStatus
-}: ItemLifecycleManagerProps) {
+export function ItemLifecycleManager({ workspaceId, entityStatus }: ItemLifecycleManagerProps) {
   const [changeLayout, setChangeLayout] = useState<boolean>(false);
-  const { data, isLoading: isLoadingStatus } = useGroupItemByEntityStatus(workspaceId, entityStatus);
+  const { data, isLoading: isLoadingStatus } = useGroupItemByEntityStatus(
+    workspaceId,
+    entityStatus
+  );
 
   const { data: session } = useSession();
   const { data: workspace } = useWorkspaceMemberData(workspaceId as string);
@@ -35,7 +35,7 @@ export function ItemLifecycleManager({
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: entityStatus as EntityStatus,
     isOwner
   });
@@ -90,40 +90,34 @@ export function ItemLifecycleManager({
     onRestoreItem: handleRestoreItem,
     onSaveDetails: handleSaveDetails,
     setEditingData,
-    setDialogState,
+    setDialogState
   };
 
   const emptyStateConfig = {
     ACTIVE: {
       icon: FolderOpen,
       title: "Nenhum Grupo ativo",
-      description: "Você ainda não tem nenhum Grupo. Crie um para começar!",
+      description: "Você ainda não tem nenhum Grupo. Crie um para começar!"
     },
     ARCHIVED: {
       icon: Archive,
       title: "Nenhum Grupo arquivado",
-      description: "Grupos e items arquivados aparecerão aqui.",
+      description: "Grupos e items arquivados aparecerão aqui."
     },
     DELETED: {
       icon: Trash,
       title: "A lixeira está vazia",
-      description: "Grupos e items deletados aparecerão aqui por 30 dias.",
-    },
+      description: "Grupos e items deletados aparecerão aqui por 30 dias."
+    }
   };
 
   if (isLoadingGroup || isLoading || isLoadingStatus) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   if (!data || data?.length === 0) {
     const config = emptyStateConfig[entityStatus];
-    return (
-      <EmptyState
-        icon={config.icon}
-        title={config.title}
-        description={config.description}
-      />
-    )
+    return <EmptyState icon={config.icon} title={config.title} description={config.description} />;
   }
 
   return (
@@ -138,7 +132,7 @@ export function ItemLifecycleManager({
         />
       )}
       <Button
-        onClick={() => setChangeLayout(prev => !prev)}
+        onClick={() => setChangeLayout((prev) => !prev)}
         variant="outline"
         className="cursor-pointer"
       >
@@ -180,18 +174,12 @@ export function ItemLifecycleManager({
                   style={{ color: group.textColor }}
                 >
                   <ChevronDown
-                    className={cn(
-                      "transition-all duration-300",
-                      !isGroupOpen && "-rotate-90"
-                    )}
+                    className={cn("transition-all duration-300", !isGroupOpen && "-rotate-90")}
                   />
                 </Button>
               </div>
 
-              <Collapsible
-                open={isGroupOpen}
-                style={{ borderColor: group.textColor }}
-              >
+              <Collapsible open={isGroupOpen} style={{ borderColor: group.textColor }}>
                 <CollapsibleContent>
                   <ItemLifecycleView
                     items={group.item}

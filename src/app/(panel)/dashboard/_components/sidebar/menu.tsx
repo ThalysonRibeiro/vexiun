@@ -1,13 +1,13 @@
-"use client"
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -44,7 +44,7 @@ export function Menu({ userData }: MenuProps) {
     if (!name) return "U";
     return name
       .split(" ")
-      .map(word => word.charAt(0))
+      .map((word) => word.charAt(0))
       .slice(0, 2)
       .join("")
       .toUpperCase();
@@ -92,7 +92,7 @@ export function Menu({ userData }: MenuProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="cursor-pointer">
-          <Link href="/dashboard/invites" className="flex items-center w-full gap-2">
+          <Link href="/dashboard/workspace/invites" className="flex items-center w-full gap-2">
             <Mail className="mr-2 h-4 w-4" />
             Convites
             <Badge className="ml-auto">1</Badge>

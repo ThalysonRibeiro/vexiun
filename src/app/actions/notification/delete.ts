@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import prisma from "@/lib/prisma";
 import {
   ActionResponse,
@@ -8,38 +8,35 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { DeleteNotificationType, notificationIdFormSchema, } from "./notification-schema";
+import { DeleteNotificationType, notificationIdFormSchema } from "./notification-schema";
 
-export const deleteNotification = withAuth(async (
-  userId,
-  session,
-  formData: DeleteNotificationType
-): Promise<ActionResponse<string>> => {
+export const deleteNotification = withAuth(
+  async (userId, session, formData: DeleteNotificationType): Promise<ActionResponse<string>> => {
+    const schema = notificationIdFormSchema.safeParse(formData);
+    if (!schema.success) {
+      throw new ValidationError(schema.error.issues[0].message);
+    }
 
-  const schema = notificationIdFormSchema.safeParse(formData);
-  if (!schema.success) {
-    throw new ValidationError(schema.error.issues[0].message);
-  };
+    const notification = await prisma.notification.findFirst({
+      where: {
+        id: formData.notificationId,
+        userId
+      }
+    });
 
-  const notification = await prisma.notification.findFirst({
-    where: {
-      id: formData.notificationId,
-      userId,
-    },
-  });
+    if (!notification) {
+      return { error: ERROR_MESSAGES.NOT_FOUND.NOTIFICATION };
+    }
 
-  if (!notification) {
-    return { error: ERROR_MESSAGES.NOT_FOUND.NOTIFICATION };
-  };
+    await prisma.notification.delete({
+      where: { id: formData.notificationId }
+    });
 
-  await prisma.notification.delete({
-    where: { id: formData.notificationId },
-  });
+    if (formData.revalidatePaths?.length) {
+      formData.revalidatePaths.forEach((path) => revalidatePath(path));
+    }
 
-  if (formData.revalidatePaths?.length) {
-    formData.revalidatePaths.forEach((path) => revalidatePath(path));
-  }
-
-  return successResponse("Notificação deletada com sucesso");
-
-}, ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR);
+    return successResponse("Notificação deletada com sucesso");
+  },
+  ERROR_MESSAGES.GENERIC.UNKNOWN_ERROR
+);

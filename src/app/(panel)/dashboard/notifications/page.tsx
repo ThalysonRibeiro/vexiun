@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   useDeleteAllNotifications,
   useDeleteMultipleNotifications,
@@ -8,15 +8,15 @@ import {
   useMarkNotificationAsRead,
   useNotifications,
   useSmartCleanup
-} from '@/hooks/use-notifications';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCheck, X, Sparkles, Check, Bell, Trash } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
-import { isSuccessResponse } from '@/lib/errors/error-handler';
+} from "@/hooks/use-notifications";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CheckCheck, X, Sparkles, Check, Bell, Trash } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { toast } from "sonner";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 
 export default function NotificationsPage() {
   const { data: notifications = [], refetch } = useNotifications();
@@ -30,22 +30,18 @@ export default function NotificationsPage() {
   const markNotificationAsRead = useMarkNotificationAsRead();
   const smartCleanup = useSmartCleanup();
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const handleSelectAll = () => {
     if (selectedIds.length === notifications.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(notifications.map(n => n.id));
+      setSelectedIds(notifications.map((n) => n.id));
     }
   };
 
   const handleToggleSelect = (id: string) => {
-    setSelectedIds(prev =>
-      prev.includes(id)
-        ? prev.filter(i => i !== id)
-        : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   const handleDelete = async (id: string) => {
@@ -81,7 +77,7 @@ export default function NotificationsPage() {
   };
 
   const handleDeleteAll = async () => {
-    if (!confirm('Deseja realmente deletar todas as notificações?')) return;
+    if (!confirm("Deseja realmente deletar todas as notificações?")) return;
 
     setIsDeleting(true);
     const result = await deleteAllNotifications.mutateAsync();
@@ -148,7 +144,7 @@ export default function NotificationsPage() {
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao marcar como lida");
     }
-    refetch();;
+    refetch();
   };
 
   return (
@@ -157,18 +153,13 @@ export default function NotificationsPage() {
         <div>
           <h1 className="text-2xl font-bold">Notificações</h1>
           <p className="text-sm text-muted-foreground">
-            {unreadCount > 0 ? `${unreadCount} não lidas` : 'Todas lidas'}
+            {unreadCount > 0 ? `${unreadCount} não lidas` : "Todas lidas"}
           </p>
         </div>
 
         <div className="flex gap-2 flex-wrap justify-end">
           {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleMarkAllRead}
-              disabled={isDeleting}
-            >
+            <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isDeleting}>
               <Check className="w-4 h-4 mr-2" />
               Marcar todas como lidas
             </Button>
@@ -186,32 +177,17 @@ export default function NotificationsPage() {
             </Button>
           )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDeleteRead}
-            disabled={isDeleting}
-          >
+          <Button variant="outline" size="sm" onClick={handleDeleteRead} disabled={isDeleting}>
             <CheckCheck className="w-4 h-4 mr-2" />
             Deletar Lidas
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSmartCleanup}
-            disabled={isDeleting}
-          >
+          <Button variant="outline" size="sm" onClick={handleSmartCleanup} disabled={isDeleting}>
             <Sparkles className="w-4 h-4 mr-2" />
             Limpeza Inteligente
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDeleteAll}
-            disabled={isDeleting}
-          >
+          <Button variant="outline" size="sm" onClick={handleDeleteAll} disabled={isDeleting}>
             <X className="w-4 h-4 mr-2" />
             Deletar Todas
           </Button>
@@ -227,8 +203,8 @@ export default function NotificationsPage() {
             />
             <span className="text-sm font-medium">
               {selectedIds.length === notifications.length
-                ? 'Desselecionar todas'
-                : 'Selecionar todas'}
+                ? "Desselecionar todas"
+                : "Selecionar todas"}
             </span>
           </label>
         </div>
@@ -244,8 +220,9 @@ export default function NotificationsPage() {
           notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`flex items-start gap-3 p-4 border rounded-lg transition-colors ${!notification.isRead ? 'bg-accent/50 border-accent' : 'hover:bg-muted/50'
-                }`}
+              className={`flex items-start gap-3 p-4 border rounded-lg transition-colors ${
+                !notification.isRead ? "bg-accent/50 border-accent" : "hover:bg-muted/50"
+              }`}
             >
               <Checkbox
                 checked={selectedIds.includes(notification.id)}
@@ -265,7 +242,7 @@ export default function NotificationsPage() {
                 <span className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(notification.createdAt), {
                     addSuffix: true,
-                    locale: ptBR,
+                    locale: ptBR
                   })}
                 </span>
               </div>

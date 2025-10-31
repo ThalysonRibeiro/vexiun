@@ -1,23 +1,31 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useWorkspaceForm } from "@/hooks/use-workspace"
-import { Textarea } from "@/components/ui/textarea"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { CATEGORIES_ARRAY } from "@/lib/constants"
+import { useEffect } from "react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useWorkspaceForm } from "@/hooks/use-workspace";
+import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { CATEGORIES_ARRAY } from "@/lib/constants";
 
 export function WorkspaceStepForm({
   canProceed,
   form
 }: {
-  canProceed?: (valid: boolean) => void
-  form: ReturnType<typeof useWorkspaceForm>
+  canProceed?: (valid: boolean) => void;
+  form: ReturnType<typeof useWorkspaceForm>;
 }) {
   useEffect(() => {
-    canProceed?.(form.formState.isValid)
-  }, [form.formState.isValid, canProceed])
+    canProceed?.(form.formState.isValid);
+  }, [form.formState.isValid, canProceed]);
 
   return (
     <Form {...form}>
@@ -27,9 +35,7 @@ export function WorkspaceStepForm({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Titulo
-              </FormLabel>
+              <FormLabel>Titulo</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -51,9 +57,7 @@ export function WorkspaceStepForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Descrição
-              </FormLabel>
+              <FormLabel>Descrição</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
@@ -75,20 +79,19 @@ export function WorkspaceStepForm({
           name="categories"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Categorias
-              </FormLabel>
+              <FormLabel>Categorias</FormLabel>
               <FormControl>
                 <ToggleGroup
                   type="multiple"
-                  spacing={2} size={"sm"}
+                  spacing={2}
+                  size={"sm"}
                   variant={"outline"}
                   value={field.value || []}
                   onValueChange={field.onChange}
                   className="grid grid-cols-4 gap-2 justify-start"
                 >
-                  {CATEGORIES_ARRAY.map(category => {
-                    const Icon = category.icon
+                  {CATEGORIES_ARRAY.map((category) => {
+                    const Icon = category.icon;
                     return (
                       <ToggleGroupItem
                         key={category.id}
@@ -98,7 +101,7 @@ export function WorkspaceStepForm({
                         <Icon className="h-4 w-4" />
                         {category.label}
                       </ToggleGroupItem>
-                    )
+                    );
                   })}
                 </ToggleGroup>
               </FormControl>
@@ -111,5 +114,5 @@ export function WorkspaceStepForm({
         />
       </form>
     </Form>
-  )
+  );
 }

@@ -6,10 +6,10 @@ import { mockFetch, sessionStorageMock } from "../../test-utils/global-mocks";
 
 // Mock dependencies
 jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+  useSession: jest.fn()
 }));
 jest.mock("@/hooks/use-mobile", () => ({
-  getDeviceInfo: jest.fn(() => ({ os: "test-os", browser: "test-browser" })),
+  getDeviceInfo: jest.fn(() => ({ os: "test-os", browser: "test-browser" }))
 }));
 
 describe("LoginAlert", () => {
@@ -31,7 +31,7 @@ describe("LoginAlert", () => {
   it("does not send login alert if emailNotifications is false", async () => {
     (useSession as jest.Mock).mockReturnValue({
       data: { user: { email: "test@example.com", name: "Test User" } },
-      status: "authenticated",
+      status: "authenticated"
     });
     render(<LoginAlert emailNotifications={false} />);
 
@@ -44,11 +44,11 @@ describe("LoginAlert", () => {
   it("sends login alert if session exists and emailNotifications is true (first load)", async () => {
     (useSession as jest.Mock).mockReturnValue({
       data: { user: { email: "test@example.com", name: "Test User" } },
-      status: "authenticated",
+      status: "authenticated"
     });
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ message: "Alert sent" }),
+      json: () => Promise.resolve({ message: "Alert sent" })
     });
 
     render(<LoginAlert emailNotifications={true} />);
@@ -63,8 +63,8 @@ describe("LoginAlert", () => {
           body: JSON.stringify({
             email: "test@example.com",
             name: "Test User",
-            deviceInfo: { os: "test-os", browser: "test-browser" },
-          }),
+            deviceInfo: { os: "test-os", browser: "test-browser" }
+          })
         })
       );
       expect(sessionStorageMock.setItem).toHaveBeenCalledWith("loginAlertSent", "true");
@@ -75,7 +75,7 @@ describe("LoginAlert", () => {
     sessionStorageMock.setItem("loginAlertSent", "true");
     (useSession as jest.Mock).mockReturnValue({
       data: { user: { email: "test@example.com", name: "Test User" } },
-      status: "authenticated",
+      status: "authenticated"
     });
 
     render(<LoginAlert emailNotifications={true} />);
@@ -86,10 +86,10 @@ describe("LoginAlert", () => {
   });
 
   it("logs an error if the API call fails", async () => {
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     (useSession as jest.Mock).mockReturnValue({
       data: { user: { email: "test@example.com", name: "Test User" } },
-      status: "authenticated",
+      status: "authenticated"
     });
     mockFetch.mockRejectedValueOnce(new Error("API Error"));
 

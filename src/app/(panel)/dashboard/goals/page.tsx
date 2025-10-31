@@ -5,12 +5,11 @@ import { GoalsContent } from "./_components/goals-content";
 import { getWeekPendingGoal, getWeekSummary } from "@/app/data-access/goals";
 import { unwrapServerData } from "@/utils/server-helpers";
 
-
 export default async function GoalsPage() {
   const session = await getSession();
 
   if (!session) {
-    redirect('/')
+    redirect("/");
   }
   const pedingGoals = await getWeekPendingGoal(session?.user?.id as string).then(unwrapServerData);
   const weekSummaryDate = await getWeekSummary(session?.user?.id as string).then(unwrapServerData);
@@ -30,5 +29,5 @@ export default async function GoalsPage() {
         language={language}
       />
     </main>
-  )
+  );
 }

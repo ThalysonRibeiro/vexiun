@@ -28,7 +28,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Tutoriais - Documentação Catalyst",
-  description: "Tutoriais práticos e casos de uso para dominar o Catalyst",
+  description: "Tutoriais práticos e casos de uso para dominar o Catalyst"
 };
 
 export default function TutoriaisPage() {
@@ -147,8 +147,8 @@ export default function TutoriaisPage() {
                       <span>Iniciante</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Configure metas pessoais para estudar programação e acompanhe seu progresso
-                      de forma motivadora.
+                      Configure metas pessoais para estudar programação e acompanhe seu progresso de
+                      forma motivadora.
                     </p>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">O que você vai aprender:</h4>
@@ -271,8 +271,8 @@ export default function TutoriaisPage() {
                       <span>Intermediário</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Aprenda a estruturar uma campanha de marketing digital completa,
-                      desde o planejamento até a análise de resultados.
+                      Aprenda a estruturar uma campanha de marketing digital completa, desde o
+                      planejamento até a análise de resultados.
                     </p>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">O que você vai aprender:</h4>
@@ -316,8 +316,8 @@ export default function TutoriaisPage() {
                       <span>Avançado</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Configure metas baseadas em dados e use o Catalyst para acompanhar
-                      KPIs de marketing de forma visual.
+                      Configure metas baseadas em dados e use o Catalyst para acompanhar KPIs de
+                      marketing de forma visual.
                     </p>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">O que você vai aprender:</h4>
@@ -366,8 +366,8 @@ export default function TutoriaisPage() {
                       <span>Iniciante</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Use o Catalyst para organizar e acompanhar seus objetivos pessoais,
-                      desde saúde até desenvolvimento profissional.
+                      Use o Catalyst para organizar e acompanhar seus objetivos pessoais, desde
+                      saúde até desenvolvimento profissional.
                     </p>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">O que você vai aprender:</h4>
@@ -441,9 +441,7 @@ export default function TutoriaisPage() {
                       <Lightbulb className="h-5 w-5 text-yellow-500" />
                       Dicas de Produtividade
                     </CardTitle>
-                    <CardDescription>
-                      Maximize sua eficiência com o Catalyst
-                    </CardDescription>
+                    <CardDescription>Maximize sua eficiência com o Catalyst</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm text-muted-foreground">
@@ -461,9 +459,7 @@ export default function TutoriaisPage() {
                       <Users className="h-5 w-5 text-blue-500" />
                       Colaboração Eficiente
                     </CardTitle>
-                    <CardDescription>
-                      Melhore o trabalho em equipe
-                    </CardDescription>
+                    <CardDescription>Melhore o trabalho em equipe</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm text-muted-foreground">
@@ -481,9 +477,7 @@ export default function TutoriaisPage() {
                       <Zap className="h-5 w-5 text-purple-500" />
                       Atalhos e Truques
                     </CardTitle>
-                    <CardDescription>
-                      Acelere seu fluxo de trabalho
-                    </CardDescription>
+                    <CardDescription>Acelere seu fluxo de trabalho</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm text-muted-foreground">
@@ -547,8 +541,8 @@ export default function TutoriaisPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Tutorial completo que te leva desde a criação da conta até a configuração
-                    do seu primeiro projeto profissional.
+                    Tutorial completo que te leva desde a criação da conta até a configuração do seu
+                    primeiro projeto profissional.
                   </p>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -583,8 +577,8 @@ export default function TutoriaisPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Aprenda a definir metas eficazes e use o sistema de acompanhamento
-                    para manter a motivação e alcançar seus objetivos.
+                    Aprenda a definir metas eficazes e use o sistema de acompanhamento para manter a
+                    motivação e alcançar seus objetivos.
                   </p>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -612,7 +606,8 @@ export default function TutoriaisPage() {
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-4">Pronto para começar?</h3>
               <p className="text-muted-foreground mb-6">
-                Escolha um tutorial que mais se adequa ao seu objetivo e comece a usar o Catalyst hoje mesmo.
+                Escolha um tutorial que mais se adequa ao seu objetivo e comece a usar o Catalyst
+                hoje mesmo.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/login">

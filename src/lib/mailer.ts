@@ -6,6 +6,6 @@ export const transporter = nodemailer.createTransport({
   secure: Number(process.env.MAIL_PORT) === 465, // true para 465, false para outros
   auth: {
     user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-  },
-});;
+    pass: process.env.MAIL_PASS
+  }
+});

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
-import { getGroups } from "@/app/data-access/groupe";
 import {
   ChangeGroupStatusType,
   createGroup,
@@ -15,17 +14,17 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityStatus } from "@/generated/prisma";
-import { getGroupItemByEntityStatus } from "@/app/data-access/groupe/get-item-by-entity-status";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { changeGroupStatus } from "@/app/actions/group/change-group-status";
-
+import { fetchAPI } from "@/lib/api/fetch-api";
+import { ItemWhitCreatedAssignedUser } from "./use-items";
 
 export interface UseGroupFormProps {
   initialValues?: {
     title: string;
     textColor: string;
-  }
+  };
 }
 
 export function UseGroupForm({ initialValues }: UseGroupFormProps) {
@@ -35,46 +34,47 @@ export function UseGroupForm({ initialValues }: UseGroupFormProps) {
       title: "",
       textColor: "#FF3445"
     }
-  })
+  });
 }
-
-export type GroupsResponse = Awaited<ReturnType<typeof getGroups>>;
-export type GroupsData = Extract<GroupsResponse, { success: true }>['data'];
 
 export function useGroups(workspaceId: string) {
   return useQuery({
     queryKey: ["groups", workspaceId] as const,
     queryFn: async () => {
-      const result = await getGroups(workspaceId);
+      // const params = new URLSearchParams();
+      // if (cursor) {
+      //   params.append("cursor", cursor)
+      // };
+      // params.append("take", take.toString());
 
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return await fetchAPI(`/api/workspace/${workspaceId}/groups`);
     },
-    enabled: !!workspaceId,
+    enabled: !!workspaceId
   });
 }
 
-export type GroupItemByEntityStatusResult = Awaited<ReturnType<typeof getGroupItemByEntityStatus>>;
-export type GroupItemByEntityStatusData = Extract<GroupItemByEntityStatusResult, { success: true }>['data'];
+export type GroupItemByEntityStatusResponse = {
+  id: string;
+  title: string;
+  textColor: string;
+  workspaceId: string;
+  status: EntityStatus;
+  createdAt: string;
+  updatedAt: string;
+  item: ItemWhitCreatedAssignedUser[];
+};
 
 export function useGroupItemByEntityStatus(workspaceId: string, status: EntityStatus) {
-  return useQuery<GroupItemByEntityStatusData>({
+  return useQuery<GroupItemByEntityStatusResponse[]>({
     queryKey: ["groups", "items", "by-entity-status", workspaceId, status] as const,
     queryFn: async () => {
-      const result = await getGroupItemByEntityStatus(workspaceId, status);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return await fetchAPI(
+        `/api/workspace/${workspaceId}/groups/item-by-entity-status?status=${status}`
+      );
     },
     enabled: !!workspaceId && !!status,
     refetchOnWindowFocus: true
-  })
+  });
 }
 
 export function useInvalidateGreoups() {
@@ -100,7 +100,7 @@ export function useCreateGroup() {
     },
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["groups", variables.workspaceId] });
-    },
+    }
   });
 }
 
@@ -142,6 +142,7 @@ export function useChangeGroupStatus() {
       return result;
     },
     onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["items", "items-count"] });
       queryClient.invalidateQueries({ queryKey: ["groups"] });
       queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
     }
@@ -214,7 +215,7 @@ export function useGroupActions(workspaceId: string) {
   const moveToTrash = useMoveGroupToTrash();
 
   const toggleDropdown = useCallback((groupId: string) => {
-    setOpenGroups(prev => {
+    setOpenGroups((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(groupId)) {
         newSet.delete(groupId);
@@ -241,87 +242,93 @@ export function useGroupActions(workspaceId: string) {
     return value;
   }, []);
 
-  const handleDeleteGroup = useCallback(async (groupId: string) => {
-    try {
-      if (!confirm('Deseja realmente deletar o grupo? todos os itens serão deletados junto')) {
-        return;
+  const handleDeleteGroup = useCallback(
+    async (groupId: string) => {
+      try {
+        if (!confirm("Deseja realmente deletar o grupo? todos os itens serão deletados junto")) {
+          return;
+        }
+        await deleteGroup.mutateAsync({
+          workspaceId,
+          groupId,
+          revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
+        });
+        toast.success("Grupo deletado com sucesso!");
+        setOpenGroups((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(groupId);
+          return newSet;
+        });
+      } catch (error) {
+        toast.error("Erro ao deletar grupo");
       }
-      await deleteGroup.mutateAsync({
-        workspaceId,
-        groupId,
-        revalidatePaths: [`/dashboard/workspace/${workspaceId}`]
-      });
-      toast.success("Grupo deletado com sucesso!");
-      setOpenGroups(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(groupId);
-        return newSet;
-      });
-    } catch (error) {
-      toast.error("Erro ao deletar grupo");
-    }
-  }, [deleteGroup, workspaceId]);
+    },
+    [deleteGroup, workspaceId]
+  );
 
-  const handleMoveToTrash = useCallback(async (groupId: string) => {
-    if (!confirm('Deseja realmente mover para lixeira?')) {
-      return;
-    }
-
-    setIsLoading(groupId);
-
-    try {
-      const response = await moveToTrash.mutateAsync(
-        workspaceId, groupId,
-      );
-
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao deletar item");
+  const handleMoveToTrash = useCallback(
+    async (groupId: string) => {
+      if (!confirm("Deseja realmente mover para lixeira?")) {
         return;
       }
 
-      toast.success("Group movido para lixeira com sucess!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [moveToTrash, workspaceId,]);
+      setIsLoading(groupId);
 
-  const handleArchiveGroup = useCallback(async (groupId: string) => {
-    setIsLoading(groupId);
+      try {
+        const response = await moveToTrash.mutateAsync(workspaceId, groupId);
 
-    try {
-      const response = await archivedGroup.mutateAsync(
-        workspaceId, groupId,
-      );
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao deletar item");
+          return;
+        }
 
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao arquivar Group");
-        return;
+        toast.success("Group movido para lixeira com sucess!");
+      } finally {
+        setIsLoading(null);
       }
+    },
+    [moveToTrash, workspaceId]
+  );
 
-      toast.success("Group arquivado!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [workspaceId, archivedGroup]);
+  const handleArchiveGroup = useCallback(
+    async (groupId: string) => {
+      setIsLoading(groupId);
 
-  const handleRestoreGroup = useCallback(async (groupId: string) => {
-    setIsLoading(groupId);
+      try {
+        const response = await archivedGroup.mutateAsync(workspaceId, groupId);
 
-    try {
-      const response = await restoreGroup.mutateAsync(
-        workspaceId, groupId,
-      );
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao arquivar Group");
+          return;
+        }
 
-      if (!isSuccessResponse(response)) {
-        toast.error("Erro ao restaurar Group");
-        return;
+        toast.success("Group arquivado!");
+      } finally {
+        setIsLoading(null);
       }
+    },
+    [workspaceId, archivedGroup]
+  );
 
-      toast.success("Group restaurado!");
-    } finally {
-      setIsLoading(null);
-    }
-  }, [workspaceId, restoreGroup]);
+  const handleRestoreGroup = useCallback(
+    async (groupId: string) => {
+      setIsLoading(groupId);
+
+      try {
+        const response = await restoreGroup.mutateAsync(workspaceId, groupId);
+
+        if (!isSuccessResponse(response)) {
+          toast.error("Erro ao restaurar Group");
+          return;
+        }
+
+        toast.success("Group restaurado!");
+      } finally {
+        setIsLoading(null);
+      }
+    },
+    [workspaceId, restoreGroup]
+  );
 
   return {
     // Estado
@@ -340,6 +347,5 @@ export function useGroupActions(workspaceId: string) {
     handleMoveToTrash,
     handleArchiveGroup,
     handleRestoreGroup
-
-  }
+  };
 }

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   DialogContent,
@@ -15,7 +15,6 @@ import Link from "next/link";
 import { Link as LinkLu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-
 interface ItemsAssociatedWithMemberProps {
   workspaceId: string;
   memberId: string;
@@ -23,9 +22,10 @@ interface ItemsAssociatedWithMemberProps {
 }
 
 export function ItemsAssociatedWithMember({
-  member, workspaceId, memberId
-}: ItemsAssociatedWithMemberProps
-) {
+  member,
+  workspaceId,
+  memberId
+}: ItemsAssociatedWithMemberProps) {
   const { data, isLoading, error } = useItemsAssociatedWithMember(workspaceId, memberId);
   const hasMore = (data?.items?.length ?? 0) >= 100;
   return (
@@ -35,10 +35,11 @@ export function ItemsAssociatedWithMember({
         <DialogDescription>
           {data?.member?.joinedAt && (
             <>
-              Membro {formatDistanceToNow(
-                new Date(data.member.joinedAt),
-                { addSuffix: true, locale: ptBR }
-              )}
+              Membro{" "}
+              {formatDistanceToNow(new Date(data.member.joinedAt), {
+                addSuffix: true,
+                locale: ptBR
+              })}
             </>
           )}
         </DialogDescription>
@@ -46,17 +47,16 @@ export function ItemsAssociatedWithMember({
 
       <Button variant={"outline"} size={"sm"} className="w-fit">
         <LinkLu />
-        <Link href={`/dashboard/workspace/${workspaceId}/members/${memberId}}`}>
-          Detalhes
-        </Link>
+        <Link href={`/dashboard/workspace/${workspaceId}/members/${memberId}}`}>Detalhes</Link>
       </Button>
 
       <ul className="border p-2 rounded max-h-100 overflow-y-auto">
         {data?.items.map((item, index) => (
           <li key={item.id} className={cn("min-w-0 flex items-center justify-between border-b")}>
-            <p className="truncate">{index + 1} - {item.title}</p>
-            <span className={cn("min-w-30 text-center text-sm rounded", colorStatus(item.status)
-            )}>
+            <p className="truncate">
+              {index + 1} - {item.title}
+            </p>
+            <span className={cn("min-w-30 text-center text-sm rounded", colorStatus(item.status))}>
               {statusMap[item.status]}
             </span>
           </li>
@@ -68,5 +68,5 @@ export function ItemsAssociatedWithMember({
         </p>
       )}
     </DialogContent>
-  )
+  );
 }

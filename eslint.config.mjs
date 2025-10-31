@@ -6,24 +6,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
-  baseDirectory: __dirname,
+  baseDirectory: __dirname
 });
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    ignores: ["src/generated/**"],
+    ignores: ["src/generated/**"]
   },
   {
     rules: {
-      "@typescript-eslint/no-unused-vars": "off",
-    },
+      "@typescript-eslint/no-unused-vars": "off"
+    }
   },
   {
     files: ["**/*.cjs"],
     rules: {
-      "@typescript-eslint/no-require-imports": "off",
-    },
+      "@typescript-eslint/no-require-imports": "off"
+    }
   }
 ];
 

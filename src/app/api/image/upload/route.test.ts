@@ -7,9 +7,9 @@ jest.mock("cloudinary", () => ({
   v2: {
     config: jest.fn(),
     uploader: {
-      upload_stream: jest.fn(),
-    },
-  },
+      upload_stream: jest.fn()
+    }
+  }
 }));
 
 // Mock File.prototype.arrayBuffer
@@ -32,7 +32,7 @@ describe("API Route: /api/image/upload", () => {
 
     const mockRequest = new NextRequest("http://localhost/api/image/upload", {
       method: "POST",
-      body: formData,
+      body: formData
     });
 
     const mockUploadStream = cloudinary.uploader.upload_stream as jest.Mock;
@@ -59,7 +59,7 @@ describe("API Route: /api/image/upload", () => {
 
     const mockRequest = new NextRequest("http://localhost/api/image/upload", {
       method: "POST",
-      body: formData,
+      body: formData
     });
 
     const response = await POST(mockRequest);
@@ -78,7 +78,7 @@ describe("API Route: /api/image/upload", () => {
 
     const mockRequest = new NextRequest("http://localhost/api/image/upload", {
       method: "POST",
-      body: formData,
+      body: formData
     });
 
     const response = await POST(mockRequest);
@@ -97,7 +97,7 @@ describe("API Route: /api/image/upload", () => {
 
     const mockRequest = new NextRequest("http://localhost/api/image/upload", {
       method: "POST",
-      body: formData,
+      body: formData
     });
 
     const mockUploadStream = cloudinary.uploader.upload_stream as jest.Mock;

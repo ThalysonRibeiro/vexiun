@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { nameFallback } from "@/utils/name-fallback";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-
 
 interface ItemAssignProps {
   itemId: string;
@@ -27,7 +26,7 @@ interface TeamUser {
 
 export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
   const params = useParams();
-  const workspaceId = params.id as string
+  const workspaceId = params.id as string;
   const { data } = useTeam(workspaceId);
   const [selected, setSelected] = useState<TeamUser | null>();
   const assignTo = useAssignTo();
@@ -46,33 +45,33 @@ export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
     toast.success("Item designado com sucesso!");
     setSelected(null);
     closeRef.current?.click();
-  }
+  };
 
   return (
     <>
       <div className="flex flex-wrap gap-2 overflow-y-scroll max-h-80">
-        {data?.filter(u => u.id !== assignedToUser?.id).map(menber => (
-          <button key={menber.id}
-            onClick={() => setSelected(menber)}
-            className={cn("bg-accent rounded-full w-fit flex items-center gap-2 pr-3 cursor-pointer",
-              "transition-colors duration-300",
-              selected?.id === menber.id && "bg-primary text-white",
-            )}
-          >
-            <Avatar>
-              <AvatarImage className="h-12 w-12" src={menber?.image as string} />
-              <AvatarFallback>
-                {nameFallback(menber?.name as string)}
-              </AvatarFallback>
-            </Avatar>
-            <span>{menber?.name?.split(" ")[0] ?? "CATALYST"}</span>
-          </button>
-        ))}
+        {data
+          ?.filter((u) => u.id !== assignedToUser?.id)
+          .map((menber) => (
+            <button
+              key={menber.id}
+              onClick={() => setSelected(menber)}
+              className={cn(
+                "bg-accent rounded-full w-fit flex items-center gap-2 pr-3 cursor-pointer",
+                "transition-colors duration-300",
+                selected?.id === menber.id && "bg-primary text-white"
+              )}
+            >
+              <Avatar>
+                <AvatarImage className="h-12 w-12" src={menber?.image as string} />
+                <AvatarFallback>{nameFallback(menber?.name as string)}</AvatarFallback>
+              </Avatar>
+              <span>{menber?.name?.split(" ")[0] ?? "CATALYST"}</span>
+            </button>
+          ))}
       </div>
-      <Button onClick={handleAssign}>
-        Designar
-      </Button>
+      <Button onClick={handleAssign}>Designar</Button>
       <DialogClose ref={closeRef} className="hidden" />
     </>
-  )
+  );
 }

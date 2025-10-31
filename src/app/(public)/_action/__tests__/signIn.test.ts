@@ -2,7 +2,7 @@ import { handleRegister } from "../signIn";
 import { signIn } from "@/lib/auth";
 
 jest.mock("@/lib/auth", () => ({
-  signIn: jest.fn(),
+  signIn: jest.fn()
 }));
 
 describe("handleRegister", () => {
@@ -14,7 +14,7 @@ describe("handleRegister", () => {
     await handleRegister("github");
     expect(signIn).toHaveBeenCalledWith("github", {
       redirectTo: "/dashboard",
-      callbackUrl: "/dashboard",
+      callbackUrl: "/dashboard"
     });
   });
 
@@ -22,9 +22,7 @@ describe("handleRegister", () => {
     await handleRegister("google");
     expect(signIn).toHaveBeenCalledWith("google", {
       redirectTo: "/dashboard",
-      callbackUrl: "/dashboard",
+      callbackUrl: "/dashboard"
     });
   });
 });
-
-

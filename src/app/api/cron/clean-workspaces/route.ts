@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         select: { id: true }
       });
 
-      const workspaceIds = workspaces.map(w => w.id);
+      const workspaceIds = workspaces.map((w) => w.id);
 
       if (workspaceIds.length === 0) {
         return { workspaces: 0, notifications: 0 };
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
         where: {
           referenceId: { in: workspaceIds },
           type: {
-            in: ['WORKSPACE_INVITE', 'WORKSPACE_ACCEPTED']
+            in: ["WORKSPACE_INVITE", "WORKSPACE_ACCEPTED"]
           }
         }
       });
@@ -50,11 +50,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `${result.workspaces} workspace(s) e ${result.notifications} notificação(ões) deletados`,
+      message: `${result.workspaces} workspace(s) e ${result.notifications} notificação(ões) deletados`
     });
-
   } catch (error) {
-    console.error('Erro ao limpar workspaces:', error);
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    console.error("Erro ao limpar workspaces:", error);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

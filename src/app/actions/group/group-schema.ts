@@ -4,15 +4,16 @@ import { workspaceIdSchema } from "../workspace";
 
 export const groupIdFormSchema = z.object({
   workspaceId: z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  groupId: z.string()
+  groupId: z
+    .string()
     .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
     .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
-  revalidatePaths: z.array(z.string()).optional(),
+  revalidatePaths: z.array(z.string()).optional()
 });
 
 export const groupFormSchema = z.object({
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
-  textColor: z.string().min(4, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
+  textColor: z.string().min(4, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
 });
 
 export const createGroupFormSchema = workspaceIdSchema.merge(groupFormSchema);

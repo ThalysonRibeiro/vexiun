@@ -7,7 +7,7 @@ import { unwrapServerData } from "@/utils/server-helpers";
 export default async function Profile() {
   const session = await getSession();
   if (!session) {
-    redirect('/');
+    redirect("/");
   }
   if (!session.user) return null;
 
@@ -18,5 +18,5 @@ export default async function Profile() {
     <main className="container mx-auto px-6 pt-6">
       <ProfileContent sessionUser={session.user} detailUser={detailUser} />
     </main>
-  )
+  );
 }

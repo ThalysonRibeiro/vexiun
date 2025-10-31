@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Card,
@@ -23,11 +23,7 @@ import {
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { usePagination } from "@/hooks/use-pagination";
 import { ActionItem } from "./action-item";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage
-} from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Check, Eye } from "lucide-react";
 import { format } from "date-fns";
@@ -75,7 +71,7 @@ function ItemLifecycleView(props: ItemLifecycleViewProps) {
   const currentUserId = session?.user.id;
   const isOwner = workspace?.workspace.userId === currentUserId;
   const permissions = useWorkspacePermissions({
-    userRole: workspace?.member.role as WorkspaceRole ?? "VIEWER",
+    userRole: (workspace?.member.role as WorkspaceRole) ?? "VIEWER",
     workspaceStatus: entityStatus as EntityStatus,
     isOwner
   });
@@ -84,7 +80,7 @@ function ItemLifecycleView(props: ItemLifecycleViewProps) {
     <>
       {changeLayout ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {items.map(item => (
+          {items.map((item) => (
             <Card key={item.id}>
               <CardHeader>
                 <CardTitle className="truncate">
@@ -145,17 +141,13 @@ function ItemLifecycleView(props: ItemLifecycleViewProps) {
                     <TableHead className="text-center max-w-25 overflow-hidden border-x">
                       Responsável
                     </TableHead>
-                    <TableHead className="text-center border-x">
-                      Finalizado
-                    </TableHead>
-                    <TableHead className="text-center border-l">
-                      Detalhes
-                    </TableHead>
+                    <TableHead className="text-center border-x">Finalizado</TableHead>
+                    <TableHead className="text-center border-l">Detalhes</TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
-                  {pagination?.currentItems.map(item => (
+                  {pagination?.currentItems.map((item) => (
                     <TableRow key={item.id}>
                       {permissions.canRestore && (
                         <TableCell className="py-0.5 border-r">
@@ -188,10 +180,7 @@ function ItemLifecycleView(props: ItemLifecycleViewProps) {
                       </TableCell>
 
                       <TableCell className="border-x w-fit py-0.5">
-                        <TermItem
-                          label={false}
-                          updatedAt={item.updatedAt}
-                        />
+                        <TermItem label={false} updatedAt={item.updatedAt} />
                       </TableCell>
 
                       <TableCell className="py-0.5">
@@ -203,9 +192,7 @@ function ItemLifecycleView(props: ItemLifecycleViewProps) {
               </Table>
             </div>
 
-            {items.length > 10 && pagination && (
-              <PaginationControls {...pagination} />
-            )}
+            {items.length > 10 && pagination && <PaginationControls {...pagination} />}
           </CollapsibleContent>
         </Collapsible>
       )}
@@ -213,77 +200,81 @@ function ItemLifecycleView(props: ItemLifecycleViewProps) {
   );
 }
 
-
 function TitleItem({ title }: { title: string }) {
-  return (
-    <div>
-      {title[0].toUpperCase() + title.slice(1)}
-    </div>
-  )
+  return <div>{title[0].toUpperCase() + title.slice(1)}</div>;
 }
 
 function AssignedToUserItem({
-  image, name, label, className
-}: { image: string, name: string, label: boolean, className?: string }) {
+  image,
+  name,
+  label,
+  className
+}: {
+  image: string;
+  name: string;
+  label: boolean;
+  className?: string;
+}) {
   return (
     <div>
-      {label && <label htmlFor="responsável" className="text-muted-foreground text-sm">Responsável</label>}
+      {label && (
+        <label htmlFor="responsável" className="text-muted-foreground text-sm">
+          Responsável
+        </label>
+      )}
       <div className={cn("flex items-center gap-2 h-full w-full", className)}>
         <Avatar>
           <AvatarImage src={image} />
-          <AvatarFallback>
-            {(name)[0].toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
         </Avatar>
-        <div>{name?.split(' ')[0]}</div>
+        <div>{name?.split(" ")[0]}</div>
       </div>
     </div>
-  )
+  );
 }
 
 function TermItem({
-  updatedAt, label, className
-}: { updatedAt: Date, label: boolean, className?: string }) {
+  updatedAt,
+  label,
+  className
+}: {
+  updatedAt: Date;
+  label: boolean;
+  className?: string;
+}) {
   return (
     <div>
-      {label && <label htmlFor="prazo" className="text-muted-foreground text-sm">Prazo</label>}
+      {label && (
+        <label htmlFor="prazo" className="text-muted-foreground text-sm">
+          Prazo
+        </label>
+      )}
       <div className={cn("flex items-center justify-center gap-2 w-full", className)}>
         <div className="flex items-center gap-1">
           <Check className="h-4 w-4 text-green-600" />
         </div>
         <div
-          className={cn(
-            "cursor-pointer hover:bg-accent p-1 rounded transition-colors",
-          )}
+          className={cn("cursor-pointer hover:bg-accent p-1 rounded transition-colors")}
           title="Clique para editar"
         >
           {format(updatedAt, "dd/MM/yyyy")}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function DetailsItem({ item }: { item: ItemWhitCreatedAssignedUser }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button
-          className="w-full cursor-pointer"
-          variant={"outline"}
-        >
+        <Button className="w-full cursor-pointer" variant={"outline"}>
           <Eye /> Detalhes do item
         </Button>
       </SheetTrigger>
       <InfoItem data={item} editable={false} team={[]} />
     </Sheet>
-  )
+  );
 }
 
-export {
-  ItemLifecycleView,
-  TitleItem,
-  AssignedToUserItem,
-  TermItem,
-  DetailsItem
-}
+export { ItemLifecycleView, TitleItem, AssignedToUserItem, TermItem, DetailsItem };
