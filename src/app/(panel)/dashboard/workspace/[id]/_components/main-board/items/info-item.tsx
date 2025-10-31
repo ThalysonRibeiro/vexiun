@@ -60,6 +60,7 @@ export function InfoItem({
       {isEditing && editable && permissions.canCreateOrEditItem ? (
         <div className="p-4 space-y-4">
           <CreateOrEditItemForm
+            workspaceId={workspaceId as string}
             closeForm={() => setIsEditing(false)}
             initialValues={{
               title: data.title,

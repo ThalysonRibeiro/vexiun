@@ -1,21 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { isSuccessResponse } from "@/lib/errors/error-handler";
-import { getTeam, getTeamCount } from "@/app/data-access/team";
+import { fetchAPI } from "@/lib/api/fetch-api";
 
-export type TeamResult = Awaited<ReturnType<typeof getTeam>>;
-export type TeamData = Extract<TeamResult, { success: true }>["data"];
+type TeamResponse = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  email: string;
+}[];
 
 export function useTeam(workspaceId: string) {
-  return useQuery<TeamData>({
+  return useQuery<TeamResponse>({
     queryKey: ["team", workspaceId] as const,
     queryFn: async () => {
-      const result = await getTeam(workspaceId);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return fetchAPI(`/api/workspace/${workspaceId}/team`);
     },
     enabled: !!workspaceId
   });
@@ -25,13 +22,7 @@ export function useTeamCount(workspaceId: string) {
   return useQuery<number | undefined>({
     queryKey: ["team", "team-count", workspaceId] as const,
     queryFn: async () => {
-      const result = await getTeamCount(workspaceId);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data?.count;
+      return fetchAPI(`/api/workspace/${workspaceId}/team/counts`);
     },
     enabled: !!workspaceId
   });

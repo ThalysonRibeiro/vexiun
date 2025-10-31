@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
-import { getDetailUser, searchUsers } from "@/app/data-access/user";
 import {
   updateAvatar,
   UpdateAvatarType,
@@ -17,6 +16,7 @@ import {
 } from "@/app/actions/user/user-schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { fetchAPI } from "@/lib/api/fetch-api";
 
 export interface UseNameFormProps {
   initialValues?: {
@@ -54,22 +54,22 @@ export function UseSettingsForm({ initialValues }: UseSettingsFormProps) {
   });
 }
 
-type UserResult = Awaited<ReturnType<typeof searchUsers>>;
-type UserData = Extract<UserResult, { success: true }>["data"];
+type UserResponse = {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+}[];
 
 export function useUserSearch(query: string, excludeUserIds: string[] = []) {
-  return useQuery<UserData>({
+  return useQuery<UserResponse>({
     queryKey: ["user", "search", query, excludeUserIds] as const,
     queryFn: async () => {
-      const result = await searchUsers(query);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
+      const result: UserResponse = await fetchAPI(`/api/user/search-users?query=${query}`);
 
       return excludeUserIds.length > 0
-        ? result?.data?.filter((user) => !excludeUserIds.includes(user.id))
-        : result.data;
+        ? result?.filter((user) => !excludeUserIds.includes(user.id))
+        : result;
     },
     enabled: query.trim().length >= 2
   });

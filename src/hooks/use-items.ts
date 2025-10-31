@@ -17,17 +17,11 @@ import {
 } from "@/app/actions/item";
 import { assignTo } from "@/app/actions/item/assign-to";
 import { changeItemStatus } from "@/app/actions/item/change-status";
-import {
-  getAssociatedWithMember,
-  getItemsByStatus,
-  getItemsCountByStatus,
-  getPublicItems
-} from "@/app/data-access/item";
-import { getItemsByEntityStatus } from "@/app/data-access/item/get-by-entity-status";
 import { EntityStatus, Priority, Prisma, Status } from "@/generated/prisma";
+import { fetchAPI } from "@/lib/api/fetch-api";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient, dataTagErrorSymbol } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { JSONContent } from "@tiptap/core";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -62,8 +56,6 @@ export function UseItemForm({ initialValues }: UseItemFormProps) {
   });
 }
 
-export type ItemData = Awaited<ReturnType<typeof getPublicItems>>;
-
 export type ItemWhitCreatedAssignedUser = Prisma.ItemGetPayload<{
   include: {
     createdByUser: {
@@ -87,62 +79,58 @@ export type ItemWhitCreatedAssignedUser = Prisma.ItemGetPayload<{
   };
 }>;
 
-export type ItemsResults = Awaited<ReturnType<typeof getPublicItems>>;
-export type ItemsData = Extract<ItemsResults, { success: true }>["data"];
-
-export function useItems(groupId: string) {
-  return useQuery<ItemsData>({
+export function useItems(workspaceId: string, groupId: string) {
+  return useQuery<ItemsByStatusResponse>({
     queryKey: ["items", groupId] as const,
     queryFn: async () => {
-      const result = await getPublicItems(groupId);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return fetchAPI(`/api/workspace/${workspaceId}/groups/${groupId}/public-items`);
     },
-    enabled: !!groupId,
+    enabled: !!workspaceId && !!groupId,
     refetchOnWindowFocus: true
   });
 }
 
-export type ItemsByStatusResult = Awaited<ReturnType<typeof getItemsByStatus>>;
-export type ItemsByStatusData = Extract<ItemsByStatusResult, { success: true }>["data"];
+type ItemsByStatusResponse = {
+  response: ItemWhitCreatedAssignedUser[];
+  itemsNotCompleted: ItemWhitCreatedAssignedUser[];
+  statusDone: ItemWhitCreatedAssignedUser[];
+  statusNotStarted: ItemWhitCreatedAssignedUser[];
+  statusInProgress: ItemWhitCreatedAssignedUser[];
+  statusStoped: ItemWhitCreatedAssignedUser[];
+};
 
 export function useItemsByStatus(workspaceId: string) {
-  return useQuery<ItemsByStatusData>({
+  return useQuery<ItemsByStatusResponse>({
     queryKey: ["items", "by-status", workspaceId] as const,
     queryFn: async () => {
-      const result = await getItemsByStatus(workspaceId);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return fetchAPI(`/api/workspace/${workspaceId}/groups/items/by-status`);
     },
     enabled: !!workspaceId,
     refetchOnWindowFocus: true
   });
 }
 
-export type ItemsAssociatedWithMemberResult = Awaited<ReturnType<typeof getAssociatedWithMember>>;
-export type ItemsAssociatedWithMemberData = Extract<
-  ItemsAssociatedWithMemberResult,
-  { success: true }
->["data"];
+export type ItemsAssociatedWithMemberResponse = {
+  member: {
+    joinedAt: Date;
+  };
+  items: {
+    title: string;
+    id: string;
+    status: Status;
+    term: Date;
+    priority: Priority;
+    assignedTo: string | null;
+  }[];
+};
 
 export function useItemsAssociatedWithMember(workspaceId: string, memberId: string) {
-  return useQuery<ItemsAssociatedWithMemberData>({
+  return useQuery<ItemsAssociatedWithMemberResponse>({
     queryKey: ["items", "associated-with-member", workspaceId, memberId] as const,
     queryFn: async () => {
-      const result = await getAssociatedWithMember(workspaceId, memberId);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return fetchAPI(
+        `/api/workspace/${workspaceId}/groups/items/associated-with-member?memberId=${memberId}`
+      );
     },
     enabled: !!workspaceId && !!memberId,
     refetchOnWindowFocus: true
@@ -156,13 +144,9 @@ export function usePrefetchMemberItems() {
     queryClient.prefetchQuery({
       queryKey: ["items", "associated-with-member", workspaceId, memberId] as const,
       queryFn: async () => {
-        const result = await getAssociatedWithMember(workspaceId, memberId);
-
-        if (!isSuccessResponse(result)) {
-          throw new Error(result.error);
-        }
-
-        return result.data;
+        return fetchAPI(
+          `/api/workspace/${workspaceId}/groups/items/associated-with-member?memberId=${memberId}`
+        );
       },
       staleTime: 5 * 60 * 1000 // Cache por 5min
     });
@@ -171,36 +155,30 @@ export function usePrefetchMemberItems() {
   return { prefetch };
 }
 
-export type ItemsByEntityStatusResult = Awaited<ReturnType<typeof getItemsByEntityStatus>>;
-export type ItemsByEntityStatusData = Extract<ItemsByEntityStatusResult, { success: true }>["data"];
-
-export function useItemsByEntityStatus(groupId: string, status: EntityStatus) {
-  return useQuery<ItemsByEntityStatusData>({
+export function useItemsByEntityStatus(workspaceId: string, groupId: string, status: EntityStatus) {
+  return useQuery({
     queryKey: ["items", "by-entity-status", groupId, status] as const,
     queryFn: async () => {
-      const result = await getItemsByEntityStatus(groupId, status);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
+      return fetchAPI(
+        `/api/workspace/${workspaceId}/groups/${groupId}/item-by-entity-status?status=${status}`
+      );
     },
     enabled: !!groupId && !!status,
     refetchOnWindowFocus: true
   });
 }
 
+export type ItemsCountByStatusResponse = {
+  count: number;
+};
+
 export function useItemsCountByStatus(workspaceId: string, entityStatus: EntityStatus) {
   return useQuery<number | undefined>({
     queryKey: ["items", "items-count", workspaceId, entityStatus],
     queryFn: async () => {
-      const result = await getItemsCountByStatus(workspaceId, entityStatus);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data?.count;
+      return fetchAPI(
+        `/api/workspace/${workspaceId}/groups/items/count-by-status?status=${entityStatus}`
+      );
     },
     enabled: !!workspaceId
   });

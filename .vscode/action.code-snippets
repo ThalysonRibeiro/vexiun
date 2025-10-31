@@ -351,7 +351,7 @@
   "Route Handler GET with Auth": {
     "prefix": "route-get",
     "body": [
-      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { withAuthRoute } from \"@/lib/api/with-auth-route\";",
       "import { NextResponse } from \"next/server\";",
       "import prisma from \"@/lib/prisma\";",
       "",
@@ -377,7 +377,7 @@
   "Route Handler GET with Dynamic Params": {
     "prefix": "route-get-params",
     "body": [
-      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { withAuthRoute } from \"@/lib/api/with-auth-route\";",
       "import { NextResponse } from \"next/server\";",
       "import prisma from \"@/lib/prisma\";",
       "",
@@ -403,7 +403,7 @@
   "Route Handler POST with Auth": {
     "prefix": "route-post",
     "body": [
-      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { withAuthRoute } from \"@/lib/api/with-auth-route\";",
       "import { NextResponse } from \"next/server\";",
       "import prisma from \"@/lib/prisma\";",
       "",
@@ -430,7 +430,7 @@
   "Route Handler GET with Query Params and Filters": {
     "prefix": "route-get-filters",
     "body": [
-      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { withAuthRoute } from \"@/lib/api/with-auth-route\";",
       "import { NextResponse } from \"next/server\";",
       "import prisma from \"@/lib/prisma\";",
       "import { ${1:EntityStatus} } from \"@/generated/prisma\";",
@@ -469,7 +469,7 @@
       "// });",
       "",
       "// DEPOIS (Route Handler):",
-      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { withAuthRoute } from \"@/lib/api/with-auth-route\";",
       "import { NextResponse } from \"next/server\";",
       "import prisma from \"@/lib/prisma\";",
       "",
@@ -491,7 +491,7 @@
   "Route Handler with Validation": {
     "prefix": "route-validate",
     "body": [
-      "import { withAuthRoute } from \"@/lib/errors\";",
+      "import { withAuthRoute } from \"@/lib/api/with-auth-route\";",
       "import { NextResponse } from \"next/server\";",
       "import { validateWorkspaceAccess } from \"@/lib/helpers/validate-workspace-access\";",
       "import prisma from \"@/lib/prisma\";",

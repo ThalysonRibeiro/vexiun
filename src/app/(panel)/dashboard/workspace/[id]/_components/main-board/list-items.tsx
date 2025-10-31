@@ -14,7 +14,7 @@ export function ListItems(props: ItemsTablesProps) {
   const { groupId, team, changeLayout, workspaceId } = props;
   const formRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { data: items, isLoading: isLoadingItems } = useItems(groupId);
+  const { data: items, isLoading: isLoadingItems } = useItems(workspaceId, groupId);
 
   const {
     dialogState,

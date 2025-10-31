@@ -13,7 +13,7 @@ import {
 } from "@/app/actions/group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EntityStatus } from "@/generated/prisma";
+import { EntityStatus, Priority, Status } from "@/generated/prisma";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { changeGroupStatus } from "@/app/actions/group/change-group-status";
@@ -37,8 +37,33 @@ export function UseGroupForm({ initialValues }: UseGroupFormProps) {
   });
 }
 
+type GroupsResponse = {
+  group: {
+    id: string;
+    title: string;
+    textColor: string;
+    workspaceId: string;
+    status: EntityStatus;
+    createdAt: string;
+    updatedAt: string;
+    item: {
+      id: string;
+      status: Status;
+      priority: Priority;
+    }[];
+    _count: {
+      item: number;
+    };
+    doneCount: number;
+    pendingCount: number;
+    totalItems: number;
+  }[];
+  itemsCompletedCount: number;
+  totalItems: number;
+};
+
 export function useGroups(workspaceId: string) {
-  return useQuery({
+  return useQuery<GroupsResponse>({
     queryKey: ["groups", workspaceId] as const,
     queryFn: async () => {
       // const params = new URLSearchParams();

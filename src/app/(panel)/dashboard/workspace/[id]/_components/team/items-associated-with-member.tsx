@@ -57,7 +57,7 @@ export function ItemsAssociatedWithMember({
               {index + 1} - {item.title}
             </p>
             <span className={cn("min-w-30 text-center text-sm rounded", colorStatus(item.status))}>
-              {statusMap[item.status]}
+              {statusMap.filter((status) => status.key === item.status)[0].label}
             </span>
           </li>
         ))}
