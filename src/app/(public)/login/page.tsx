@@ -1,6 +1,7 @@
 import { CardSignIn } from "@/components/card-signIn";
 import { CatalystLogo } from "@/components/catalyst-logo";
 import getSession from "@/lib/getSession";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function Login() {
@@ -28,9 +29,9 @@ export default async function Login() {
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
             Não tem uma conta?{" "}
-            <a href="/" className="text-primary hover:underline">
+            <Link href="/" className="text-primary hover:underline">
               Voltar para a página inicial
-            </a>
+            </Link>
           </p>
         </div>
       </div>

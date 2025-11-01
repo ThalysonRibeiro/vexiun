@@ -4,7 +4,7 @@ import { SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/compo
 import { cn } from "@/lib/utils";
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { Edit, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreateOrEditItemForm } from "../create-or-edit-item-form";
 import { JSONContent } from "@tiptap/core";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
@@ -45,6 +45,16 @@ export function InfoItem({
     workspaceStatus: workspace?.workspace.status as EntityStatus,
     isOwner
   });
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shetRef.current && !shetRef.current.contains(event.target as Node)) {
+        setIsEditing(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <SheetContent ref={shetRef} className="overflow-y-scroll min-w-[calc(80vw-25rem)]">

@@ -315,7 +315,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                         onChange={(date) => {
                           field.onChange(date);
                         }}
-                        initialDate={field.value || new Date()} // Adiciona esta linha
+                        initialDate={initialValues?.term} // Adiciona esta linha
                       />
                     </FormControl>
                     <FormDescription />

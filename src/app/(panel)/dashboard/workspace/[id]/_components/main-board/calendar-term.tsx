@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
 
 export function CalendarTerm({
   onChange,
@@ -40,7 +41,7 @@ export function CalendarTerm({
             type="button"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? date.toLocaleDateString("pt-BR") : <span>Selecione a data</span>}
+            {date ? format(date, "dd/MM/yyyy") : <span>Selecione a data</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent
