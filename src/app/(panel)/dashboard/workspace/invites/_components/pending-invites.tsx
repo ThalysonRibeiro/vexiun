@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { memo } from "react";
-import { InvitesWithWorkspaceAndInviter } from "./types";
+import { InvitesWithWorkspaceAndInviter } from "../types";
 
 interface InvitesContentProps {
   pendingInvites: InvitesWithWorkspaceAndInviter[];

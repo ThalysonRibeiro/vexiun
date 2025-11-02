@@ -13,7 +13,7 @@ import {
   TableCell,
   TableCaption
 } from "@/components/ui/table";
-import { SentInvite } from "./types";
+import { SentInvite } from "../types";
 
 interface InvitesContentProps {
   sentInvites?: SentInvite[] | null;

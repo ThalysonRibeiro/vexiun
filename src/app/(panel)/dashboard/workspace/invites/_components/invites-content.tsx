@@ -2,7 +2,7 @@
 
 import { useActionWorkspaceInvites } from "@/hooks/use-workspace";
 import { Separator } from "@/components/ui/separator";
-import { InvitesWithWorkspaceAndInviter, SentInvite } from "./types";
+import { InvitesWithWorkspaceAndInviter, SentInvite } from "../types";
 import { PendingInvites } from "./pending-invites";
 import { SentInvites } from "./sent-invites";
 
