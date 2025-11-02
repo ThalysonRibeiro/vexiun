@@ -28,6 +28,7 @@ import { CACHE_TIMES } from "@/lib/constants";
 import { useCallback, useState } from "react";
 import { WorkspaceWithDetails } from "@/app/(panel)/dashboard/workspace/_components/workspaces-page-client";
 import { toast } from "sonner";
+import { SentInvite } from "@/app/(panel)/dashboard/workspace/invites/types";
 
 export interface UseWorkspaceProps {
   initialValues?: {
@@ -43,6 +44,8 @@ export function useWorkspaceForm({ initialValues }: UseWorkspaceProps) {
     resolver: zodResolver(workspaceSchema),
     defaultValues: initialValues || {
       title: "",
+      categories: [],
+      description: "",
       invitationUsersId: []
     }
   });
@@ -87,9 +90,6 @@ export function useUpdateWorkspace() {
   });
 }
 
-/**
- * deletar permanente
- */
 export function useDeleteWorkspace() {
   const queryClient = useQueryClient();
 
@@ -217,6 +217,9 @@ export function useAcceptWorkspaceInvitation() {
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       queryClient.invalidateQueries({
+        queryKey: ["workspace"]
+      });
+      queryClient.invalidateQueries({
         queryKey: ["workspace", variables.workspaceId]
       });
       queryClient.invalidateQueries({
@@ -244,8 +247,14 @@ export function useCancelWorkspaceInvitation() {
     },
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["workspace", variables.invitationId, "invitations"]
+        queryKey: ["workspace"]
       });
+      // variables may contain multiple invitationIds; invalidate related queries
+      if (variables?.invitationIds && Array.isArray(variables.invitationIds)) {
+        variables.invitationIds.forEach((id) => {
+          queryClient.invalidateQueries({ queryKey: ["workspace", id, "invitations"] });
+        });
+      }
 
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     }
@@ -266,6 +275,9 @@ export function useDeclineWorkspaceInvitation() {
       return result.data;
     },
     onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["workspace"]
+      });
       queryClient.invalidateQueries({
         queryKey: ["workspace", variables.workspaceId, "invitations"]
       });
@@ -408,6 +420,121 @@ export function useActionsWorkspaceList() {
     handleArchive,
     handleDelete,
     handleSelectForEdit
+  };
+}
+
+export function useActionWorkspaceInvites() {
+  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const accept = useAcceptWorkspaceInvitation();
+  const decline = useDeclineWorkspaceInvitation();
+  const cancel = useCancelWorkspaceInvitation();
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelected((s) => ({ ...s, [id]: !s[id] }));
+  }, []);
+
+  const clearSelected = useCallback((ids: string[]) => {
+    setSelected((s) => {
+      const next = { ...s };
+      ids.forEach((id) => delete next[id]);
+      return next;
+    });
+  }, []);
+
+  const selectAllInGroup = useCallback(
+    (group: SentInvite[]) => {
+      const next = { ...selected };
+      group.forEach((i) => {
+        next[i.id] = true;
+      });
+      setSelected(next);
+    },
+    [selected]
+  );
+
+  const unselectAllInGroup = useCallback(
+    (group: SentInvite[]) => {
+      const ids = group.map((i) => i.id);
+      clearSelected(ids);
+    },
+    [clearSelected]
+  );
+
+  const setLoading = useCallback((id: string, value: boolean) => {
+    setLoadingMap((s) => ({ ...s, [id]: value }));
+  }, []);
+
+  const handleAccept = useCallback(
+    async (inviteId: string, workspaceId: string) => {
+      if (loadingMap[inviteId]) return;
+      setLoading(inviteId, true);
+      try {
+        await accept.mutateAsync({
+          workspaceId,
+          revalidatePaths: ["/dashboard/workspace/invites"]
+        });
+        toast.success("Convite aceito");
+      } catch (err) {
+        toast.error("Erro ao aceitar convite");
+      } finally {
+        setLoading(inviteId, false);
+      }
+    },
+    [accept, loadingMap, setLoading]
+  );
+
+  const handleDecline = useCallback(
+    async (inviteId: string, workspaceId: string) => {
+      if (loadingMap[inviteId]) return;
+      setLoading(inviteId, true);
+      try {
+        await decline.mutateAsync({
+          workspaceId,
+          revalidatePaths: ["/dashboard/workspace/invites"]
+        });
+        toast.success("Convite recusado");
+      } catch (err) {
+        toast.error("Erro ao recusar convite");
+      } finally {
+        setLoading(inviteId, false);
+      }
+    },
+    [decline, loadingMap, setLoading]
+  );
+
+  const handleCancel = useCallback(
+    async (inviteId: Array<string>) => {
+      if (inviteId.some((id) => loadingMap[id])) return;
+      setLoading(inviteId[0], true);
+      try {
+        await cancel.mutateAsync({
+          invitationIds: inviteId,
+          revalidatePaths: ["/dashboard/workspace/invites"]
+        });
+        toast.success("Convite cancelado");
+      } catch (err) {
+        toast.error("Erro ao cancelar convite");
+      } finally {
+        setLoading(inviteId[0], false);
+      }
+    },
+    [cancel, loadingMap, setLoading]
+  );
+
+  return {
+    // Estado
+    loadingMap,
+    selected,
+    // Setters
+    toggleSelect,
+    clearSelected,
+    selectAllInGroup,
+    unselectAllInGroup,
+    // Ações
+    handleAccept,
+    handleDecline,
+    handleCancel
   };
 }
 

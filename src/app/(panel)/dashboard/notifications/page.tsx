@@ -148,54 +148,51 @@ export default function NotificationsPage() {
   };
 
   return (
-    <main className="container mx-auto p-6 max-w-4xl mt-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Notificações</h1>
-          <p className="text-sm text-muted-foreground">
-            {unreadCount > 0 ? `${unreadCount} não lidas` : "Todas lidas"}
-          </p>
-        </div>
-
-        <div className="flex gap-2 flex-wrap justify-end">
-          {unreadCount > 0 && (
-            <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isDeleting}>
-              <Check className="w-4 h-4 mr-2" />
-              Marcar todas como lidas
-            </Button>
-          )}
-
-          {selectedIds.length > 0 && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteSelected}
-              disabled={isDeleting}
-            >
-              <Trash className="w-4 h-4 mr-2" />
-              Deletar ({selectedIds.length})
-            </Button>
-          )}
-
-          <Button variant="outline" size="sm" onClick={handleDeleteRead} disabled={isDeleting}>
-            <CheckCheck className="w-4 h-4 mr-2" />
-            Deletar Lidas
+    <main className="container mx-auto space-y-4 p-6 max-w-4xl mt-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Notificações</h1>
+        <p className="text-sm text-muted-foreground">
+          {unreadCount > 0 ? `${unreadCount} não lidas` : "Todas lidas"}
+        </p>
+      </div>
+      <div className="flex items-center gap-2 flex-wrap justify-center">
+        {unreadCount > 0 && (
+          <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isDeleting}>
+            <Check className="w-4 h-4 mr-2" />
+            Marcar todas como lidas
           </Button>
+        )}
 
-          <Button variant="outline" size="sm" onClick={handleSmartCleanup} disabled={isDeleting}>
-            <Sparkles className="w-4 h-4 mr-2" />
-            Limpeza Inteligente
+        {selectedIds.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleDeleteSelected}
+            disabled={isDeleting}
+          >
+            <Trash className="w-4 h-4 mr-2" />
+            Deletar ({selectedIds.length})
           </Button>
+        )}
 
-          <Button variant="outline" size="sm" onClick={handleDeleteAll} disabled={isDeleting}>
-            <X className="w-4 h-4 mr-2" />
-            Deletar Todas
-          </Button>
-        </div>
+        <Button variant="outline" size="sm" onClick={handleDeleteRead} disabled={isDeleting}>
+          <CheckCheck className="w-4 h-4 mr-2" />
+          Deletar Lidas
+        </Button>
+
+        <Button variant="outline" size="sm" onClick={handleSmartCleanup} disabled={isDeleting}>
+          <Sparkles className="w-4 h-4 mr-2" />
+          Limpeza Inteligente
+        </Button>
+
+        <Button variant="outline" size="sm" onClick={handleDeleteAll} disabled={isDeleting}>
+          <X className="w-4 h-4 mr-2" />
+          Deletar Todas
+        </Button>
       </div>
 
       {notifications.length > 0 && (
-        <div className="mb-4 p-3 bg-muted rounded-lg">
+        <div className="p-3 bg-muted rounded-lg">
           <label className="flex items-center gap-2 cursor-pointer">
             <Checkbox
               checked={selectedIds.length === notifications.length}

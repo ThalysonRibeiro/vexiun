@@ -19,9 +19,11 @@ import { Badge } from "@/components/ui/badge";
 
 interface MenuProps {
   userData: Session;
+  countPendingInvitations: number;
 }
 
-export function Menu({ userData }: MenuProps) {
+export function Menu(props: MenuProps) {
+  const { userData, countPendingInvitations } = props;
   const { update } = useSession();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -95,7 +97,9 @@ export function Menu({ userData }: MenuProps) {
           <Link href="/dashboard/workspace/invites" className="flex items-center w-full gap-2">
             <Mail className="mr-2 h-4 w-4" />
             Convites
-            <Badge className="ml-auto">1</Badge>
+            {countPendingInvitations > 0 && (
+              <Badge className="ml-auto">{countPendingInvitations}</Badge>
+            )}
           </Link>
         </DropdownMenuItem>
 

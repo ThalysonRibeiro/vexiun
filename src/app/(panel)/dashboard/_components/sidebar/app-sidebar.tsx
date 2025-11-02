@@ -21,7 +21,6 @@ import { FaTasks } from "react-icons/fa";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CatalystLogo } from "@/components/catalyst-logo";
 import { SharedWorkspacesData, WorkspaceSummaryData } from "@/app/data-access/workspace";
-import { Prisma } from "@/generated/prisma";
 import { BadgeWorkspace } from "@/components/badge-workspace";
 
 type NavigationLink =
@@ -69,21 +68,12 @@ const navigationLinks: NavigationLink[] = [
 interface AppSidebarProps {
   workspaces: WorkspaceSummaryData;
   sharedWorkspaces: SharedWorkspacesData;
+  countPendingInvitations: number;
   userData: Session;
 }
 
-type WorkspacesMenberWithWorkspace = Prisma.WorkspaceMemberGetPayload<{
-  include: {
-    workspace: true;
-  };
-}>;
-
-type Workspace = {
-  id: string;
-  title: string;
-};
-
-export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSidebarProps) {
+export function AppSidebar(props: AppSidebarProps) {
+  const { workspaces, sharedWorkspaces, countPendingInvitations, userData } = props;
   const pathname = usePathname();
 
   if (!workspaces) {
@@ -185,7 +175,7 @@ export function AppSidebar({ workspaces, sharedWorkspaces, userData }: AppSideba
       </SidebarContent>
 
       <SidebarFooter>
-        <Menu userData={userData} />
+        <Menu userData={userData} countPendingInvitations={countPendingInvitations} />
       </SidebarFooter>
     </Sidebar>
   );

@@ -8,6 +8,7 @@ import { getMyWorkspaces } from "@/app/data-access/workspace/get-my-workspace";
 import { unwrapServerData } from "@/utils/server-helpers";
 import { getSharedWorkspaces } from "@/app/data-access/workspace/get-shared-workspaces";
 import { MainSaidebar } from "@/components/main-sidebar";
+import { getCountMyPendingInvitations } from "@/app/data-access/user";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -17,10 +18,18 @@ export default async function Layout({ children }: { children: React.ReactNode }
   }
   const workspaces = await getMyWorkspaces().then(unwrapServerData);
   const sharedWorkspaces = await getSharedWorkspaces().then(unwrapServerData);
+  const countPendingInvitations = await getCountMyPendingInvitations().then(unwrapServerData);
+
+  const comomProps = {
+    workspaces,
+    sharedWorkspaces,
+    countPendingInvitations,
+    userData: session
+  };
 
   return (
     <SidebarProvider>
-      <AppSidebar sharedWorkspaces={sharedWorkspaces} workspaces={workspaces} userData={session} />
+      <AppSidebar {...comomProps} />
       <MainSaidebar>
         <SidebarTrigger className="fixed" />
         <NotificationList />

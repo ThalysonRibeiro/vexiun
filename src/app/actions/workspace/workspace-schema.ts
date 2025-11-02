@@ -18,10 +18,7 @@ export const addMemnberSchema = workspaceIdSchema.extend({
 });
 
 export const cancelInvitationSchema = z.object({
-  invitationId: z
-    .string()
-    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
-    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+  invitationIds: z.array(z.string().cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)),
   revalidatePaths: z.array(z.string()).optional()
 });
 
