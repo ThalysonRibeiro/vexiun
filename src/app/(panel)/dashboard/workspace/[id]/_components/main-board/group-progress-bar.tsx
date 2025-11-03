@@ -105,6 +105,6 @@ function getPriorityColor(priority: string) {
     case "LOW":
       return "oklch(70.4% 0.191 22.216)";
     default:
-      return "oklch(80.8% 0.114 19.571)";
+      return "oklch(70.5% 0.015 286.067)";
   }
 }

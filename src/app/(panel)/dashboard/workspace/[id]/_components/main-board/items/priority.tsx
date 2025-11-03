@@ -60,12 +60,12 @@ export const ItemPriorityStatus = memo(function ItemPriorityStatus(props: ItemPr
               )}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="p-2">
             {priorityMap.map((p) => (
               <SelectItem
                 key={p.key}
                 value={p.key}
-                className={cn("cursor-pointer", colorPriority(p.key))}
+                className={cn("cursor-pointer rounded-none mb-1", colorPriority(p.key))}
               >
                 <div className="flex items-center gap-2">
                   <p.icon className="h-4 w-4 text-white" />
@@ -109,12 +109,12 @@ export const ItemPriorityStatus = memo(function ItemPriorityStatus(props: ItemPr
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="p-2">
           {statusMap.map((s) => (
             <SelectItem
               key={s.key}
               value={s.key}
-              className={cn("cursor-pointer", colorStatus(s.key))}
+              className={cn("cursor-pointer rounded-none mb-1", colorStatus(s.key))}
             >
               <div className="flex items-center gap-2">
                 <s.icon className={cn("h-4 w-4 text-white", s.animate && "animate-spin")} />

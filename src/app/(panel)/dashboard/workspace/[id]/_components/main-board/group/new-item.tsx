@@ -11,13 +11,13 @@ import {
 import { Plus } from "lucide-react";
 import { memo } from "react";
 import { CreateOrEditItemForm } from "../create-or-edit-item-form";
-import { TeamUser } from "../items/types";
 import { cn } from "@/lib/utils";
+import { TeamResponse } from "@/hooks/use-team";
 
 interface NewItemProps {
   workspaceId: string;
   groupId: string;
-  team: TeamUser[];
+  team: TeamResponse;
   openDialogs: Set<string>;
   setOpenDialogs: React.Dispatch<React.SetStateAction<Set<string>>>;
 }

@@ -20,14 +20,15 @@ import { ItemTerm } from "./item-term";
 import { ItemPriorityStatus } from "./priority";
 import { ItemDetails } from "./item-details";
 import { RenderEditableCell } from "./render-editablecell";
-import { DialogStateProps, EditingField, TeamUser } from "./types";
+import { DialogStateProps, EditingField } from "./types";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
+import { TeamResponse } from "@/hooks/use-team";
 
 interface ItemCardProps {
   item: ItemWhitCreatedAssignedUser;
-  team: TeamUser[];
+  team: TeamResponse;
   isLoading: string | null;
   editing: { itemId: string | null; field: EditingField };
   editingData: ItemWhitCreatedAssignedUser | null;

@@ -1,3 +1,4 @@
+import { TeamResponse } from "@/hooks/use-team";
 import { JSONContent } from "@tiptap/core";
 
 export type TeamUser = {
@@ -23,7 +24,7 @@ export interface DialogStateProps {
 
 export interface ItemsTablesProps {
   groupId: string;
-  team: TeamUser[];
+  team: TeamResponse;
   changeLayout: boolean;
   workspaceId: string;
 }

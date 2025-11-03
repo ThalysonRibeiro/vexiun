@@ -13,6 +13,7 @@ export const GET = withAuthRoute(async (req, userId, session, context) => {
       workspaceId
     },
     select: {
+      role: true,
       user: {
         select: {
           id: true,
@@ -21,11 +22,14 @@ export const GET = withAuthRoute(async (req, userId, session, context) => {
           image: true
         }
       }
+    },
+    orderBy: {
+      role: "asc"
     }
   });
 
   return NextResponse.json({
     success: true,
-    data: team.map((member) => member.user)
+    data: team.map((member) => member)
   });
 });

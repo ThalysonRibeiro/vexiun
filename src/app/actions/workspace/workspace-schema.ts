@@ -1,4 +1,4 @@
-import { EntityStatus, WorkspaceCategory } from "@/generated/prisma";
+import { EntityStatus, WorkspaceCategory, WorkspaceRole } from "@/generated/prisma";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { z } from "zod";
 
@@ -63,6 +63,26 @@ export const changeWorkspaceStatusSchema = workspaceIdSchema.extend({
   revalidatePaths: z.array(z.string()).optional()
 });
 
+export const manageMemberWorkspaceSchema = workspaceIdSchema.extend({
+  memberId: z
+    .string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID)
+});
+
+export const updateRoleMemberWorkspace = manageMemberWorkspaceSchema.extend({
+  memberId: z
+    .string()
+    .min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD)
+    .cuid(ERROR_MESSAGES.VALIDATION.INVALID_ID),
+  newRole: z.enum([
+    WorkspaceRole.OWNER,
+    WorkspaceRole.ADMIN,
+    WorkspaceRole.MEMBER,
+    WorkspaceRole.VIEWER
+  ])
+});
+
 export type AcceptWorkspaceInvitationType = z.infer<typeof workspaceIdSchema>;
 export type AddWorkspaceMemberType = z.infer<typeof addMemnberSchema>;
 export type CancelWorkspaceInvitationType = z.infer<typeof cancelInvitationSchema>;
@@ -72,3 +92,5 @@ export type DeleteWorkspaceType = z.infer<typeof workspaceIdSchema>;
 export type WorkspaceFormData = z.infer<typeof workspaceSchema>;
 export type CreateWorkspaceType = z.infer<typeof createWorkspaceSchema>;
 export type UpdateWorkspaceType = z.infer<typeof updateWorkspaceSchema>;
+export type UpadeteRoleMemberType = z.infer<typeof updateRoleMemberWorkspace>;
+export type RemoveMemberType = z.infer<typeof manageMemberWorkspaceSchema>;

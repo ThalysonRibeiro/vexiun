@@ -14,6 +14,8 @@ import {
   declineWorkspaceInvitation,
   DeclineWorkspaceInvitationType,
   DeleteWorkspaceType,
+  RemoveMemberType,
+  UpadeteRoleMemberType,
   updateWorkspace,
   UpdateWorkspaceType,
   WorkspaceFormData,
@@ -29,6 +31,8 @@ import { useCallback, useState } from "react";
 import { WorkspaceWithDetails } from "@/app/(panel)/dashboard/workspace/_components/workspaces-page-client";
 import { toast } from "sonner";
 import { SentInvite } from "@/app/(panel)/dashboard/workspace/invites/types";
+import { updateRoleMember } from "@/app/actions/workspace/update-role-member";
+import { removeMember } from "@/app/actions/workspace/remove-member";
 
 export interface UseWorkspaceProps {
   initialValues?: {
@@ -348,6 +352,50 @@ export function useWorkspaceMemberData(workspaceId: string) {
     },
     enabled: !!workspaceId,
     staleTime: CACHE_TIMES.MEDIUM
+  });
+}
+
+export function useUpdateRoleMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: UpadeteRoleMemberType) => {
+      const result = await updateRoleMember(data);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["workspace", "team"] });
+      queryClient.invalidateQueries({ queryKey: ["team"] });
+      queryClient.invalidateQueries({
+        queryKey: ["workspaces", "workspace-member", variables.workspaceId, variables.memberId]
+      });
+      toast.success("Operação realizada com sucesso");
+    }
+  });
+}
+
+export function useRemoveMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: RemoveMemberType) => {
+      const result = await removeMember(data);
+      if (!isSuccessResponse(result)) {
+        throw new Error(result.error);
+      }
+      return result;
+    },
+    onSuccess: (result, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["workspace"] });
+      queryClient.invalidateQueries({ queryKey: ["team"] });
+      queryClient.invalidateQueries({
+        queryKey: ["workspaces", "workspace-member", variables.workspaceId, variables.memberId]
+      });
+      toast.success("Operação realizada com sucesso");
+    }
   });
 }
 

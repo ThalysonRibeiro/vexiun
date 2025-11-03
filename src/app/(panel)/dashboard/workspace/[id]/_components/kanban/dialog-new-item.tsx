@@ -191,12 +191,12 @@ export function DialogContentNewItem({
                           })()}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="p-2">
                         {priorityMap.map((p) => (
                           <SelectItem
                             key={p.key}
                             value={p.key}
-                            className={cn("cursor-pointer", colorPriority(p.key))}
+                            className={cn("cursor-pointer rounded-none mb-1", colorPriority(p.key))}
                           >
                             <div className="flex items-center gap-2">
                               <p.icon className="h-4 w-4 text-white" />
@@ -238,7 +238,7 @@ export function DialogContentNewItem({
               control={form.control}
               name="assignedTo"
               render={({ field }) => {
-                const selectedTeam = team.find((t) => t.id === field.value) ?? team[0];
+                const selectedTeam = team.find((t) => t.user.id === field.value) ?? team[0];
                 return (
                   <FormItem className="mr-auto w-full">
                     <FormLabel>Responsável</FormLabel>
@@ -247,25 +247,25 @@ export function DialogContentNewItem({
                         <SelectTrigger className="flex items-center gap-2 w-full">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-6 h-6">
-                              <AvatarImage src={selectedTeam.image ?? undefined} />
+                              <AvatarImage src={selectedTeam.user.image ?? undefined} />
                               <AvatarFallback>
-                                {nameFallback(selectedTeam.name ?? undefined)}
+                                {nameFallback(selectedTeam.user.name ?? undefined)}
                               </AvatarFallback>
                             </Avatar>
-                            <span>{selectedTeam.name}</span>
+                            <span>{selectedTeam.user.name}</span>
                           </div>
                         </SelectTrigger>
                         <SelectContent>
-                          {team.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
+                          {team.map((member) => (
+                            <SelectItem key={member.user.id} value={member.user.id}>
                               <Avatar>
-                                <AvatarImage src={user.image ?? undefined} />
+                                <AvatarImage src={member.user.image ?? undefined} />
                                 <AvatarFallback>
-                                  {nameFallback(user.name ?? undefined)}
+                                  {nameFallback(member.user.name ?? undefined)}
                                 </AvatarFallback>
                               </Avatar>
                               <span className="truncate min-w-0 max-w-50 sm:max-w-90">
-                                {user.name}
+                                {member.user.name}
                               </span>
                             </SelectItem>
                           ))}

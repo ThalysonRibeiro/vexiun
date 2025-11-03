@@ -51,22 +51,22 @@ export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
     <>
       <div className="flex flex-wrap gap-2 overflow-y-scroll max-h-80">
         {data
-          ?.filter((u) => u.id !== assignedToUser?.id)
+          ?.filter((u) => u.user.id !== assignedToUser?.id)
           .map((menber) => (
             <button
-              key={menber.id}
-              onClick={() => setSelected(menber)}
+              key={menber.user.id}
+              onClick={() => setSelected(menber.user)}
               className={cn(
                 "bg-accent rounded-full w-fit flex items-center gap-2 pr-3 cursor-pointer",
                 "transition-colors duration-300",
-                selected?.id === menber.id && "bg-primary text-white"
+                selected?.id === menber.user.id && "bg-primary text-white"
               )}
             >
               <Avatar>
-                <AvatarImage className="h-12 w-12" src={menber?.image as string} />
-                <AvatarFallback>{nameFallback(menber?.name as string)}</AvatarFallback>
+                <AvatarImage className="h-12 w-12" src={menber.user?.image as string} />
+                <AvatarFallback>{nameFallback(menber.user?.name as string)}</AvatarFallback>
               </Avatar>
-              <span>{menber?.name?.split(" ")[0] ?? "CATALYST"}</span>
+              <span>{menber.user?.name?.split(" ")[0] ?? "CATALYST"}</span>
             </button>
           ))}
       </div>

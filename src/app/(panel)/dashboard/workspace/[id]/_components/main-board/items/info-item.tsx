@@ -15,13 +15,7 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
-
-type TeamUser = {
-  id: string;
-  name: string | null;
-  image: string | null;
-  email: string;
-};
+import { TeamResponse } from "@/hooks/use-team";
 
 export function InfoItem({
   data,
@@ -30,7 +24,7 @@ export function InfoItem({
 }: {
   data: ItemWhitCreatedAssignedUser;
   editable?: boolean;
-  team: TeamUser[];
+  team: TeamResponse;
 }) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const shetRef = useRef<HTMLDivElement>(null);

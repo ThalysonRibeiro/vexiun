@@ -16,11 +16,7 @@ export const getPriorities = withAuth(async (userId, session, workspaceId: strin
     return successResponse([]);
   }
 
-  const hasAccess = await validateWorkspaceAccess(workspaceId, userId);
-
-  if (!hasAccess) {
-    throw new PermissionError(ERROR_MESSAGES.PERMISSION.NO_ACCESS);
-  }
+  await validateWorkspaceAccess(workspaceId, userId);
 
   const items = await prisma.item.findMany({
     where: {

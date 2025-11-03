@@ -19,15 +19,16 @@ import { ItemTerm } from "./item-term";
 import { ItemPriorityStatus } from "./priority";
 import { colorPriority, colorStatus } from "@/utils/colorStatus";
 import { ItemDetails } from "./item-details";
-import { DialogStateProps, EditingField, TeamUser } from "./types";
+import { DialogStateProps, EditingField } from "./types";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
+import { TeamResponse } from "@/hooks/use-team";
 
 interface ItemTableProps {
   currentItems: ItemWhitCreatedAssignedUser[];
-  team: TeamUser[];
+  team: TeamResponse;
   isLoading: string | null;
   editing: { itemId: string | null; field: EditingField };
   editingData: ItemWhitCreatedAssignedUser | null;

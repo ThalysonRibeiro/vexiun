@@ -118,52 +118,6 @@ export default async function Dashboard() {
                 </Card>
               </Link>
             ))}
-            {/* {workspaces.map(workspace => (
-              <Link
-                href={`/dashboard/workspace/${workspace.id}`}
-                key={workspace.id}
-              >
-                <Card className="hover:border-primary/50 hover:bg-primary/20 transition-all duration-300 ease-in-out">
-                  <CardHeader className="p-2">
-                    <CardTitle>{workspace.title}</CardTitle>
-                    <CardDescription>
-                      Total grupos: {workspace.groupsCount}
-                      <br />
-                      Total tarefas: {workspace.itemsCount}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="mt-auto w-full p-2">
-                    {workspace.members.length > 0 && (
-                      <div className="flex relative">
-                        {workspace.members.slice(0, 6).map((member, index) => (
-                          <Avatar key={member.id} className={cn("absolute",
-                            index === 0 && "left-0",
-                            index === 1 && "left-5",
-                            index === 2 && "left-10",
-                            index === 3 && "left-15",
-                            index === 4 && "left-20",
-                            index === 5 && "left-25",
-                          )}>
-                            <AvatarImage src={member.image as string} />
-                            <AvatarFallback>
-                              {member.name?.charAt(0) ?? "N"}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
-                        {workspace.members.length > 6 && (
-                          <span className="ml-2 flex gap-1">
-                            +{workspace.members.length}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="mt-auto w-full p-2">
-                    <Priorities workspaceId={workspace.id} />
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))} */}
           </div>
         </section>
       </main>

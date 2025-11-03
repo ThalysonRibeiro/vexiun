@@ -1,4 +1,5 @@
 import { PrioritiesCount } from "@/app/data-access/item";
+import { Priority } from "@/generated/prisma";
 
 interface PrioritiesBarProps {
   priorities: PrioritiesCount[];
@@ -30,7 +31,7 @@ export function PrioritiesBar({ priorities, label = true }: PrioritiesBarProps) 
   );
 }
 
-function getPriorityColor(priority: string) {
+function getPriorityColor(priority: Priority) {
   switch (priority) {
     case "CRITICAL":
       return "oklch(37% 0.013 285.805)";

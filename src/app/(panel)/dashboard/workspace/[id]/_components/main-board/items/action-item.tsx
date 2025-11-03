@@ -14,15 +14,15 @@ import { Archive, ArchiveRestore, Ellipsis, Eye, Trash } from "lucide-react";
 import { InfoItem } from "./info-item";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { memo } from "react";
-import { TeamUser } from "./types";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
+import { TeamResponse } from "@/hooks/use-team";
 
 interface ActionItemProps {
   item: ItemWhitCreatedAssignedUser;
-  team: TeamUser[];
+  team: TeamResponse;
   isLoading: boolean | string | null;
   entityStatus?: EntityStatus;
   isDone?: boolean;

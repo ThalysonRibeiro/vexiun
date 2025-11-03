@@ -33,6 +33,7 @@ import { useCreateItem, UseItemForm, UseItemFormProps } from "@/hooks/use-items"
 import { useParams } from "next/navigation";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
+import { TeamResponse } from "@/hooks/use-team";
 
 interface CreateItemFormProps {
   workspaceId: string;
@@ -41,15 +42,8 @@ interface CreateItemFormProps {
   groupId: string;
   itemId?: string;
   editingItem: boolean;
-  team: TeamUser[];
+  team: TeamResponse;
 }
-
-type TeamUser = {
-  id: string;
-  name: string | null;
-  image: string | null;
-  email: string;
-};
 
 export function CreateOrEditItemForm(props: CreateItemFormProps) {
   const { closeForm, initialValues, groupId, itemId, editingItem, team } = props;
@@ -213,7 +207,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger
-                          className={cn("w-full", colorPriority(field.value))}
+                          className={cn("w-full cursor-pointer", colorPriority(field.value))}
                           size="sm"
                         >
                           <SelectValue>
@@ -228,12 +222,15 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                             })()}
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="p-2">
                           {priorityMap.map((p) => (
                             <SelectItem
                               key={p.key}
                               value={p.key}
-                              className={cn("cursor-pointer", colorPriority(p.key))}
+                              className={cn(
+                                "cursor-pointer rounded-none mb-1",
+                                colorPriority(p.key)
+                              )}
                             >
                               <div className="flex items-center gap-2">
                                 <p.icon className="h-4 w-4 text-white" />
@@ -260,7 +257,10 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                     <FormLabel>Status</FormLabel>
                     <FormControl>
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className={colorStatus(field.value)} size="sm">
+                        <SelectTrigger
+                          className={cn("w-full cursor-pointer", colorStatus(field.value))}
+                          size="sm"
+                        >
                           <SelectValue>
                             {(() => {
                               const s = statusMap.find((s) => s.key === field.value);
@@ -278,12 +278,12 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                             })()}
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="p-2">
                           {statusMap.map((s) => (
                             <SelectItem
                               key={s.key}
                               value={s.key}
-                              className={cn("cursor-pointer", colorStatus(s.key))}
+                              className={cn("cursor-pointer rounded-none mb-1", colorStatus(s.key))}
                             >
                               <div className="flex items-center gap-2">
                                 <s.icon
@@ -331,7 +331,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
               control={form.control}
               name="assignedTo"
               render={({ field }) => {
-                const selectedTeam = team.find((t) => t.id === field.value) ?? team[0];
+                const selectedTeam = team.find((t) => t.user.id === field.value) ?? team[0];
                 return (
                   <FormItem>
                     <FormLabel>Responsável</FormLabel>
@@ -340,24 +340,24 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                         <SelectTrigger className="flex items-center gap-2 w-full">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-6 h-6">
-                              <AvatarImage src={selectedTeam.image ?? undefined} />
+                              <AvatarImage src={selectedTeam.user.image ?? undefined} />
                               <AvatarFallback>
-                                {nameFallback(selectedTeam.name ?? undefined)}
+                                {nameFallback(selectedTeam.user.name ?? undefined)}
                               </AvatarFallback>
                             </Avatar>
-                            <span>{selectedTeam.name}</span>
+                            <span>{selectedTeam.user.name}</span>
                           </div>
                         </SelectTrigger>
                         <SelectContent>
-                          {team.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
+                          {team.map((member) => (
+                            <SelectItem key={member.user.id} value={member.user.id}>
                               <Avatar>
-                                <AvatarImage src={user.image ?? undefined} />
+                                <AvatarImage src={member.user.image ?? undefined} />
                                 <AvatarFallback>
-                                  {nameFallback(user.name ?? undefined)}
+                                  {nameFallback(member.user.name ?? undefined)}
                                 </AvatarFallback>
                               </Avatar>
-                              <span>{user.name?.split(" ")[0]}</span>
+                              <span>{member.user.name?.split(" ")[0]}</span>
                             </SelectItem>
                           ))}
                         </SelectContent>

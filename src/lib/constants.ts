@@ -1,4 +1,4 @@
-import { WorkspaceCategory } from "@/generated/prisma";
+import { WorkspaceCategory, WorkspaceRole } from "@/generated/prisma";
 import {
   User,
   Briefcase,
@@ -65,6 +65,13 @@ export const UI_LABELS = {
   UNASSIGNED: "Não atribuído",
   REASSIGN: "Reatribuir"
 } as const;
+
+export const roleDescriptions: Record<WorkspaceRole, string> = {
+  OWNER: "Proprietário do workspace com controle total",
+  ADMIN: "Administrador com permissões completas de gerenciamento",
+  MEMBER: "Membro com acesso padrão ao workspace",
+  VIEWER: "Visualizador com acesso apenas leitura"
+};
 
 export interface TestimonialsProps {
   quote: string;

@@ -30,9 +30,7 @@ export const updateWorkspace = withAuth(
       }
     });
 
-    if (formData.revalidatePaths?.length) {
-      formData.revalidatePaths.forEach((path) => revalidatePath(path));
-    }
+    formData.revalidatePaths?.forEach((path) => revalidatePath(path));
     revalidatePath("/dashboard");
     return successResponse("Workspace atualizada com sucesso!");
   },
