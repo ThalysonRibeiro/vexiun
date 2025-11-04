@@ -1,15 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import {
-  ChangeGroupStatusType,
   createGroup,
-  CreateGroupType,
   deleteGroup,
-  DeleteGroupType,
   GroupFormData,
   groupFormSchema,
-  updateGroup,
-  UpdateGroupType
+  updateGroup
 } from "@/app/actions/group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +15,7 @@ import { useCallback, useState } from "react";
 import { changeGroupStatus } from "@/app/actions/group/change-group-status";
 import { fetchAPI } from "@/lib/api/fetch-api";
 import { ItemWhitCreatedAssignedUser } from "./use-items";
+import { useMutationWithToast } from "./use-mutation-with-toast";
 
 export interface UseGroupFormProps {
   initialValues?: {
@@ -111,66 +108,33 @@ export function useInvalidateGreoups() {
 }
 
 export function useCreateGroup() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CreateGroupType) => {
-      const result = await createGroup(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["groups", variables.workspaceId] });
-    }
+  return useMutationWithToast({
+    mutationFn: createGroup,
+    invalidateQueries: [["groups"]],
+    successMessage: "Grupo criado com sucesso!",
+    errorMessage: "Erro ao criar grupo"
   });
 }
 
 export function useUpdateGroup() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateGroupType) => {
-      const result = await updateGroup(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
-      queryClient.invalidateQueries({
-        queryKey: ["groups"],
-        exact: false,
-        refetchType: "active"
-      });
-    },
-    retry: 1
+  return useMutationWithToast({
+    mutationFn: updateGroup,
+    invalidateQueries: [["groups"]],
+    successMessage: "Grupo atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar grupo",
+    retry: 1,
+    exact: false,
+    refetchType: "active"
   });
 }
 
 export function useChangeGroupStatus() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: ChangeGroupStatusType) => {
-      const result = await changeGroupStatus(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["items", "items-count"] });
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
-      queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
-    }
+  return useMutationWithToast({
+    mutationFn: changeGroupStatus,
+    invalidateQueries: [["groups"], ["items", "items-count"]],
+    successMessage: "Status atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar status",
+    retry: 1
   });
 }
 
@@ -205,27 +169,14 @@ export function useMoveGroupToTrash() {
 }
 
 export function useDeleteGroup() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: DeleteGroupType) => {
-      const result = await deleteGroup(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.removeQueries({ queryKey: ["groups", variables.groupId] });
-      queryClient.invalidateQueries({
-        queryKey: ["groups"],
-        exact: false,
-        refetchType: "active"
-      });
-    },
-    retry: 1
+  return useMutationWithToast({
+    mutationFn: deleteGroup,
+    invalidateQueries: [["groups"]],
+    successMessage: "Grupo deletado com sucesso!",
+    errorMessage: "Erro ao deletar grupo",
+    retry: 1,
+    exact: false,
+    refetchType: "active"
   });
 }
 

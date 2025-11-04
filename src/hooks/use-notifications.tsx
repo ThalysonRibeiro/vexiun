@@ -1,24 +1,20 @@
 import {
-  BroadcastNotificationType,
   deleteAllNotifications,
   deleteMultipleNotifications,
-  DeleteMultipleNotificationsType,
   deleteNotification,
-  DeleteNotificationType,
   deleteReadNotifications,
   markAllAsRead,
   markNotificationAsRead,
-  MarkNotificationAsReadType,
   sendBroadcastNotification,
   smartCleanup
 } from "@/app/actions/notification";
 import { Notification } from "@/generated/prisma";
-import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { ERROR_MESSAGES } from "@/lib/errors/messages";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { useMutationWithToast } from "./use-mutation-with-toast";
 
 export function useNotifications() {
   const previousNotifications = useRef<Notification[]>([]);
@@ -89,150 +85,58 @@ export function useUnreadNotificationsCount() {
 }
 
 export function useMarkNotificationAsRead() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: MarkNotificationAsReadType) => {
-      const result = await markNotificationAsRead(data);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", variables.notificationId] });
-    }
+  return useMutationWithToast({
+    mutationFn: markNotificationAsRead,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useMarkAllAsRead() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const result = await markAllAsRead();
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: markAllAsRead,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useDeleteNotification() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: DeleteNotificationType) => {
-      const result = await deleteNotification(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: deleteNotification,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useDeleteAllNotifications() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const result = await deleteAllNotifications();
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: deleteAllNotifications,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useDeleteMultipleNotifications() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: DeleteMultipleNotificationsType) => {
-      const result = await deleteMultipleNotifications(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", variables.notificationIds] });
-    }
+  return useMutationWithToast({
+    mutationFn: deleteMultipleNotifications,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useDeleteReadNotifications() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const result = await deleteReadNotifications();
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: deleteReadNotifications,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useSmartCleanup() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      const result = await smartCleanup();
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: smartCleanup,
+    invalidateQueries: [["notifications"]]
   });
 }
 
 export function useSendBroadcastNotification() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: BroadcastNotificationType) => {
-      const result = await sendBroadcastNotification(data);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: sendBroadcastNotification,
+    invalidateQueries: [["notifications"]]
   });
 }
 

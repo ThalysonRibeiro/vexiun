@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { memo } from "react";
-import { CreateOrEditItemForm } from "../create-or-edit-item-form";
 import { cn } from "@/lib/utils";
 import { TeamResponse } from "@/hooks/use-team";
+import { CreateOrEditItemForm } from "../items/create-or-edit-item-form";
 
 interface NewItemProps {
   workspaceId: string;

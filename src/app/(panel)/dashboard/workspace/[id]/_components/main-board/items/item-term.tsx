@@ -6,8 +6,8 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { memo } from "react";
-import { CalendarTerm } from "../calendar-term";
 import { EditingField } from "./types";
+import { CalendarTerm } from "./calendar-term";
 
 interface ItemTermProps {
   label: string;

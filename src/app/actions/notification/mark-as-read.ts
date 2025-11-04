@@ -8,7 +8,7 @@ import {
   withAuth
 } from "@/lib/errors";
 import { revalidatePath } from "next/cache";
-import { MarkNotificationAsReadType, notificationIdsFormSchema } from "./notification-schema";
+import { MarkNotificationAsReadType, notificationIdFormSchema } from "./notification-schema";
 
 export const markNotificationAsRead = withAuth(
   async (
@@ -16,7 +16,7 @@ export const markNotificationAsRead = withAuth(
     session,
     formData: MarkNotificationAsReadType
   ): Promise<ActionResponse<string>> => {
-    const schema = notificationIdsFormSchema.safeParse(formData);
+    const schema = notificationIdFormSchema.safeParse(formData);
     if (!schema.success) {
       throw new ValidationError(schema.error.issues[0].message);
     }

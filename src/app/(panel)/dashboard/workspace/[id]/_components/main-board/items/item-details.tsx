@@ -13,8 +13,8 @@ import { Eye } from "lucide-react";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
 import { JSONContent } from "@tiptap/core";
 import { memo } from "react";
-import { DetailsEditor } from "../details-editor";
 import { DialogStateProps } from "./types";
+import { DetailsEditor } from "./details-editor";
 
 interface ItemCardFooterProps {
   item: ItemWhitCreatedAssignedUser;

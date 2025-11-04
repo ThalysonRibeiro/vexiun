@@ -2,11 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { ChevronDown, LayoutGrid, Logs, Plus } from "lucide-react";
 import { useState } from "react";
-import { GroupForm } from "./group-form";
+import { GroupForm } from "./group/group-form";
 import { ListItems } from "./list-items";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { GroupPriorityBar, GroupProgressBar } from "./group-progress-bar";
+import { GroupPriorityBar, GroupProgressBar } from "./group/group-progress-bar";
 import { useGroupActions, useGroups } from "@/hooks/use-groups";
 import { useTeam } from "@/hooks/use-team";
 import { Badge } from "@/components/ui/badge";

@@ -13,12 +13,12 @@ import { User } from "next-auth";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { UseNameForm, useUpdateName } from "@/hooks/use-user";
+import { useNameForm, useUpdateName } from "@/hooks/use-user";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 
 export function NameForme({ user }: { user: User }) {
   const [isAdding, setIsAdding] = useState<boolean>(false);
-  const form = UseNameForm({ initialValues: { name: user?.name || "" } });
+  const form = useNameForm({ initialValues: { name: user?.name || "" } });
   const updateName = useUpdateName();
 
   async function onSubmit(formData: { name: string }) {

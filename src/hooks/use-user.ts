@@ -1,22 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { isSuccessResponse } from "@/lib/errors/error-handler";
-import {
-  updateAvatar,
-  UpdateAvatarType,
-  updateName,
-  updateSettings,
-  UpdateSettingsType
-} from "@/app/actions/user";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { updateAvatar, updateName, updateSettings } from "@/app/actions/user";
 import {
   NameFormData,
   nameFormSchema,
   SettingsFormData,
-  settingsFormSchema,
-  UpdateNameType
+  settingsFormSchema
 } from "@/app/actions/user/user-schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { fetchAPI } from "@/lib/api/fetch-api";
+import { useMutationWithToast } from "./use-mutation-with-toast";
 
 export interface UseNameFormProps {
   initialValues?: {
@@ -24,7 +17,7 @@ export interface UseNameFormProps {
   };
 }
 
-export function UseNameForm({ initialValues }: UseNameFormProps) {
+export function useNameForm({ initialValues }: UseNameFormProps) {
   return useForm<NameFormData>({
     resolver: zodResolver(nameFormSchema),
     defaultValues: initialValues || {
@@ -84,61 +77,31 @@ export function useInvalidateUser() {
 }
 
 export function useUpdateName() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateNameType) => {
-      const result = await updateName(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["user", variables.userId] });
-    },
+  return useMutationWithToast({
+    mutationFn: updateName,
+    invalidateQueries: [["user"]],
+    successMessage: "Nome atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar nome",
     retry: 1
   });
 }
 
 export function useUpdateSettings() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateSettingsType) => {
-      const result = await updateSettings(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["user", variables.userId, "settings"] });
-    },
+  return useMutationWithToast({
+    mutationFn: updateSettings,
+    invalidateQueries: [["user", "settings"]],
+    successMessage: "Configurações atualizadas com sucesso!",
+    errorMessage: "Erro ao atualizar configurações",
     retry: 1
   });
 }
 
 export function useUpdateAvatar() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateAvatarType) => {
-      const result = await updateAvatar(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["user", variables.avatarUrl, "avatar"] });
-    },
+  return useMutationWithToast({
+    mutationFn: updateAvatar,
+    invalidateQueries: [["user", "avatar"]],
+    successMessage: "Avatar atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar avatar",
     retry: 1
   });
 }

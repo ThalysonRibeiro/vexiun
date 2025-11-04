@@ -5,10 +5,8 @@ import { cn } from "@/lib/utils";
 import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
 import { Edit, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { CreateOrEditItemForm } from "../create-or-edit-item-form";
 import { JSONContent } from "@tiptap/core";
 import { ItemWhitCreatedAssignedUser } from "@/hooks/use-items";
-import { DetailsEditor } from "../details-editor";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { useParams } from "next/navigation";
@@ -16,6 +14,8 @@ import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
 import { TeamResponse } from "@/hooks/use-team";
+import { CreateOrEditItemForm } from "./create-or-edit-item-form";
+import { DetailsEditor } from "./details-editor";
 
 export function InfoItem({
   data,

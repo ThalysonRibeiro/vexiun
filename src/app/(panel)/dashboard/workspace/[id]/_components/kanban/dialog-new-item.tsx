@@ -24,7 +24,6 @@ import {
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CalendarTerm } from "../main-board/calendar-term";
 import { Priority, Status } from "@/generated/prisma";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
@@ -35,11 +34,12 @@ import { useCreateItem, UseItemForm } from "@/hooks/use-items";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nameFallback } from "@/utils/name-fallback";
-import { DetailsEditor } from "../main-board/details-editor";
 import { useTeam } from "@/hooks/use-team";
 import { colorPriority, priorityMap } from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
 import { ItemFormData } from "@/app/actions/item";
+import { CalendarTerm } from "../main-board/items/calendar-term";
+import { DetailsEditor } from "../main-board/items/details-editor";
 
 interface DialogContentNewItemProps {
   closeDialog: (value: boolean) => void;

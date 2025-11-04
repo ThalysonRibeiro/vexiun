@@ -24,7 +24,7 @@ export function InviteMembersToWorkspaces({
   const userSearchRef = useRef<UserSearchRef>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const existingMemberIds = data?.map((member) => member.id) || [];
+  const existingMemberIds = data?.map((member) => member.user.id) || [];
 
   const onSubmit = async () => {
     const ids = selectedUsers.map((user) => user.id);
@@ -57,21 +57,21 @@ export function InviteMembersToWorkspaces({
       <h3>Membros da equipe</h3>
       <div className="flex flex-wrap gap-4">
         {data?.map((member) => (
-          <div key={member.id} className="relative group">
+          <div key={member.user.id} className="relative group">
             <div className="flex items-center gap-2 border rounded-full hover:pr-3 bg-accent relative w-10 h-10 group-hover:w-64 overflow-hidden transition-all duration-300 ease-in-out">
               <Avatar className="w-10 h-10 flex-shrink-0">
-                {member.image && (
-                  <AvatarImage src={member.image} alt={`Avatar de ${member.name}`} />
+                {member.user.image && (
+                  <AvatarImage src={member.user.image} alt={`Avatar de ${member.user.name}`} />
                 )}
                 <AvatarFallback>
-                  {member.name
-                    ? member.name.charAt(0).toUpperCase()
-                    : member.email.charAt(0).toUpperCase()}
+                  {member.user.name
+                    ? member.user.name.charAt(0).toUpperCase()
+                    : member.user.email.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 whitespace-nowrap min-w-0">
-                <p className="text-sm">{member.name}</p>
-                <p className="text-xs">{member.email}</p>
+                <p className="text-sm">{member.user.name}</p>
+                <p className="text-xs">{member.user.email}</p>
               </div>
             </div>
           </div>

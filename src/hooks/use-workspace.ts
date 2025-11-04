@@ -1,23 +1,13 @@
 "use client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { acceptWorkspaceInvitation } from "@/app/actions/workspace/accept-invite";
 import {
-  AcceptWorkspaceInvitationType,
   addWorkspaceMember,
-  AddWorkspaceMemberType,
   cancelWorkspaceInvitation,
-  CancelWorkspaceInvitationType,
-  ChangeStatusInput,
   createWorkspace,
-  CreateWorkspaceType,
   declineWorkspaceInvitation,
-  DeclineWorkspaceInvitationType,
-  DeleteWorkspaceType,
-  RemoveMemberType,
-  UpadeteRoleMemberType,
   updateWorkspace,
-  UpdateWorkspaceType,
   WorkspaceFormData,
   workspaceSchema
 } from "@/app/actions/workspace";
@@ -33,6 +23,7 @@ import { toast } from "sonner";
 import { SentInvite } from "@/app/(panel)/dashboard/workspace/invites/types";
 import { updateRoleMember } from "@/app/actions/workspace/update-role-member";
 import { removeMember } from "@/app/actions/workspace/remove-member";
+import { useMutationWithToast } from "./use-mutation-with-toast";
 
 export interface UseWorkspaceProps {
   initialValues?: {
@@ -56,96 +47,41 @@ export function useWorkspaceForm({ initialValues }: UseWorkspaceProps) {
 }
 
 export function useCreateWorkspace() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CreateWorkspaceType) => {
-      const result = await createWorkspace(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: createWorkspace,
+    invalidateQueries: [["workspace"], ["notifications"]],
+    successMessage: "Workspace criado com sucesso!",
+    errorMessage: "Erro ao criar workspace"
   });
 }
 
 export function useUpdateWorkspace() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: UpdateWorkspaceType) => {
-      const result = await updateWorkspace(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace", variables.workspaceId] });
-    },
+  return useMutationWithToast({
+    mutationFn: updateWorkspace,
+    invalidateQueries: [["workspace"]],
+    successMessage: "Workspace atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar workspace",
     retry: 1
   });
 }
 
 export function useDeleteWorkspace() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: DeleteWorkspaceType) => {
-      const result = await deleteWorkspace(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      // Remove tudo relacionado ao workspace do cache
-      queryClient.removeQueries({
-        queryKey: ["workspace", variables.workspaceId]
-      });
-      queryClient.removeQueries({
-        queryKey: ["groups", variables.workspaceId]
-      });
-      queryClient.removeQueries({
-        queryKey: ["priorities", variables.workspaceId]
-      });
-      queryClient.removeQueries({
-        queryKey: ["status", variables.workspaceId]
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-
-      // NÃO invalida nada - deixa quieto
-    },
+  return useMutationWithToast({
+    mutationFn: deleteWorkspace,
+    invalidateQueries: [["workspace"], ["workspaces"], ["groups"], ["priorities"], ["status"]],
+    successMessage: "Workspace deletado com sucesso!",
+    errorMessage: "Erro ao deletar workspace",
     retry: 1
   });
 }
 
 export function useChangeWorkspaceStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: ChangeStatusInput) => {
-      const result = await changeWorkspaceStatus(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-    }
+  return useMutationWithToast({
+    mutationFn: changeWorkspaceStatus,
+    invalidateQueries: [["workspaces"]],
+    successMessage: "Status atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar status",
+    retry: 1
   });
 }
 
@@ -181,112 +117,39 @@ export function useMoveWorkspaceToTrash() {
 }
 
 export function useAddWorkspaceMember() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: AddWorkspaceMemberType) => {
-      const result = await addWorkspaceMember(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["workspace", variables.workspaceId, "members"]
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["workspace", variables.workspaceId, "invitations"]
-      });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: addWorkspaceMember,
+    invalidateQueries: [["workspace", "members"], ["invitations"], ["notifications"]],
+    successMessage: "Membro adicionado com sucesso!",
+    errorMessage: "Erro ao adicionar membro"
   });
 }
 
 export function useAcceptWorkspaceInvitation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: AcceptWorkspaceInvitationType) => {
-      const result = await acceptWorkspaceInvitation(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-      queryClient.invalidateQueries({
-        queryKey: ["workspace"]
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["workspace", variables.workspaceId]
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["workspace", variables.workspaceId, "members"]
-      });
-      queryClient.invalidateQueries({ queryKey: ["invitations"] });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+  return useMutationWithToast({
+    mutationFn: acceptWorkspaceInvitation,
+    invalidateQueries: [["workspaces"], ["invitations"], ["notifications"]],
+    successMessage: "Convite aceito com sucesso!",
+    errorMessage: "Erro ao aceitar convite",
     retry: 1
   });
 }
 
 export function useCancelWorkspaceInvitation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CancelWorkspaceInvitationType) => {
-      const result = await cancelWorkspaceInvitation(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["workspace"]
-      });
-      // variables may contain multiple invitationIds; invalidate related queries
-      if (variables?.invitationIds && Array.isArray(variables.invitationIds)) {
-        variables.invitationIds.forEach((id) => {
-          queryClient.invalidateQueries({ queryKey: ["workspace", id, "invitations"] });
-        });
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    }
+  return useMutationWithToast({
+    mutationFn: cancelWorkspaceInvitation,
+    invalidateQueries: [["workspace"], ["invitations"], ["notifications"]],
+    successMessage: "Convite cancelado com sucesso!",
+    errorMessage: "Erro ao cancelar convite"
   });
 }
 
 export function useDeclineWorkspaceInvitation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: DeclineWorkspaceInvitationType) => {
-      const result = await declineWorkspaceInvitation(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result.data;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["workspace"]
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["workspace", variables.workspaceId, "invitations"]
-      });
-    },
-    retry: 1
+  return useMutationWithToast({
+    mutationFn: declineWorkspaceInvitation,
+    invalidateQueries: [["workspace"], ["invitations"]],
+    successMessage: "Convite recusado com sucesso!",
+    errorMessage: "Erro ao recusar convite"
   });
 }
 
@@ -356,46 +219,20 @@ export function useWorkspaceMemberData(workspaceId: string) {
 }
 
 export function useUpdateRoleMember() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpadeteRoleMemberType) => {
-      const result = await updateRoleMember(data);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace", "team"] });
-      queryClient.invalidateQueries({ queryKey: ["team"] });
-      queryClient.invalidateQueries({
-        queryKey: ["workspaces", "workspace-member", variables.workspaceId, variables.memberId]
-      });
-      toast.success("Operação realizada com sucesso");
-    }
+  return useMutationWithToast({
+    mutationFn: updateRoleMember,
+    invalidateQueries: [["workspace", "team"]],
+    successMessage: (data) => data || "Role atualizada!",
+    errorMessage: "Erro ao atualizar role"
   });
 }
 
 export function useRemoveMember() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: RemoveMemberType) => {
-      const result = await removeMember(data);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["workspace"] });
-      queryClient.invalidateQueries({ queryKey: ["team"] });
-      queryClient.invalidateQueries({
-        queryKey: ["workspaces", "workspace-member", variables.workspaceId, variables.memberId]
-      });
-      toast.success("Operação realizada com sucesso");
-    }
+  return useMutationWithToast({
+    mutationFn: removeMember,
+    invalidateQueries: [["workspace"], ["team"]],
+    successMessage: (data) => data || "Membro removido!",
+    errorMessage: "Erro ao remover membro"
   });
 }
 

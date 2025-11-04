@@ -95,7 +95,7 @@ export function GroupForm(props: CreateGroupFormProps) {
                     placeholder="Digite o nome do grupo"
                     aria-describedby="group-name-error"
                     aria-required="true"
-                    className="mt-2"
+                    className="mt-2 h-9"
                   />
                 </FormControl>
                 <FormDescription />

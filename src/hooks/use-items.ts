@@ -4,16 +4,11 @@ import {
   EditingState
 } from "@/app/(panel)/dashboard/workspace/[id]/_components/main-board/items/types";
 import {
-  AssignToType,
-  ChangeStatusInputType,
   createItem,
-  CreateItemType,
   deleteItem,
-  DeleteItemType,
   ItemFormData,
   itemFormSchema,
-  updateItem,
-  UpdateItemType
+  updateItem
 } from "@/app/actions/item";
 import { assignTo } from "@/app/actions/item/assign-to";
 import { changeItemStatus } from "@/app/actions/item/change-status";
@@ -21,11 +16,12 @@ import { EntityStatus, Priority, Prisma, Status } from "@/generated/prisma";
 import { fetchAPI } from "@/lib/api/fetch-api";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { JSONContent } from "@tiptap/core";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useMutationWithToast } from "./use-mutation-with-toast";
 
 export interface UseItemFormProps {
   initialValues?: {
@@ -193,117 +189,54 @@ export function useInvalidateItems() {
 }
 
 export function useCreateItem() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: CreateItemType) => {
-      const result = await createItem(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-      console.log(result);
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["items", variables.groupId] });
-      queryClient.invalidateQueries({ queryKey: ["items", "by-status"] });
-    }
+  return useMutationWithToast({
+    mutationFn: createItem,
+    invalidateQueries: [["items"], ["groups"]],
+    successMessage: "Item criado com sucesso!",
+    errorMessage: "Erro ao criar item"
   });
 }
 
 export function useUpdateItem() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: UpdateItemType) => {
-      const result = await updateItem(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.setQueryData(["items", variables.itemId], result.data);
-      queryClient.invalidateQueries({
-        queryKey: ["items"],
-        exact: false,
-        refetchType: "active"
-      });
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
-    },
+  return useMutationWithToast({
+    mutationFn: updateItem,
+    invalidateQueries: [["items"], ["groups"]],
+    successMessage: "Item atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar item",
     retry: 1
   });
 }
 
 export function useAssignTo() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: AssignToType) => {
-      const result = await assignTo(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.setQueryData(["items", variables.itemId, variables.workspaceId], result.data);
-      queryClient.invalidateQueries({
-        queryKey: ["items"],
-        exact: false,
-        refetchType: "active"
-      });
-    },
+  return useMutationWithToast({
+    mutationFn: assignTo,
+    invalidateQueries: [["items"]],
+    successMessage: "Item atribuido com sucesso!",
+    errorMessage: "Erro ao atribuir item",
     retry: 1
   });
 }
 
 export function useDeleteItem() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: DeleteItemType) => {
-      const result = await deleteItem(data);
-
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.removeQueries({ queryKey: ["items", variables.itemId] });
-      queryClient.invalidateQueries({
-        queryKey: ["items"],
-        exact: false,
-        refetchType: "active"
-      });
-    },
-    retry: 1
+  return useMutationWithToast({
+    mutationFn: deleteItem,
+    invalidateQueries: [["items"], ["groups"]],
+    successMessage: "Item deletado com sucesso!",
+    errorMessage: "Erro ao deletar item",
+    retry: 1,
+    exact: false,
+    refetchType: "active"
   });
 }
 
 export function useChangeItemStatus() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: ChangeStatusInputType) => {
-      const result = await changeItemStatus(data);
-      if (!isSuccessResponse(result)) {
-        throw new Error(result.error);
-      }
-
-      return result;
-    },
-    onSuccess: (result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      queryClient.removeQueries({ queryKey: ["items", variables.itemId] });
-    }
+  return useMutationWithToast({
+    mutationFn: changeItemStatus,
+    invalidateQueries: [["items"], ["groups"]],
+    removeQueries: [["items"]],
+    successMessage: "Status atualizado com sucesso!",
+    errorMessage: "Erro ao atualizar status",
+    retry: 1
   });
 }
 
@@ -577,36 +510,3 @@ export function useItemActions(workspaceId: string) {
     handleRestoreItem
   };
 }
-
-// / ❌ CREATE - SEM retry (pode duplicar)
-// export function useCreateItem() {
-//   return useMutation({
-//     mutationFn: itemsApi.createItem,
-//     // retry: 0 (usa o padrão)
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: itemsKeys.lists() });
-//     },
-//   });
-// }
-
-// // ✅ UPDATE - COM retry (idempotente)
-// export function useUpdateItem() {
-//   return useMutation({
-//     mutationFn: ({ id, data }) => itemsApi.updateItem(id, data),
-//     retry: 1, // ✅ Seguro - atualizar N vezes = mesmo resultado
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: itemsKeys.lists() });
-//     },
-//   });
-// }
-
-// // ✅ DELETE - COM retry (idempotente)
-// export function useDeleteItem() {
-//   return useMutation({
-//     mutationFn: itemsApi.deleteItem,
-//     retry: 1, // ✅ Seguro - deletar N vezes = mesmo resultado
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: itemsKeys.lists() });
-//     },
-//   });
-// }

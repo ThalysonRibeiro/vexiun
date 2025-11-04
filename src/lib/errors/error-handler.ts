@@ -86,6 +86,14 @@ function handlePrismaError(error: Prisma.PrismaClientKnownRequestError): ErrorRe
   }
 }
 
+const EXPECTED_ERRORS = [
+  PermissionError,
+  NotFoundError,
+  ValidationError,
+  DuplicateError,
+  AuthenticationError
+];
+
 /**
  * Handler principal de erros
  *
@@ -99,11 +107,14 @@ export function handleError(
   defaultMessage: string = "Erro ao processar operação",
   context?: Record<string, unknown>
 ): ErrorResponse {
-  // Suprime log de PermissionError (comum quando recursos são deletados durante navegação)
-  const shouldLog = !(error instanceof PermissionError);
+  const isDev = process.env.NODE_ENV === "development";
+  const silentErrors = [PermissionError];
 
-  // Log detalhado no servidor (não envia para o cliente)
-  if (shouldLog) {
+  const shouldLog = !silentErrors.some((ErrorClass) => error instanceof ErrorClass);
+
+  // Em dev, loga tudo (exceto silentErrors)
+  // Em prod, só loga erros inesperados
+  if (shouldLog && (isDev || !(error instanceof Error) || !isExpectedError(error))) {
     const timestamp = new Date().toISOString();
     console.error(`[${timestamp}] ${defaultMessage}:`, {
       error,
@@ -167,6 +178,15 @@ export function handleError(
 
   // Erro desconhecido
   return { error: defaultMessage, code: "UNKNOWN_ERROR" };
+}
+
+function isExpectedError(error: Error): boolean {
+  return (
+    error instanceof NotFoundError ||
+    error instanceof ValidationError ||
+    error instanceof DuplicateError ||
+    error instanceof AuthenticationError
+  );
 }
 
 /**
