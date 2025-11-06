@@ -1,7 +1,6 @@
 "use client";
 
 import { User } from "next-auth";
-import { User as DetailUser } from "@/generated/prisma";
 import { NameForme } from "./name-form";
 import Avatar from "./avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

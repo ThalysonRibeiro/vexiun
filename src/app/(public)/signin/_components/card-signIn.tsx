@@ -1,36 +1,35 @@
 "use client";
-import { handleRegister, SigInType } from "@/app/actions/auth/signIn";
+import { handleCredentialsSignIn, handleSignin, SigInType } from "@/app/actions/auth/signIn";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage
-} from "../../../../components/ui/form";
-import { Input, InputPassword } from "../../../../components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Input, InputPassword } from "@/components/ui/input";
 import { useSignInForm } from "@/hooks/use-auth";
-import { Separator } from "../../../../components/ui/separator";
+import { Separator } from "@/components/ui/separator";
+import { SignInFormData } from "@/app/actions/auth";
 import { useState } from "react";
-
-interface CardSignInProps {
-  className?: string;
-  title: string;
-}
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function CardSignIn() {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const form = useSignInForm({});
+  const router = useRouter();
 
   const handleSignIn = async (provider: SigInType) => {
-    await handleRegister(provider);
+    await handleSignin(provider);
   };
 
-  const onSubmit = async (formData: { email: string; password: string }) => {
-    console.log(formData);
+  const onSubmit = async (formData: SignInFormData) => {
+    try {
+      setLoading(true);
+      await handleCredentialsSignIn(formData.email, formData.password);
+    } finally {
+      setLoading(false);
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -69,7 +68,13 @@ export function CardSignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input id="email" type="email" placeholder="Digite seu email" {...field} />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Digite seu email"
+                      disabled={loading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -81,15 +86,20 @@ export function CardSignIn() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputPassword id="password" placeholder="Digite sua senha" {...field} />
+                    <InputPassword
+                      id="password"
+                      placeholder="Digite sua senha"
+                      disabled={loading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" size={"sm"} className="w-full mt-2">
-              Entrar
+            <Button type="submit" size={"lg"} className="w-full mt-2 cursor-pointer">
+              {loading ? <Loader2 className="animate-spin" /> : "Entrar"}
             </Button>
           </form>
         </Form>

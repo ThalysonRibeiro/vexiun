@@ -80,20 +80,21 @@ export default function NotificationsPage() {
     if (!confirm("Deseja realmente deletar todas as notificações?")) return;
 
     setIsDeleting(true);
-    const result = await deleteAllNotifications.mutateAsync();
+    const result = await deleteAllNotifications.mutateAsync({});
 
     if (!isSuccessResponse(result)) {
-      toast.error("Error ao deletar notificações");
+      toast.error("Erro ao deletar notificações");
+      setIsDeleting(false);
+    } else {
+      toast.success(`${result.data} notificações deletadas`);
+      refetch();
       setIsDeleting(false);
     }
-    toast.success(`${result.data} notificações deletadas`);
-    refetch();
-    setIsDeleting(false);
   };
 
   const handleDeleteRead = async () => {
     setIsDeleting(true);
-    const result = await deleteReadNotifications.mutateAsync();
+    const result = await deleteReadNotifications.mutateAsync({});
 
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao deletar notificações");
@@ -105,7 +106,7 @@ export default function NotificationsPage() {
 
   const handleSmartCleanup = async () => {
     setIsDeleting(true);
-    const result = await smartCleanup.mutateAsync();
+    const result = await smartCleanup.mutateAsync({});
 
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao limpar notificações");
@@ -126,10 +127,10 @@ export default function NotificationsPage() {
 
   const handleMarkAllRead = async () => {
     setIsDeleting(true);
-    const result = await markAllAsRead.mutateAsync();
+    const result = await markAllAsRead.mutateAsync({});
 
     if (isSuccessResponse(result)) {
-      toast.error("Error ao marcar notificações como lidas");
+      toast.success("Notificações marcadas como lidas");
     }
     refetch();
 

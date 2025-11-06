@@ -74,6 +74,15 @@ export const ERROR_MESSAGES = {
     EXPIRED: "Este convite expirou"
   },
 
+  PASSWORD: {
+    MIN: "A senha deve ter no mínimo 8 caracteres",
+    MAX: "A senha deve ter no máximo 100 caracteres",
+    UPPERCASE: "A senha deve conter pelo menos uma letra maiúscula",
+    LOWERCASE: "A senha deve conter pelo menos uma letra minúscula",
+    NUMBER: "A senha deve conter pelo menos um número",
+    SPECIAL: "A senha deve conter pelo menos um caractere especial"
+  },
+
   // Operações CRUD
   WORKSPACE: {
     CREATE_ERROR: "Erro ao criar workspace",

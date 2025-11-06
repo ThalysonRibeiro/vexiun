@@ -44,7 +44,7 @@ export function NotificationContent() {
   };
 
   const handleMarkAllRead = async () => {
-    const result = await markAllAsRead.mutateAsync();
+    const result = await markAllAsRead.mutateAsync({});
 
     if (!isSuccessResponse(result)) {
       toast.error("Erro ao marcar todas como lidas");
@@ -177,8 +177,7 @@ export function NotificationContent() {
                 </span>
 
                 {/* Avatar (se aplicável) */}
-                {!notification.type ===
-                  withoutAvatar.includes(notification.type as NotificationType) && (
+                {!withoutAvatar.includes(notification.type as NotificationType) && (
                   <Avatar className="absolute top-2 left-2 w-6 h-6">
                     <AvatarImage src={notification.image as string} />
                     <AvatarFallback>
@@ -187,8 +186,7 @@ export function NotificationContent() {
                   </Avatar>
                 )}
 
-                {!notification.type ===
-                  withoutAvatar.includes(notification.type as NotificationType) && (
+                {!withoutAvatar.includes(notification.type as NotificationType) && (
                   <div className="text-sm font-medium -mb-6 ml-7 truncate max-w-45">
                     <span className="uppercase">{notification.nameReference?.slice(0, 1)}</span>
                     <span>{notification.nameReference?.slice(1)}</span>

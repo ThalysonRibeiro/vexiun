@@ -112,7 +112,7 @@ export default async function Home() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href="/login">
+              <Link href="/signin">
                 <Button size="lg" className="gap-2 w-full sm:w-auto">
                   Começar agora <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -210,7 +210,7 @@ export default async function Home() {
               </div>
 
               <div className="mt-4 md:mt-6">
-                <Link href="/login">
+                <Link href="/signin">
                   <Button className="w-full bg-primary hover:bg-primary/90">
                     Acessar Dashboard
                   </Button>
@@ -1010,7 +1010,7 @@ export default async function Home() {
             projetos em equipe.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/login">
+            <Link href="/signin">
               <Button size="lg" className="text-base px-8 py-6 gap-2">
                 <ArrowRight className="h-5 w-5" />
                 Começar agora

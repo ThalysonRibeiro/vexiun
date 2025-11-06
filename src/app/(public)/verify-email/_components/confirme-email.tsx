@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import logo_img from "@/assets/logo-goallist.png";
 
 export function ConfirmEmailConmponent() {
   const searchParams = useSearchParams();
@@ -159,12 +158,10 @@ export function ConfirmEmailConmponent() {
 
         {/* Logo ou nome da empresa */}
         <div className="border-t border-gray-200">
-          <Image
-            src={logo_img}
-            alt="DevTasks Logo"
-            className="mx-auto mt-2 w-24 h-auto opacity-50"
-          />
-          <p className="text-gray-400 text-sm">DevTasks</p>
+          <div className="mx-auto mt-2 w-24 h-auto opacity-50 flex items-center justify-center">
+            <span className="text-2xl font-bold text-gray-400">Catalyst</span>
+          </div>
+          <p className="text-gray-400 text-sm">Catalyst</p>
         </div>
       </Card>
     </div>

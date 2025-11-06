@@ -1,31 +1,37 @@
 "use client";
-import { handleRegister, SigInType } from "@/app/actions/auth/signIn";
+import { handleSignin, SigInType } from "@/app/actions/auth/signIn";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from "../../../../components/ui/form";
-import { Input, InputPassword } from "../../../../components/ui/input";
-import { useSignUpForm } from "@/hooks/use-auth";
-import { Separator } from "../../../../components/ui/separator";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Input, InputPassword } from "@/components/ui/input";
+import { useSignUp, useSignUpForm } from "@/hooks/use-auth";
+import { Separator } from "@/components/ui/separator";
+import { SignUpFormData } from "@/app/actions/auth";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function CardSignUp() {
+  const [loading, setLoading] = useState<boolean>(false);
   const form = useSignUpForm({});
+  const signUp = useSignUp();
+  const router = useRouter();
 
   const handleSignIn = async (provider: SigInType) => {
-    await handleRegister(provider);
+    await handleSignin(provider);
   };
 
-  const onSubmit = async (formData: { email: string; password: string }) => {
-    console.log(formData);
+  const onSubmit = async (formData: SignUpFormData) => {
+    try {
+      setLoading(true);
+      await signUp.mutateAsync(formData);
+    } finally {
+      form.reset();
+      setLoading(false);
+      router.push("/signin");
+    }
   };
 
   return (
@@ -65,7 +71,13 @@ export function CardSignUp() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input id="email" type="text" placeholder="Digite seu nome" {...field} />
+                    <Input
+                      id="email"
+                      type="text"
+                      placeholder="Digite seu nome"
+                      disabled={loading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -77,7 +89,13 @@ export function CardSignUp() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input id="email" type="email" placeholder="Digite seu email" {...field} />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Digite seu email"
+                      disabled={loading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,7 +107,12 @@ export function CardSignUp() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputPassword id="password" placeholder="Digite sua senha" {...field} />
+                    <InputPassword
+                      id="password"
+                      placeholder="Digite sua senha"
+                      disabled={loading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -101,15 +124,20 @@ export function CardSignUp() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputPassword id="confirmPassword" placeholder="Digite sua senha" {...field} />
+                    <InputPassword
+                      id="confirmPassword"
+                      placeholder="Digite sua senha"
+                      disabled={loading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" size={"lg"} className="w-full">
-              Cadastrar
+            <Button type="submit" size={"lg"} className="w-full cursor-pointer">
+              {loading ? <Loader2 className="animate-spin" /> : "Criar conta"}
             </Button>
           </form>
         </Form>
