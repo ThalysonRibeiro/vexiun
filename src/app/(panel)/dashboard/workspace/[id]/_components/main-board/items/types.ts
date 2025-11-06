@@ -27,4 +27,5 @@ export interface ItemsTablesProps {
   team: TeamResponse;
   changeLayout: boolean;
   workspaceId: string;
+  isVisible: (key: string) => boolean;
 }

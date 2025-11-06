@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, LayoutGrid, Logs, Plus } from "lucide-react";
+import { ChevronDown, LayoutGrid, Logs, Plus, Settings2 } from "lucide-react";
 import { useState } from "react";
 import { GroupForm } from "./group/group-form";
 import { ListItems } from "./list-items";
@@ -16,6 +16,14 @@ import { NewItem } from "./group/new-item";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { useVisibleColumns } from "@/hooks/use-items";
+import { VisibleColumns } from "./items/visible-columns";
 
 export function Groups({ workspaceId }: { workspaceId: string }) {
   const [changeLayout, setChangeLayout] = useState<boolean>(false);
@@ -50,6 +58,8 @@ export function Groups({ workspaceId }: { workspaceId: string }) {
     handleRestoreGroup
   } = useGroupActions(workspaceId);
 
+  const { COLUMNS, isVisible, toggleColumn, visibleColumns } = useVisibleColumns();
+
   return (
     <section className="space-y-6 mb-6">
       {groups?.group.length === 0 && <h2 className="text-center">Cadastre um group</h2>}
@@ -79,6 +89,13 @@ export function Groups({ workspaceId }: { workspaceId: string }) {
               <span>Layout</span>
               {changeLayout ? "lista" : "grid"}
             </Button>
+
+            <VisibleColumns
+              COLUMNS={COLUMNS}
+              visibleColumns={visibleColumns}
+              isVisible={isVisible}
+              toggleColumn={toggleColumn}
+            />
           </div>
         )}
       </div>
@@ -157,6 +174,7 @@ export function Groups({ workspaceId }: { workspaceId: string }) {
                     team={team ?? []}
                     changeLayout={changeLayout}
                     workspaceId={workspaceId}
+                    isVisible={isVisible}
                   />
                   {permissions.canCreateOrEditItem && (
                     <NewItem

@@ -37,6 +37,7 @@ import { CATEGORIES_MAP } from "@/lib/constants";
 import { InviteMembersToWorkspaces } from "@/components/invite-members-to-workspaces";
 import { WorkspaceWithDetails } from "./workspaces-page-client";
 import { ActionsWorkspaceList } from "./actions-workspace-list";
+import { useDragScroll } from "@/hooks/use-drag-scroll";
 
 interface WorkspaceListProps {
   workspaces: WorkspaceWithDetails[];
@@ -46,10 +47,6 @@ export function WorkspaceList({ workspaces }: WorkspaceListProps) {
   const [changeLayout, setChangeLayout] = useState<boolean>(false);
   const [changeEditOrInvite, setChangeEditOrInvite] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isDown, setIsDown] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftStart, setScrollLeftStart] = useState(0);
-  const animationFrameRef = useRef<number | null>(null);
   const router = useRouter();
   const {
     isOpen,
@@ -74,84 +71,16 @@ export function WorkspaceList({ workspaces }: WorkspaceListProps) {
     onEdit: handleSelectForEdit
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (changeLayout) return;
+  const { handleMouseDown, handleMouseLeave, handleMouseUp, handleMouseMove } = useDragScroll(
+    changeLayout,
+    scrollRef
+  );
 
-    const container = scrollRef.current?.querySelector(
-      ".relative.w-full.overflow-x-auto"
-    ) as HTMLElement;
-    if (!container) return;
-
-    const target = e.target as HTMLElement;
-    if (
-      target.closest("button") ||
-      target.closest("input") ||
-      target.closest("textarea") ||
-      target.closest("select") ||
-      target.closest("a")
-    ) {
-      return;
-    }
-
-    setIsDown(true);
-    container.style.cursor = "grabbing";
-    container.style.userSelect = "none";
-    container.style.scrollBehavior = "auto";
-
-    setStartX(e.pageX - container.offsetLeft);
-    setScrollLeftStart(container.scrollLeft);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDown(false);
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    const container = scrollRef.current?.querySelector(
-      ".relative.w-full.overflow-x-auto"
-    ) as HTMLElement;
-    if (container) {
-      container.style.cursor = "grab";
-      container.style.userSelect = "auto";
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDown(false);
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    const container = scrollRef.current?.querySelector(
-      ".relative.w-full.overflow-x-auto"
-    ) as HTMLElement;
-    if (container) {
-      container.style.cursor = "grab";
-      container.style.userSelect = "auto";
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDown) return;
-
-    const container = scrollRef.current?.querySelector(
-      ".relative.w-full.overflow-x-auto"
-    ) as HTMLElement;
-    if (!container) return;
-
-    e.preventDefault();
-
-    const x = e.pageX - container.offsetLeft;
-    const walk = x - startX;
-
-    const newScrollLeft = scrollLeftStart - walk;
-
-    container.scrollLeft = newScrollLeft;
+  const CommonDragScroll = {
+    onMouseDown: handleMouseDown,
+    onMouseLeave: handleMouseLeave,
+    onMouseUp: handleMouseUp,
+    onMouseMove: handleMouseMove
   };
 
   if (workspaces.length === 0) {
@@ -237,10 +166,7 @@ export function WorkspaceList({ workspaces }: WorkspaceListProps) {
           touchAction: "pan-y",
           willChange: "scroll-position"
         }}
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onMouseUp={handleMouseUp}
-        onMouseMove={handleMouseMove}
+        {...CommonDragScroll}
       >
         {changeLayout ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">

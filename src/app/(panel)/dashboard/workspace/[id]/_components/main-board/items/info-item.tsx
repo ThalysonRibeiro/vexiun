@@ -43,7 +43,12 @@ export function InfoItem({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (shetRef.current && !shetRef.current.contains(event.target as Node)) {
-        setIsEditing(false);
+        const isPopoverClick = (event.target as Element).closest(
+          "[data-radix-popper-content-wrapper]"
+        );
+        if (!isPopoverClick) {
+          setIsEditing(false);
+        }
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -71,6 +76,7 @@ export function InfoItem({
               term: data.term,
               priority: data.priority,
               status: data.status,
+              complexity: data.complexity,
               notes: data.notes,
               description: data.description,
               assignedTo: data.assignedTo,

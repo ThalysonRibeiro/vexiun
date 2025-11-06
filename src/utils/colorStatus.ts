@@ -1,6 +1,8 @@
 import { NotificationType } from "@/generated/prisma";
 import {
   AlertCircle,
+  AlertOctagon,
+  AlertTriangle,
   ArrowDown,
   ArrowUp,
   CheckCircle2,
@@ -102,6 +104,40 @@ export const priorityMap = [
   { key: "LOW", label: "BAIXO", icon: ArrowDown, color: "text-green-600" },
   { key: "STANDARD", label: "PADRÃO", icon: Circle, color: "text-gray-600" }
 ];
+
+export const complexityMap = [
+  {
+    key: "LOW",
+    label: "BAIXA",
+    icon: AlertCircle,
+    color: "text-green-600 bg-green-50 border-green-200"
+  },
+  {
+    key: "MEDIUM",
+    label: "MÉDIA",
+    icon: AlertTriangle,
+    color: "text-yellow-600 bg-yellow-50 border-yellow-200"
+  },
+  {
+    key: "HIGH",
+    label: "ALTA",
+    icon: AlertOctagon,
+    color: "text-red-600 bg-red-50 border-red-200"
+  }
+];
+
+export function colorComplexity(status: string): string {
+  switch (status) {
+    case "LOW":
+      return "bg-green-500 dark:bg-green-500 text-white";
+    case "MEDIUM":
+      return "bg-yellow-500 dark:bg-yellow-500 text-white";
+    case "HIGH":
+      return "bg-red-500 dark:bg-red-500 text-white";
+    default:
+      return "bg-zinc-400  text-white";
+  }
+}
 
 export const notificationMap = {
   WORKSPACE_INVITE: "CONVITE DE PROJETO",

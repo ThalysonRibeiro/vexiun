@@ -2,7 +2,7 @@ import { ERROR_MESSAGES } from "@/lib/errors";
 import { JSONContent } from "@tiptap/core";
 import { z } from "zod";
 import { groupIdFormSchema } from "../group";
-import { EntityStatus } from "@/generated/prisma";
+import { ComplexityType, EntityStatus, Priority, Status } from "@/generated/prisma";
 
 export const itemIdFormSchema = z.object({
   itemId: z
@@ -15,8 +15,15 @@ export const itemIdFormSchema = z.object({
 export const itemFormSchema = z.object({
   title: z.string().min(1, ERROR_MESSAGES.VALIDATION.REQUIRED_FIELD),
   term: z.date().optional(),
-  priority: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW", "STANDARD"]),
-  status: z.enum(["DONE", "IN_PROGRESS", "STOPPED", "NOT_STARTED"]),
+  priority: z.enum([
+    Priority.CRITICAL,
+    Priority.HIGH,
+    Priority.MEDIUM,
+    Priority.LOW,
+    Priority.STANDARD
+  ]),
+  status: z.enum([Status.DONE, Status.IN_PROGRESS, Status.STOPPED, Status.NOT_STARTED]),
+  complexity: z.enum([ComplexityType.LOW, ComplexityType.MEDIUM, ComplexityType.HIGH]),
   notes: z.string().optional(),
   description: z.string().optional(),
   details: z.custom<JSONContent>().nullable().optional(),

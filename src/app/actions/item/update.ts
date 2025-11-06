@@ -27,6 +27,7 @@ export const updateItem = withAuth(
         status: formData.status,
         term: formData.term,
         priority: formData.priority,
+        complexity: formData.complexity,
         notes: formData.notes,
         description: formData.description,
         details: (formData.details as JSONContent) || null,

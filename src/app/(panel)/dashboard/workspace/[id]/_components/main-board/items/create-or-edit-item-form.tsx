@@ -21,7 +21,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CalendarTerm } from "./calendar-term";
 import { Textarea } from "@/components/ui/textarea";
-import { colorPriority, colorStatus, priorityMap, statusMap } from "@/utils/colorStatus";
+import {
+  colorComplexity,
+  colorPriority,
+  colorStatus,
+  complexityMap,
+  priorityMap,
+  statusMap
+} from "@/utils/colorStatus";
 import { cn } from "@/lib/utils";
 import { ItemFormData, updateItem } from "@/app/actions/item";
 import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler";
@@ -72,8 +79,9 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
         itemId: itemId,
         title: formData?.title,
         status: formData?.status,
-        term: formData?.term,
+        complexity: formData?.complexity,
         priority: formData?.priority,
+        term: formData?.term,
         notes: formData?.notes,
         description: formData?.description,
         assignedTo: formData?.assignedTo ?? session?.user?.id,
@@ -86,7 +94,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
       } else {
         toast.success("Item atualizado com sucesso!");
       }
-      closeForm(false);
+      // closeForm(false);
       form.reset();
       setIsLoading(false);
       return;
@@ -95,8 +103,9 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
         workspaceId: workspaceId as string,
         groupId: groupId,
         title: formData.title,
-        term: formData.term,
         priority: formData.priority,
+        complexity: formData?.complexity,
+        term: formData.term,
         notes: formData.notes,
         description: formData.description,
         status: "NOT_STARTED",
@@ -109,7 +118,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
         return;
       }
       toast.success("Item cadastrado com sucesso!");
-      closeForm(false);
+      // closeForm(false);
       form.reset();
       setIsLoading(false);
       return;
@@ -230,6 +239,57 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
                               className={cn(
                                 "cursor-pointer rounded-none mb-1",
                                 colorPriority(p.key)
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                <p.icon className="h-4 w-4 text-white" />
+                                <span>{p.label}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {permissions.canCreateOrEditItem && (
+              <FormField
+                control={form.control}
+                name="complexity"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Complexidade</FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger
+                          className={cn("w-full cursor-pointer", colorComplexity(field.value))}
+                          size="sm"
+                        >
+                          <SelectValue>
+                            {(() => {
+                              const p = complexityMap.find((p) => p.key === field.value);
+                              return p ? (
+                                <div className="flex items-center gap-1.5">
+                                  <p.icon className="h-3.5 w-3.5 text-white" />
+                                  <span>{p.label}</span>
+                                </div>
+                              ) : null;
+                            })()}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="p-2">
+                          {complexityMap.map((p) => (
+                            <SelectItem
+                              key={p.key}
+                              value={p.key}
+                              className={cn(
+                                "cursor-pointer rounded-none mb-1",
+                                colorComplexity(p.key)
                               )}
                             >
                               <div className="flex items-center gap-2">

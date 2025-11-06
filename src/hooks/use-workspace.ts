@@ -221,7 +221,7 @@ export function useWorkspaceMemberData(workspaceId: string) {
 export function useUpdateRoleMember() {
   return useMutationWithToast({
     mutationFn: updateRoleMember,
-    invalidateQueries: [["workspace", "team"]],
+    invalidateQueries: [["workspace"], ["team"]],
     successMessage: (data) => data || "Role atualizada!",
     errorMessage: "Erro ao atualizar role"
   });

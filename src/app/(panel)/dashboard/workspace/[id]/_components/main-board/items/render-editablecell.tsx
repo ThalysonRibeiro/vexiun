@@ -59,7 +59,7 @@ export const RenderEditableCell = memo(function RenderEditableCell(props: Render
           }}
           autoFocus
           disabled={isLoading === item.id}
-          className="flex-1 w-full min-w-30 h-8"
+          className="flex-1  w-55 h-8"
         />
         <Button
           type="submit"
@@ -92,7 +92,7 @@ export const RenderEditableCell = memo(function RenderEditableCell(props: Render
           className="cursor-pointer hover:bg-accent p-1 rounded transition-colors overflow-auto"
         >
           <p
-            className="overflow-hidden max-w-75 text-ellipsis truncate"
+            className="overflow-hidden w-70 text-left text-ellipsis truncate"
             style={{
               display: "-webkit-box",
               WebkitLineClamp: 2,

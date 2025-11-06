@@ -38,7 +38,7 @@ interface ItemCardProps {
   onSaveField: (item: ItemWhitCreatedAssignedUser) => void;
   onSelectChange: (
     item: ItemWhitCreatedAssignedUser,
-    field: "priority" | "status",
+    field: "priority" | "status" | "complexity",
     value: Priority | Status
   ) => void;
   onDeleteItem: (itemId: string) => void;
@@ -162,20 +162,29 @@ export const ItemCard = memo(function ItemCard(props: ItemCardProps) {
           className="p-2 bg-muted/50 rounded-md hover:bg-muted transition-colors"
         />
 
-        <ItemTerm
-          label="Prazo"
-          className=""
-          item={item}
-          isLoading={isLoading}
-          editing={editing}
-          permissionsEdit={permissions.canCreateOrEditItem}
-          editingData={editingData}
-          onStartEditing={onStartEditing}
-          onCancelEditing={onCancelEditing}
-          onSaveField={onSaveField}
-          setEditingData={setEditingData}
-        />
-
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+          <ItemTerm
+            label="Prazo"
+            className=""
+            item={item}
+            isLoading={isLoading}
+            editing={editing}
+            permissionsEdit={permissions.canCreateOrEditItem}
+            editingData={editingData}
+            onStartEditing={onStartEditing}
+            onCancelEditing={onCancelEditing}
+            onSaveField={onSaveField}
+            setEditingData={setEditingData}
+          />
+          <ItemPriorityStatus
+            type="complexity"
+            label="Complexidade"
+            item={item}
+            isLoading={isLoading}
+            onSelectChange={onSelectChange}
+            permissionsEdit={permissions.canCreateOrEditItem}
+          />
+        </div>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
           <ItemPriorityStatus
             type="priority"

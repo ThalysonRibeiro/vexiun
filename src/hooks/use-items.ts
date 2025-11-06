@@ -12,13 +12,13 @@ import {
 } from "@/app/actions/item";
 import { assignTo } from "@/app/actions/item/assign-to";
 import { changeItemStatus } from "@/app/actions/item/change-status";
-import { EntityStatus, Priority, Prisma, Status } from "@/generated/prisma";
+import { ComplexityType, EntityStatus, Priority, Prisma, Status } from "@/generated/prisma";
 import { fetchAPI } from "@/lib/api/fetch-api";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { JSONContent } from "@tiptap/core";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMutationWithToast } from "./use-mutation-with-toast";
@@ -29,6 +29,7 @@ export interface UseItemFormProps {
     term: Date;
     priority: Priority;
     status: Status;
+    complexity: ComplexityType;
     notes?: string;
     description?: string;
     details?: JSONContent | null;
@@ -44,6 +45,7 @@ export function UseItemForm({ initialValues }: UseItemFormProps) {
       term: new Date(),
       priority: "STANDARD",
       status: "NOT_STARTED",
+      complexity: "MEDIUM",
       notes: "",
       description: "",
       details: null,
@@ -310,6 +312,7 @@ export function useItemActions(workspaceId: string) {
           itemId: item.id,
           title: item.title,
           status: item.status,
+          complexity: item.complexity,
           term: new Date(item.term),
           priority: item.priority,
           notes: item.notes,
@@ -344,6 +347,7 @@ export function useItemActions(workspaceId: string) {
           itemId: item.id,
           title: editingData.title,
           status: editingData.status,
+          complexity: editingData.complexity,
           term: new Date(editingData.term),
           priority: editingData.priority,
           notes: editingData.notes,
@@ -367,7 +371,7 @@ export function useItemActions(workspaceId: string) {
   const handleSelectChange = useCallback(
     async (
       item: ItemWhitCreatedAssignedUser,
-      field: "priority" | "status",
+      field: "priority" | "status" | "complexity",
       value: Priority | Status
     ) => {
       setIsLoading(item.id);
@@ -378,6 +382,7 @@ export function useItemActions(workspaceId: string) {
           itemId: item.id,
           title: item.title,
           status: field === "status" ? (value as Status) : item.status,
+          complexity: field === "complexity" ? (value as ComplexityType) : item.complexity,
           term: new Date(item.term),
           priority: field === "priority" ? (value as Priority) : item.priority,
           notes: item.notes,
@@ -508,5 +513,65 @@ export function useItemActions(workspaceId: string) {
     handleMoveToTrash,
     handleArchiveItem,
     handleRestoreItem
+  };
+}
+
+export function useVisibleColumns() {
+  const STORAGE_KEY = "items-table-columns";
+  const COLUMNS = [
+    { key: "actions", label: "Ações", defaultVisible: true, fixed: true }, // Sempre visível
+    { key: "title", label: "Título", defaultVisible: true },
+    { key: "notes", label: "Notas", defaultVisible: false },
+    { key: "responsible", label: "Responsável", defaultVisible: true },
+    { key: "deadline", label: "Prazo", defaultVisible: true },
+    { key: "complexity", label: "Complexidade", defaultVisible: false },
+    { key: "priority", label: "Prioridade", defaultVisible: true },
+    { key: "status", label: "Status", defaultVisible: true },
+    { key: "description", label: "Descrição", defaultVisible: false },
+    { key: "details", label: "Detalhes", defaultVisible: false }
+  ];
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") {
+      return new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.key));
+    }
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return new Set(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error("Erro ao carregar preferências:", error);
+    }
+
+    return new Set(COLUMNS.filter((col) => col.defaultVisible).map((col) => col.key));
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...visibleColumns]));
+    } catch (error) {
+      console.error("Erro ao salvar preferências:", error);
+    }
+  }, [visibleColumns]);
+
+  const toggleColumn = useCallback((columnKey: string) => {
+    setVisibleColumns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(columnKey)) {
+        newSet.delete(columnKey);
+      } else {
+        newSet.add(columnKey);
+      }
+      return newSet;
+    });
+  }, []);
+  const isVisible = useCallback((key: string) => visibleColumns.has(key), [visibleColumns]);
+
+  return {
+    COLUMNS,
+    visibleColumns,
+    toggleColumn,
+    isVisible
   };
 }
