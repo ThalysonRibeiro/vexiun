@@ -5,10 +5,5 @@ export function Progress(props: ProgressPrimitive.ProgressProps) {
 }
 
 export function ProgressIndicator(props: ProgressPrimitive.ProgressIndicatorProps) {
-  return (
-    <ProgressPrimitive.Indicator
-      {...props}
-      className="bg-gradient-to-r from-primary to-orange-500 w-1/2 h-2 rounded-full"
-    />
-  );
+  return <ProgressPrimitive.Indicator {...props} className="bg-primary w-1/2 h-2 rounded-full" />;
 }

@@ -10,13 +10,41 @@ import {
   Megaphone,
   TrendingUp,
   Headphones,
-  MoreHorizontal,
-  LucideIcon
+  MoreHorizontal
 } from "lucide-react";
 
-export const APP_NAME = "Catalyst";
-export const APP_DESCRIPTION = "Accelerate your team's productivity";
-export const APP_TAGLINE = "Where collaboration meets velocity";
+export const branding = {
+  // Nome oficial
+  name: "Vexiun",
+  domain: "vexiun.com",
+
+  email: "noreply@vexiun.com",
+  support: "support@vexiun.com",
+  contact: "contact@vexiun.com",
+  privacy: "privacy@vexiun.com",
+  terms: "terms@vexiun.com",
+
+  // Marketing
+  tagline1: "Project management, reimagined",
+  tagline2: "The smart project manager",
+  tagline3: "AI-powered project management",
+  description:
+    "Vexiun é uma plataforma moderna de gestão de projetos e times, projetada para transformar visão em execução com fluidez e inteligência.",
+  pitch: "Vexiun — Onde a visão encontra a execução.",
+
+  // Pronuncia:
+  pronunciation: "VEKS-ee-un",
+
+  story: {
+    origin: "Nome criado para representar velocidade + visão",
+    meaning: "Projetos que movem rápido com clareza",
+    tagline: "Move fast. Stay clear."
+  },
+  // Social
+  twitter: "@vexiun",
+  linkedin: "vexiun",
+  github: "vexiun"
+};
 
 export const CACHE_TIMES = {
   SHORT: 1 * 60 * 1000, // 1min - dados frequentes
@@ -25,11 +53,7 @@ export const CACHE_TIMES = {
   PERMANENT: Infinity // Dados imutáveis
 } as const;
 
-export const CATEGORIES_ARRAY: {
-  id: WorkspaceCategory;
-  label: string;
-  icon: LucideIcon;
-}[] = [
+export const CATEGORIES_ARRAY = [
   { id: "PERSONAL", label: "Pessoal", icon: User },
   { id: "WORK", label: "Trabalho", icon: Briefcase },
   { id: "EDUCATION", label: "Educação", icon: GraduationCap },
@@ -73,14 +97,7 @@ export const roleDescriptions: Record<WorkspaceRole, string> = {
   VIEWER: "Visualizador com acesso apenas leitura"
 };
 
-export interface TestimonialsProps {
-  quote: string;
-  author: string;
-  role: string;
-  initials: string;
-}
-
-export const TESTIMONIALS: TestimonialsProps[] = [
+export const TESTIMONIALS = [
   {
     quote:
       "A visualização de progresso e as estatísticas me ajudam a entender onde estou gastando meu tempo e como posso melhorar.",

@@ -99,7 +99,7 @@ export const UserSearch = forwardRef<UserSearchRef, UserSearchProps>(
             {selectedUsers.map((user) => (
               <div
                 key={user.id}
-                className="flex items-center gap-2 bg-gradient-to-br from-primary to-orange-500 text-white px-3 py-1 rounded-full"
+                className="flex items-center gap-2 bg-primary text-white dark:text-black px-3 py-1 rounded-full"
               >
                 <span className="text-sm">{user.name}</span>
                 <button

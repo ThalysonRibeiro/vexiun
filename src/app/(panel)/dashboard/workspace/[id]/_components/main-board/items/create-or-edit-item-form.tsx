@@ -75,6 +75,7 @@ export function CreateOrEditItemForm(props: CreateItemFormProps) {
 
     if (editingItem && itemId) {
       const response = await updateItem({
+        //modificar para usar  hook
         workspaceId: workspaceId as string,
         itemId: itemId,
         title: formData?.title,

@@ -41,7 +41,7 @@ export function UtilityButtonItem({
     <div
       onClick={onClick}
       className={cn(
-        "cursor-pointer group/item flex items-center gap-2 bg-gradient-to-tr from-primary to-orange-500 text-white rounded-full shadow-lg active:shadow-md overflow-hidden pointer-events-auto",
+        "cursor-pointer group/item flex items-center gap-2 bg-primary text-white dark:text-black rounded-full shadow-lg active:shadow-md overflow-hidden pointer-events-auto",
         "transition-all duration-300 ease-out",
         delayClass,
         "h-12 pl-4 pr-4 min-w-12",
@@ -116,7 +116,7 @@ export default function UtilityButton({ children }: UtilityButtonProps) {
 
         <button
           className={cn(
-            "w-14 h-14 rounded-full bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center cursor-pointer shadow-xl",
+            "w-14 h-14 rounded-full bg-primary flex items-center justify-center cursor-pointer shadow-xl",
             "active:scale-95 transition-all duration-300 ease-out relative",
             "hover:scale-110"
           )}
@@ -125,7 +125,7 @@ export default function UtilityButton({ children }: UtilityButtonProps) {
         >
           <Plus
             className={cn(
-              "w-6 h-6 text-white absolute transition-all duration-300",
+              "w-6 h-6 text-white dark:text-black absolute transition-all duration-300",
               isOpen ? "rotate-[135deg]" : "rotate-0 opacity-100"
             )}
           />

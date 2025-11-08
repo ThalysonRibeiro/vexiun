@@ -66,9 +66,9 @@ export function Stepper({
                   className={cn(
                     "flex items-center justify-center min-w-8 min-h-8 rounded-full transition-colors",
                     isCompleted
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-white dark:text-black"
                       : isActive
-                        ? "bg-primary text-white"
+                        ? "bg-primary text-white dark:text-black"
                         : "bg-accent text-muted-foreground"
                   )}
                 >
@@ -80,7 +80,7 @@ export function Stepper({
                     <div
                       className={cn(
                         "h-full transition-all duration-500",
-                        currentStep > step && "bg-gradient-to-r from-primary to-orange-500"
+                        currentStep > step && "bg-primary"
                       )}
                     />
                   </div>

@@ -10,6 +10,7 @@ import { ItemLifecycleManager } from "./Item-lifecycle-manager";
 import { useSession } from "next-auth/react";
 import { useWorkspaceMemberData, useWorkspacePermissions } from "@/hooks/use-workspace";
 import { EntityStatus, WorkspaceRole } from "@/generated/prisma";
+import { Badge } from "@/components/ui/badge";
 
 interface WorkspaceContentProps {
   workspaceId: string;
@@ -87,7 +88,7 @@ export function WorkspaceContent({ workspaceId }: WorkspaceContentProps) {
             >
               {tab.icon}
               <span className="hidden sm:block">{tab.label}</span>
-              {tab.length}
+              {tab.length && <Badge variant="secondary">{tab.length}</Badge>}
             </TabsTrigger>
           ))}
       </TabsList>

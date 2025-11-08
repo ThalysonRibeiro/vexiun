@@ -35,7 +35,9 @@ export function ListItems(props: ItemsTablesProps) {
     handleRestoreItem
   } = useItemActions(workspaceId);
 
-  const pagination = usePagination(items?.response ?? [], changeLayout ? 6 : 20);
+  const itemsPerPage: number = changeLayout ? 6 : 20;
+
+  const pagination = usePagination(items?.response ?? [], itemsPerPage);
   const currentItems = pagination.currentItems;
 
   const { handleMouseDown, handleMouseLeave, handleMouseUp, handleMouseMove } = useDragScroll(
@@ -142,9 +144,7 @@ export function ListItems(props: ItemsTablesProps) {
         )}
       </div>
 
-      {(items?.itemsNotCompleted ?? []).length > (changeLayout ? 6 : 20) && (
-        <PaginationControls {...pagination} />
-      )}
+      {(items?.response ?? []).length > itemsPerPage && <PaginationControls {...pagination} />}
     </div>
   );
 }

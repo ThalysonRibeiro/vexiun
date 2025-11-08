@@ -19,30 +19,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Catalyst - Accelerate Your Team",
-  description: "Collaborative task management platform that accelerates team productivity",
-  keywords: [
-    "task management",
-    "collaboration",
-    "productivity",
-    "team work",
-    "dev",
-    "tasks",
-    "task",
-    "tarefas",
-    "produtividade",
-    "metas",
-    "lista de metas",
-    "kanban",
-    "calendario"
-  ],
-  authors: [{ name: "Thalyson Ribeiro" }],
+  title: {
+    default: "Vexiun - AI-Powered Project Management",
+    template: "%s | Vexiun"
+  },
+  description:
+    "Project management with AI. Analyze repositories, create tasks automatically, and manage your team efficiently.",
+  keywords: ["project management", "ai", "github", "tasks", "team"],
+  authors: [{ name: "Vexiun" }],
+  creator: "Vexiun",
   openGraph: {
-    title: "Catalyst",
-    description: "Accelerate your team's productivity",
+    type: "website",
     images: [``],
     locale: "pt_BR",
-    type: "website"
+    url: "https://vexiun.com",
+    title: "Vexiun - AI-Powered Project Management",
+    description: "Project management with AI",
+    siteName: "Vexiun"
   },
   robots: {
     index: true,
@@ -56,8 +49,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Catalyst - Accelerate Your Team",
-    description: "Collaborative task management platform that accelerates team productivity",
+    title: "Vexiun - AI-Powered Project Management",
+    description: "Project management with AI",
+    creator: "@vexiun",
     images: [``]
   }
 };

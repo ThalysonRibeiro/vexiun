@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { FaTasks } from "react-icons/fa";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { CatalystLogo } from "@/components/catalyst-logo";
+import { Vexiun } from "@/components/vexiun";
 import { SharedWorkspacesData, WorkspaceSummaryData } from "@/app/data-access/workspace";
 import { BadgeWorkspace } from "@/components/badge-workspace";
 
@@ -84,7 +84,7 @@ export function AppSidebar(props: AppSidebarProps) {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <CatalystLogo showText={false} />
+          <Vexiun size="sm" showText={false} />
           <span className="font-semibold text-lg">Espaço de trabalho</span>
         </div>
       </SidebarHeader>
@@ -104,14 +104,15 @@ export function AppSidebar(props: AppSidebarProps) {
                           <span>{link.title}</span>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
-                      <CollapsibleContent className="ml-4">
+                      <CollapsibleContent className="ml-4 pl-1 border-l">
                         <SidebarMenu>
                           {link.sublinks.map((sublink) => (
                             <SidebarMenuItem
                               key={sublink.title}
                               className={cn(
                                 "",
-                                pathname === sublink.url && "bg-primary rounded-md"
+                                pathname === sublink.url &&
+                                  "bg-primary rounded-md text-white dark:text-black hover:bg-accent"
                               )}
                             >
                               <SidebarMenuButton asChild>
@@ -126,7 +127,11 @@ export function AppSidebar(props: AppSidebarProps) {
                     </Collapsible>
                   ) : (
                     <SidebarMenuItem
-                      className={cn("", pathname === link.url && "bg-primary rounded-md")}
+                      className={cn(
+                        "",
+                        pathname === link.url &&
+                          "bg-primary rounded-md text-white dark:text-black hover:bg-accent"
+                      )}
                     >
                       <SidebarMenuButton asChild>
                         <Link href={link.url}>
@@ -153,7 +158,8 @@ export function AppSidebar(props: AppSidebarProps) {
                     <div
                       className={cn(
                         "flex items-center w-full",
-                        pathname === `/dashboard/workspace/${shared.id}` && "bg-primary rounded-md"
+                        pathname === `/dashboard/workspace/${shared.id}` &&
+                          "bg-primary rounded-md text-white dark:text-black hover:bg-accent"
                       )}
                     >
                       <SidebarMenuButton asChild className="flex-1">

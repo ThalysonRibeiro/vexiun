@@ -12,7 +12,7 @@ export const badges = {
   OWNER: {
     icon: Crown,
     label: "Owner",
-    className: "bg-amber-500"
+    className: "bg-amber-500 text-white"
   },
   ADMIN: {
     icon: Shield,

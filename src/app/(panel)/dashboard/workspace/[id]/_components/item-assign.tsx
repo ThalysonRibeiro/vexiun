@@ -59,10 +59,10 @@ export function ItemAssign({ itemId, assignedToUser }: ItemAssignProps) {
               className={cn(
                 "bg-accent rounded-full w-fit flex items-center gap-2 pr-3 cursor-pointer",
                 "transition-colors duration-300",
-                selected?.id === menber.user.id && "bg-primary text-white"
+                selected?.id === menber.user.id && "bg-primary text-white dark:text-black"
               )}
             >
-              <Avatar>
+              <Avatar className="border-2">
                 <AvatarImage className="h-12 w-12" src={menber.user?.image as string} />
                 <AvatarFallback>{nameFallback(menber.user?.name as string)}</AvatarFallback>
               </Avatar>

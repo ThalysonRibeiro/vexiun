@@ -2,7 +2,7 @@ import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TestimonialsSectionMultipleRows } from "@/components/testimonials";
-import { CatalystLogo } from "@/components/catalyst-logo";
+import { Vexiun } from "@/components/vexiun";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -63,7 +63,7 @@ export default async function Home() {
   return (
     <main className="relative overflow-x-hidden min-h-screen">
       <div className="absolute top-4 left-4">
-        <CatalystLogo size="lg" />
+        <Vexiun size="md" />
       </div>
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[44px_44px]" />
 
@@ -83,7 +83,7 @@ export default async function Home() {
               Plataforma de Gerenciamento de Projetos
             </Badge>
 
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-left bg-gradient-to-r from-primary via-orange-500 to-primary bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto] mb-4 md:mb-6">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-left bg-gradient-to-r from-primary via-zinc-500 to-primary bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto] mb-4 md:mb-6">
               Acompanhe suas metas pessoais e gerencie projetos em equipe
             </h2>
 
@@ -1034,7 +1034,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 mb-6">
-                <CatalystLogo size="sm" />
+                <Vexiun size="sm" />
                 <span className="text-xl font-bold">Catalyst</span>
               </div>
               <p className="text-muted-foreground mb-6 max-w-md">
