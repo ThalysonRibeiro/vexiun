@@ -2,10 +2,17 @@ import { getMyPendingInvitations, getWorkspacePendingInvitations } from "@/app/d
 import { unwrapServerData } from "@/utils/server-helpers";
 import { InvitesContent } from "./_components/invites-content";
 
+export const dynamic = "force-dynamic";
+
 export default async function Invites() {
-  const pendingInvitations = await getMyPendingInvitations().then(unwrapServerData);
+  const pendingInvites = await getMyPendingInvitations().then(unwrapServerData);
 
-  const sentInvitations = await getWorkspacePendingInvitations().then(unwrapServerData);
+  const sentInvites = await getWorkspacePendingInvitations().then(unwrapServerData);
 
-  return <InvitesContent pendingInvites={pendingInvitations} sentInvites={sentInvitations} />;
+  const commonProps = {
+    pendingInvites,
+    sentInvites
+  };
+
+  return <InvitesContent {...commonProps} />;
 }
