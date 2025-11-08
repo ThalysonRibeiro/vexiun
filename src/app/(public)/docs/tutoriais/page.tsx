@@ -177,7 +177,7 @@ export default function TutoriaisPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                      <h4 className="font-semibold">Workspace: "E-commerce 2024"</h4>
+                      <h4 className="font-semibold">Workspace: &quot;E-commerce 2024&quot;</h4>
                       <div className="space-y-3">
                         <div className="p-3 border rounded-lg">
                           <h5 className="font-medium mb-2 flex items-center gap-2">

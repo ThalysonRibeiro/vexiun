@@ -1,7 +1,7 @@
 {
-  "name": "catalyst",
-  "version": "1.0.0",
-  "description": "Accelerate your team's productivity",
+  "name": "vexiun",
+  "version": "1.0.1",
+  "description": "Vexiun is a modern project and team management platform designed to transform vision into execution with fluidity and intelligence",
   "author": "Thalyson Ribeiro",
   "private": true,
   "scripts": {

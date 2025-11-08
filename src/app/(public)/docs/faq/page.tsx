@@ -292,7 +292,10 @@ export default function FAQPage() {
                       sistema permite:
                     </p>
                     <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-                      <li>Definir metas com frequência semanal (ex: "Estudar React 3x/semana")</li>
+                      <li>
+                        Definir metas com frequência semanal (ex: &quot;Estudar React
+                        3x/semana&quot;)
+                      </li>
                       <li>Acompanhar progresso visual com gráficos e estatísticas</li>
                       <li>Receber lembretes e notificações</li>
                       <li>Ver histórico de conquistas e evolução</li>
@@ -394,7 +397,7 @@ export default function FAQPage() {
                     </p>
                     <ol className="space-y-2 text-muted-foreground">
                       <li>1. Acesse as configurações do workspace</li>
-                      <li>2. Clique em "Convidar Membros"</li>
+                      <li>2. Clique em &quot;Convidar Membros&quot;</li>
                       <li>3. Digite o email do membro</li>
                       <li>4. Escolha o nível de permissão</li>
                       <li>5. Envie o convite</li>

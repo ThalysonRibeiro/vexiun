@@ -24,7 +24,7 @@ import {
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Priority, Status } from "@/generated/prisma";
+import { ComplexityType, Priority, Status } from "@/generated/prisma";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { isSuccessResponse } from "@/lib/errors/error-handler";
@@ -47,6 +47,7 @@ interface DialogContentNewItemProps {
     title: string;
     term: Date;
     priority: Priority;
+    complexity: ComplexityType;
     status: Status;
     notes: string;
     description: string;
@@ -75,6 +76,7 @@ export function DialogContentNewItem({
       title: formData.title,
       term: formData.term,
       priority: formData.priority,
+      complexity: formData.complexity,
       notes: formData.notes || "",
       description: formData.description || "",
       status,

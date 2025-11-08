@@ -145,13 +145,13 @@ export default function PrimeirosPassosPage() {
                         <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
                           1
                         </span>
-                        <span>Clique em "Novo Workspace" no dashboard</span>
+                        <span>Clique em &quot;Novo Workspace&quot; no dashboard</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
                           2
                         </span>
-                        <span>Escolha um nome descritivo (ex: "Projeto Website")</span>
+                        <span>Escolha um nome descritivo (ex: &quot;Projeto Website&quot;)</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
@@ -173,7 +173,7 @@ export default function PrimeirosPassosPage() {
                     <ul className="space-y-1 text-sm text-muted-foreground">
                       <li>• Use nomes claros e descritivos</li>
                       <li>• Evite abreviações confusas</li>
-                      <li>• Exemplos: "E-commerce 2024", "App Mobile"</li>
+                      <li>• Exemplos: &quot;E-commerce 2024&quot;, &quot;App Mobile&quot;</li>
                     </ul>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export default function PrimeirosPassosPage() {
                   <div className="bg-muted/50 rounded-lg p-4">
                     <h4 className="font-semibold mb-2">🎯 Como criar grupos:</h4>
                     <ol className="space-y-1 text-sm text-muted-foreground">
-                      <li>1. Dentro do workspace, clique em "Novo Grupo"</li>
+                      <li>1. Dentro do workspace, clique em &quot;Novo Grupo&quot;</li>
                       <li>2. Escolha um nome claro</li>
                       <li>3. Defina uma cor para identificação</li>
                       <li>4. Adicione uma descrição opcional</li>
@@ -326,13 +326,13 @@ export default function PrimeirosPassosPage() {
                         <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
                           1
                         </span>
-                        <span>Vá para "Configurações do Workspace"</span>
+                        <span>Vá para &quot;Configurações do Workspace&quot;</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
                           2
                         </span>
-                        <span>Clique em "Convidar Membros"</span>
+                        <span>Clique em &quot;Convidar Membros&quot;</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">

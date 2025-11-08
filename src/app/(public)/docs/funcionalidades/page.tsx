@@ -152,7 +152,7 @@ export default function FuncionalidadesPage() {
                     <div className="space-y-3">
                       <h4 className="font-semibold">1. Criar Workspace</h4>
                       <ol className="space-y-1 text-sm text-muted-foreground">
-                        <li>• Clique em "Novo Workspace"</li>
+                        <li>• Clique em &quot;Novo Workspace&quot;</li>
                         <li>• Escolha nome descritivo</li>
                         <li>• Defina cor e ícone</li>
                         <li>• Adicione descrição</li>

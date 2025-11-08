@@ -101,9 +101,11 @@ export function KanbanGrid() {
         workspaceId,
         itemId: draggedItem.id,
         status: status,
+        priority: draggedItem.priority,
+        complexity: draggedItem.complexity,
+        term: draggedItem.term,
         description: draggedItem.description,
         notes: draggedItem.notes,
-        priority: draggedItem.priority,
         title: draggedItem.title
       });
       if (!isSuccessResponse(response)) {
