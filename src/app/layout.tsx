@@ -2,29 +2,40 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionAuthProvider } from "@/components/session-auth";
-import { Bounce, ToastContainer } from "react-toastify";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/modeToggle";
+import { Providers } from "@/components/providers";
+import { ToastProvider } from "@/components/toast-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin"]
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin"]
 });
 
 export const metadata: Metadata = {
-  title: "Dev tasks",
-  description: "Uma aplicação moderna de gerenciamento de tarefas para desenvolvedores.",
-  keywords: ["dev", "tasks", "task", "tarefas", "produtividade", "metas", "lista de metas", "kanban", "calendario",],
+  title: {
+    default: "Vexiun - AI-Powered Project Management",
+    template: "%s | Vexiun"
+  },
+  description:
+    "Project management with AI. Analyze repositories, create tasks automatically, and manage your team efficiently.",
+  keywords: ["project management", "ai", "github", "tasks", "team"],
+  authors: [{ name: "Vexiun" }],
+  creator: "Vexiun",
   openGraph: {
-    title: "Dev tasks",
+    type: "website",
     images: [``],
     locale: "pt_BR",
-    type: "website",
+    url: "https://vexiun.com",
+    title: "Vexiun - AI-Powered Project Management",
+    description: "Project management with AI",
+    siteName: "Vexiun"
   },
   robots: {
     index: true,
@@ -33,52 +44,41 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: true,
-    },
+      noimageindex: true
+    }
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dev tasks",
-    description: "Uma aplicação moderna de gerenciamento de tarefas para desenvolvedores.",
-    images: [``],
-  },
+    title: "Vexiun - AI-Powered Project Management",
+    description: "Project management with AI",
+    creator: "@vexiun",
+    images: [``]
+  }
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
-      >
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}>
         <SessionAuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick={false}
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="dark"
-              transition={Bounce}
-            />
-            <div className="absolute top-4 right-4 z-50">
-              <ModeToggle />
-            </div>
-            {children}
-          </ThemeProvider>
+          <Providers>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <ToastProvider />
+              <div className="absolute top-4 right-4 z-50">
+                <ModeToggle />
+              </div>
+              <TooltipProvider delayDuration={300}>{children}</TooltipProvider>
+            </ThemeProvider>
+          </Providers>
         </SessionAuthProvider>
       </body>
     </html>

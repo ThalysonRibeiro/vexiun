@@ -1,16 +1,21 @@
-"use client"
+"use client";
 
-import { User } from "next-auth"
-import { User as DetailUser } from "@/generated/prisma"
-import { NameForme } from "./name-form"
-import Avatar from "./avatar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import AccountSecurity from "./account-security"
-import { Shield } from "lucide-react"
-import AccountStats from "./account-stats"
-import { UserWithCounts } from "../types/profile-types"
+import { User } from "next-auth";
+import { NameForme } from "./name-form";
+import Avatar from "./avatar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import AccountSecurity from "./account-security";
+import { Shield } from "lucide-react";
+import AccountStats from "./account-stats";
+import { UserWithCounts } from "../types/profile-types";
 
-export function ProfileContent({ sessionUser, detailUser }: { sessionUser: User, detailUser: UserWithCounts }) {
+export function ProfileContent({
+  sessionUser,
+  detailUser
+}: {
+  sessionUser: User;
+  detailUser: UserWithCounts;
+}) {
   return (
     <div className="space-y-6 mt-6 mb-10">
       <Card>
@@ -48,5 +53,5 @@ export function ProfileContent({ sessionUser, detailUser }: { sessionUser: User,
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

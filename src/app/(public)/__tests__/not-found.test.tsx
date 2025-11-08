@@ -6,12 +6,12 @@ describe("NotFound component", () => {
     render(<NotFound />);
 
     expect(screen.getByRole("heading", { level: 1, name: /404/i })).toBeInTheDocument();
-    expect(screen.getByText("Oops, a página que você está procurando não foi encontrada.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Oops, a página que você está procurando não foi encontrada.")
+    ).toBeInTheDocument();
 
     const link = screen.getByRole("link", { name: /Voltar para o Início/i });
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "/dashboard");
   });
 });
-
-

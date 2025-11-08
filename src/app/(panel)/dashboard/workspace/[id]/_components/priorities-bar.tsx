@@ -1,0 +1,47 @@
+import { PrioritiesCount } from "@/app/data-access/item";
+import { Priority } from "@/generated/prisma";
+
+interface PrioritiesBarProps {
+  priorities: PrioritiesCount[];
+  label?: boolean;
+}
+
+export function PrioritiesBar({ priorities, label = true }: PrioritiesBarProps) {
+  const total = priorities?.reduce((acc, priority) => acc + priority.count, 0);
+
+  return (
+    <div className="relative group">
+      {label && <h3 className="font-semibold text-sm text-center">Prioridade geral</h3>}
+      <div
+        data-testid="progress-bar-container"
+        className=" flex w-full h-4 rounded-md overflow-hidden"
+      >
+        {priorities?.map((priority) => (
+          <div
+            key={priority.priority}
+            className={`h-full`}
+            style={{
+              width: `${total > 0 ? (priority.count / total) * 100 : 0}%`,
+              backgroundColor: getPriorityColor(priority.priority)
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getPriorityColor(priority: Priority) {
+  switch (priority) {
+    case "CRITICAL":
+      return "oklch(37% 0.013 285.805)";
+    case "HIGH":
+      return "oklch(50.5% 0.213 27.518)";
+    case "MEDIUM":
+      return "oklch(63.7% 0.237 25.331)";
+    case "LOW":
+      return "oklch(70.4% 0.191 22.216)";
+    default:
+      return "oklch(70.5% 0.015 286.067)";
+  }
+}

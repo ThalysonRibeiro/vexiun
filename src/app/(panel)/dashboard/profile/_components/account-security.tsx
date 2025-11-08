@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -6,95 +6,85 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  SelectValue
+} from "@/components/ui/select";
 import { AlertCircle, CheckCircle, Mail, Shield } from "lucide-react";
-import { toast } from "react-toastify";
-import { SettingsFormData, UseSettingsForm } from "./use-settings-form";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { UserWithCounts } from "../types/profile-types";
-import { updateSettings } from "../_actions/update-settings";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
+import { UseSettingsForm, useUpdateSettings } from "@/hooks/use-user";
+import { SettingsFormData } from "@/app/actions/user";
+import { useMutation } from "@tanstack/react-query";
+import { useSendVerificationEmail } from "@/hooks/use-email";
 
 export default function AccountSecurity({ detailUser }: { detailUser: UserWithCounts }) {
   const isVerified = detailUser.emailVerified !== null;
+  const updateSettings = useUpdateSettings();
+  const sendVerificationEmail = useSendVerificationEmail();
 
-  if (!detailUser.UserSettings) {
-    return null
+  if (!detailUser.userSettings) {
+    return null;
   }
 
   const form = UseSettingsForm({
     initialValues: {
-      emailNotifications: detailUser.UserSettings?.emailNotifications,
-      pushNotifications: detailUser.UserSettings?.pushNotifications,
-      language: detailUser.UserSettings?.language,
-      timezone: detailUser.UserSettings?.timezone,
+      emailNotifications: detailUser.userSettings?.emailNotifications,
+      pushNotifications: detailUser.userSettings?.pushNotifications,
+      language: detailUser.userSettings?.language,
+      timezone: detailUser.userSettings?.timezone
     }
   });
 
-  const timeZone = Intl.supportedValuesOf("timeZone").filter(zone =>
-    zone.startsWith("America/Sao_Paulo") ||
-    zone.startsWith("America/Fortaleza") ||
-    zone.startsWith("America/Recife") ||
-    zone.startsWith("America/Bahia") ||
-    zone.startsWith("America/Belem") ||
-    zone.startsWith("America/Manaus") ||
-    zone.startsWith("America/Cuiaba") ||
-    zone.startsWith("America/Boa_Vista")
+  const timeZone = Intl.supportedValuesOf("timeZone").filter(
+    (zone) =>
+      zone.startsWith("America/Sao_Paulo") ||
+      zone.startsWith("America/Fortaleza") ||
+      zone.startsWith("America/Recife") ||
+      zone.startsWith("America/Bahia") ||
+      zone.startsWith("America/Belem") ||
+      zone.startsWith("America/Manaus") ||
+      zone.startsWith("America/Cuiaba") ||
+      zone.startsWith("America/Boa_Vista")
   );
 
   const languages = ["pt-BR", "en-US"];
 
-  const sendVerificationEmail = async () => {
-    try {
-      const responsePromise = fetch('/api/auth/send-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: detailUser.email }),
-      });
-
-      await toast.promise(responsePromise, {
-        pending: 'Enviando e-mail de verificação...',
-        success: 'E-mail de verificação enviado com sucesso!',
-        error: 'Falha ao enviar o e-mail de verificação.',
-      });
-
-      // Opcional: verificar se a resposta foi ok
-      const response = await responsePromise;
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send verification email');
-      }
-
-    } catch (error) {
-      console.error('Error sending verification email:', error);
-    }
+  const handleSendVerification = () => {
+    sendVerificationEmail.mutate(detailUser.email);
   };
+
+  // Acesso ao estado da mutation
+  const { isPending, isError, isSuccess } = sendVerificationEmail;
 
   const onSubmit = async (formData: SettingsFormData) => {
     if (!detailUser.id) {
       return;
     }
-    try {
-      const response = await updateSettings({
-        userId: detailUser.id,
-        emailNotifications: formData.emailNotifications,
-        pushNotifications: formData.pushNotifications,
-        language: formData.language,
-        timezone: formData.timezone,
-      });
-      if (response?.error) {
-        toast.error(response.error);
-        return;
-      }
-      toast.success(response.success);
 
-    } catch {
+    const response = await updateSettings.mutateAsync({
+      userId: detailUser.id,
+      emailNotifications: formData.emailNotifications,
+      pushNotifications: formData.pushNotifications,
+      language: formData.language,
+      timezone: formData.timezone,
+      revalidatePaths: ["/dashboard/profile"]
+    });
+    if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar configurações de segurança");
+      return;
     }
-  }
+    toast.success(response.message || "Configurações de segurança atualizadas com sucesso!");
+  };
 
   return (
     <div className="w-full">
@@ -104,23 +94,22 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
             {isVerified ? (
               <>
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="font-semibold text-green-700">Email Verified</span>
+                <span className="font-semibold text-green-700">Email verificado</span>
               </>
             ) : (
               <>
                 <AlertCircle className="w-5 h-5 text-orange-700" />
-                <span className="font-semibold text-orange-700">Email Not Verified</span>
+                <span className="font-semibold text-orange-700">E-mail não verificado</span>
               </>
             )}
           </div>
           <p className="text-sm">
             {isVerified
               ? `Seu e-mail foi verificado em ${detailUser.emailVerified?.toLocaleDateString()}`
-              : 'Verifique seu e-mail e clique no link de verificação para proteger sua conta.'
-            }
+              : "Verifique seu e-mail e clique no link de verificação para proteger sua conta."}
           </p>
           {!isVerified && (
-            <Button className="cursor-pointer" size="sm" onClick={sendVerificationEmail}>
+            <Button className="cursor-pointer" size="sm" onClick={handleSendVerification}>
               Reenviar e-mail de verificação
             </Button>
           )}
@@ -129,21 +118,15 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
         {/* Security Settings */}
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 p-4 rounded-xl border"
-          >
-            <h3 className="font-semibold text-lg">Security Settings</h3>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-4 rounded-xl border">
+            <h3 className="font-semibold text-lg">Configurações de segurança</h3>
 
             <div className="opacity-50 cursor-not-allowed border flex items-center justify-between py-3 px-4 rounded-lg">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5" />
                 <span className="font-medium">Autenticação de dois fatores</span>
               </div>
-              <Switch
-                checked={false}
-                className="cursor-not-allowed"
-              />
+              <Switch checked={false} className="cursor-not-allowed" />
             </div>
 
             <FormField
@@ -154,9 +137,7 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
                   <Shield className="w-6 h-6" />
                   <div className="space-y-0.5">
                     <FormLabel>Ativar alerta</FormLabel>
-                    <FormDescription>
-                      Alertas de login via email
-                    </FormDescription>
+                    <FormDescription>Alertas de login via email</FormDescription>
                   </div>
                   <FormControl className="ml-auto">
                     <Switch
@@ -188,17 +169,13 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
                             {timeZone}
                           </SelectItem>
                         ))}
-
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      Selecione seu fuso horário
-                    </FormDescription>
+                    <FormDescription>Selecione seu fuso horário</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
 
               <FormField
                 control={form.control}
@@ -218,26 +195,21 @@ export default function AccountSecurity({ detailUser }: { detailUser: UserWithCo
                             {language}
                           </SelectItem>
                         ))}
-
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      Selecione seu idioma
-                    </FormDescription>
+                    <FormDescription>Selecione seu idioma</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-
             <Button type="submit" size="sm" className="cursor-pointer">
               Salvar
             </Button>
           </form>
         </Form>
-
       </div>
     </div>
   );
-};
+}

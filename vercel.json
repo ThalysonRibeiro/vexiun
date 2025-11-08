@@ -9,5 +9,15 @@
   },
   "env": {
     "PRISMA_GENERATE_DATAPROXY": "true"
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/clean-notifications",
+      "schedule": "0 0 * * 0"
+    },
+    {
+      "path": "/api/cron/clean-workspaces",
+      "schedule": "0 2 * * 0"
+    }
+  ]
 }

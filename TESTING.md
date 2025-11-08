@@ -19,6 +19,7 @@ tests/                           # Testes E2E (Playwright)
 ## Testes Unitários (Jest)
 
 ### Executar Testes
+
 ```bash
 # Executar todos os testes unitários
 npm run test:unit
@@ -31,11 +32,13 @@ npm run test:unit:coverage
 ```
 
 ### Convenções de Nomenclatura
+
 - Arquivos de teste: `*.test.ts` ou `*.test.tsx`
 - Localização: `src/__tests__/` ou junto ao arquivo testado
 - Exemplo: `src/components/ui/__tests__/button.test.tsx`
 
 ### Exemplo de Teste
+
 ```typescript
 import { render, screen } from '@testing-library/react'
 import { Button } from '../button'
@@ -51,6 +54,7 @@ describe('Button Component', () => {
 ## Testes E2E (Playwright)
 
 ### Executar Testes
+
 ```bash
 # Executar todos os testes E2E
 npm run test:e2e
@@ -63,23 +67,26 @@ npm run test:e2e:headed
 ```
 
 ### Configuração
+
 - Base URL: `http://localhost:3000`
 - Navegador: Chromium (configurável)
 - Timeout: 120 segundos para servidor de desenvolvimento
 
 ### Exemplo de Teste
-```typescript
-import { test, expect } from '@playwright/test';
 
-test('should show login page', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: /sign in/i })).toBeVisible();
+```typescript
+import { test, expect } from "@playwright/test";
+
+test("should show login page", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: /sign in/i })).toBeVisible();
 });
 ```
 
 ## Configuração de Ambiente
 
 ### Variáveis de Ambiente
+
 Crie um arquivo `.env.test` baseado no `.env.test.example`:
 
 ```bash
@@ -97,6 +104,7 @@ EMAIL_FROM="test@example.com"
 ```
 
 ### Banco de Dados de Teste
+
 ```bash
 # Executar migrações no banco de teste
 npm run db:test:migrate
@@ -112,10 +120,12 @@ npm run test:all
 ## Relatórios
 
 ### Jest (Testes Unitários)
+
 - Cobertura: `coverage/` (gerado automaticamente)
 - Relatório HTML: `coverage/lcov-report/index.html`
 
 ### Playwright (Testes E2E)
+
 - Relatório HTML: `playwright-report/`
 - Screenshots: `test-results/` (apenas em falhas)
 - Vídeos: `test-results/` (apenas em falhas)

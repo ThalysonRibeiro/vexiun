@@ -1,3 +1,4 @@
+// Schema atualizado com Super Admin
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -23,6 +24,81 @@ enum Priority {
   STANDARD
 }
 
+enum ComplexityType {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum SpatusInvitation {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  CANCELLED
+}
+
+enum NotificationType {
+  WORKSPACE_INVITE // Convite para um projeto
+  WORKSPACE_ACCEPTED // Projeto aceito
+  ITEM_COMPLETED // Item completo
+  ITEM_ASSIGNED // Item atribuído
+  CHAT_MESSAGE // Nova mensagem no chat
+  SISTEM_MESSAGE // Mensagem do sistema
+  NOTICES_MESSAGE // Mensagem de notícias
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum EntityStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum WorkspaceCategory {
+  PERSONAL // Pessoal
+  WORK // Trabalho
+  EDUCATION // Educação
+  HEALTH // Saúde
+  FINANCE // Finanças
+  CREATIVE // Criativo
+  TECHNOLOGY // Tecnologia
+  MARKETING // Marketing
+  SALES // Vendas
+  SUPPORT // Suporte
+  OTHER // Outro
+}
+
+enum ActivityAction {
+  CREATE
+  UPDATE
+  DELETE
+  COMPLETE
+  REOPEN
+  ASSIGN
+  COMMENT
+  ARCHIVE
+}
+
+enum EntityType {
+  GROUP
+  ITEM
+  COMMENT
+  ATTACHMENT
+}
+
 model Goals {
   id                     String            @id @default(cuid())
   title                  String
@@ -44,64 +120,277 @@ model GoalCompletions {
   goal Goals @relation(fields: [goalId], references: [id], onDelete: Cascade)
 }
 
-model Desktop {
-  id        String   @id @default(cuid())
-  title     String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  groupe    Group[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Workspace {
+  id                  String                @id @default(cuid())
+  title               String
+  categories          WorkspaceCategory[]
+  description         String?
+  userId              String
+  status              EntityStatus          @default(ACTIVE)
+  statusChangedAt     DateTime?
+  statusChangedBy     String?
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groups              Group[]
+  members             WorkspaceMember[]
+  workspaceInvitation WorkspaceInvitation[]
+  chat                Chat[]
+  statusChanger       User?                 @relation("WorkspaceStatusChanger", fields: [statusChangedBy], references: [id])
+  lastActivityAt      DateTime              @default(now())
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  activityLogs        ActivityLog[]
+  userMetrics         UserMetrics[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([lastActivityAt])
+  @@index([statusChangedAt])
+}
+
+model WorkspaceMember {
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now()) //rastrear quando entrou
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId])
+}
+
+model WorkspaceInvitation {
+  id          String           @id @default(cuid())
+  workspaceId String
+  userId      String // usuário convidado
+  status      SpatusInvitation @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  invitedBy String // Quem enviou o convite
+  inviter   User      @relation("InvitedBy", fields: [invitedBy], references: [id], onDelete: Cascade)
+  expiresAt DateTime?
+
+  @@unique([workspaceId, userId])
+  @@index([userId]) // Workspaces do usuário
+  @@index([workspaceId]) // Membros do workspace
 }
 
 model Group {
-  id        String   @id @default(cuid())
-  title     String
-  textColor String
-  desktopId String
-  desktop   Desktop  @relation(fields: [desktopId], references: [id], onDelete: Cascade)
-  item      Item[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(cuid())
+  title       String
+  textColor   String
+  workspaceId String
+  status      EntityStatus @default(ACTIVE)
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  item        Item[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([status]) // Filtro por status
+  @@index([createdAt]) // Ordenação
 }
 
 model Item {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   title       String
-  status      Status   @default(NOT_STARTED)
+  status      Status         @default(NOT_STARTED)
   term        DateTime
-  priority    Priority @default(STANDARD)
+  priority    Priority       @default(STANDARD)
+  complexity  ComplexityType @default(MEDIUM)
   notes       String
   description String
+  details     Json? // Conteúdo rico do editor (código, formatação, etc)
   groupId     String?
-  group       Group?   @relation(fields: [groupId], references: [id])
+
+  createdBy    String? // ID do usuário que criou
+  assignedTo   String? // ID do usuário que recebeu a tarefa
+  entityStatus EntityStatus @default(ACTIVE) // - Status de arquivamento
+
+  group          Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdByUser  User?  @relation("CreatedItems", fields: [createdBy], references: [id])
+  assignedToUser User?  @relation("AssignedItems", fields: [assignedTo], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([assignedTo]) // Items por usuário
+  @@index([status]) // Filtro por status
+  @@index([createdAt]) // Ordenação
+  @@index([groupId, status]) // Compound index
+}
+
+// 1️⃣ Tabela de Auditoria (evento = ação do usuário)
+model ActivityLog {
+  id          String @id @default(cuid())
+  workspaceId String
+  userId      String
+
+  // O que foi feito
+  action     ActivityAction // CREATE, UPDATE, DELETE, COMPLETE, etc
+  entityType EntityType // GROUP, ITEM, COMMENT, etc
+  entityId   String
+
+  // Detalhes da mudança (opcional)
+  metadata Json? // { "from": "TODO", "to": "DONE", "field": "status" }
+
+  createdAt DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, userId])
+  @@index([workspaceId, createdAt])
+}
+
+// 2️⃣ Tabela de Métricas (cache calculado)
+model UserMetrics {
+  id          String @id @default(cuid())
+  workspaceId String
+  userId      String
+
+  // Métricas calculadas
+  itemsCreated    Int @default(0)
+  itemsCompleted  Int @default(0)
+  itemsInProgress Int @default(0)
+  commentsPosted  Int @default(0)
+
+  // Meta-dados
+  lastCalculated DateTime @default(now())
+  periodStart    DateTime // Início do período (semana/mês)
+  periodEnd      DateTime // Fim do período
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId, periodStart]) // Uma métrica por período
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model Notification {
+  id            String           @id @default(cuid())
+  image         String?
+  nameReference String?
+  userId        String // usuário que recebe a notificação
+  type          NotificationType
+  message       String // texto da notificação
+  referenceId   String? // id de referência (ex: WorkspaceInvitation.id ou Item.id)
+  isRead        Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([isRead])
+}
+
+model Assessments {
+  id      String @id @default(cuid())
+  message String
+  rating  Int
+  userId  String @unique
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model Chat {
+  id      String  @id @default(cuid())
+  title   String?
+  isGroup Boolean @default(false)
+
+  // Relações
+  messages  Message[]
+  members   ChatMember[]
+  workspace Workspace?   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  workspaceId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workspaceId])
+}
+
+model ChatMember {
+  chatId String
+  userId String
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([chatId, userId])
+}
+
+model Message {
+  id       String @id @default(cuid())
+  content  String
+  senderId String
+  chatId   String
+
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model User {
-  id    String  @id @default(cuid())
-  name  String?
-  email String  @unique
-  image String?
-
+  id                     String    @id @default(cuid())
+  name                   String?
+  email                  String    @unique
+  passwordHash           String?
+  passwordResetToken     String?
+  passwordResetExpires   DateTime?
   emailVerified          DateTime?
   emailVerificationToken String?
   verificationExpiresAt  DateTime?
+  image                  String?
+  role                   Role      @default(USER)
   acceptTerms            Boolean?  @default(true)
+  isActive               Boolean   @default(true) // Para desativar usuários sem deletar
+  createdBy              String? // ID de quem criou este usuário
 
-  desktop       Desktop[]
-  accounts      Account[]
-  sessions      Session[]
-  goals         Goals[]
-  Authenticator Authenticator[]
-  UserSettings  UserSettings?
+  // Relações existentes
+  workspace       Workspace[]
+  workspaceMember WorkspaceMember[]
+  accounts        Account[]
+  sessions        Session[]
+  goals           Goals[]
+  Authenticator   Authenticator[]
+  userSettings    UserSettings?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Relações de atribuição
+  assignedItems          Item[]                @relation("AssignedItems")
+  createdItems           Item[]                @relation("CreatedItems")
+  workspaceInvitation    WorkspaceInvitation[]
+  inviter                WorkspaceInvitation[] @relation("InvitedBy")
+  workspaceStatusChanges Workspace[]           @relation("WorkspaceStatusChanger")
+  Notification           Notification[]
+  assessments            Assessments?
+
+  message    Message[]
+  chatMember ChatMember[]
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  activityLogs ActivityLog[]
+  userMetrics  UserMetrics[]
 
   @@index([email])
+  @@index([role])
+  @@index([isActive])
 }
 
 model UserSettings {
@@ -109,13 +398,10 @@ model UserSettings {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Notificações
   pushNotifications  Boolean @default(true)
   emailNotifications Boolean @default(true)
-
-  // App
-  language String @default("pt-BR")
-  timezone String @default("America/Sao_Paulo")
+  language           String  @default("pt-BR")
+  timezone           String  @default("America/Sao_Paulo")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -160,7 +446,6 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
-// Optional for WebAuthn support
 model Authenticator {
   credentialID         String  @unique
   userId               String

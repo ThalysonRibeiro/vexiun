@@ -15,26 +15,30 @@ O sistema de alerta de login envia um email para o usuário sempre que ele faz l
 ## 🏗️ Arquitetura
 
 ### 1. Componente de Alerta (`src/components/login-alert.tsx`)
+
 - Componente React que detecta quando o usuário acessa o dashboard
 - Captura informações do dispositivo usando o hook `getDeviceInfo`
 - Envia uma requisição para a API de alerta de login
 - Garante que o alerta seja enviado apenas uma vez por sessão
 
 ### 2. API de Alerta (`src/app/api/auth/login-alert/route.ts`)
+
 - Endpoint que processa as informações do login
 - Obtém o IP do cliente
 - Consulta serviço de geolocalização para obter localização
 - Envia o email de alerta usando o serviço de email
 
 ### 3. Serviço de Email (`src/services/email.service.ts`)
+
 - Função `sendLoginAlertEmail` que gera e envia o email
 - Template HTML responsivo e profissional
 - Inclui informações detalhadas do login
 - Dicas de segurança para o usuário
 
 ### 4. Hook de Informações do Dispositivo (`src/hooks/use-mobile.ts`)
+
 - Função `getDeviceInfo` que captura informações do navegador
-- Detecta tipo de dispositivo (Desktop, Mobile, Tablet)
+- Detecta tipo de dispositivo (Workspace, Mobile, Tablet)
 - Identifica navegador usado
 - Obtém resolução da tela e timezone
 
@@ -101,16 +105,19 @@ Para monitorar o funcionamento do sistema:
 ## 🐛 Troubleshooting
 
 ### Email não está sendo enviado
+
 - Verificar configurações de SMTP
 - Confirmar variáveis de ambiente
 - Verificar logs do servidor
 
 ### Localização não aparece
+
 - Verificar se o IP não é local (127.0.0.1)
 - Confirmar conectividade com IP-API.com
 - Verificar logs de erro na API
 
 ### Múltiplos emails sendo enviados
+
 - Verificar se o `sessionStorage` está funcionando
 - Confirmar que o componente `LoginAlert` está sendo montado apenas uma vez
 

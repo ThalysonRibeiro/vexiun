@@ -3,8 +3,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { ConfirmEmailConmponent } from "../_components/confirme-email";
 import { mockFetch } from "@/test-utils/global-mocks";
 
-
-
 describe("ConfirmEmailConmponent", () => {
   const mockUseSearchParams = useSearchParams as jest.Mock;
   const mockUseRouter = useRouter as jest.Mock;
@@ -24,7 +22,7 @@ describe("ConfirmEmailConmponent", () => {
 
   it("should show loading state initially", async () => {
     // Mock fetch to never resolve to keep the loading state
-    mockFetch.mockReturnValue(new Promise(() => { }));
+    mockFetch.mockReturnValue(new Promise(() => {}));
 
     mockUseSearchParams.mockReturnValue(new URLSearchParams({ token: "some-token" }));
     await act(async () => {
@@ -38,7 +36,7 @@ describe("ConfirmEmailConmponent", () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams({ token: "valid-token" }));
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ message: "E-mail confirmado com sucesso!" }),
+      json: async () => ({ message: "E-mail confirmado com sucesso!" })
     });
 
     await act(async () => {
@@ -57,7 +55,7 @@ describe("ConfirmEmailConmponent", () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams({ token: "invalid-token" }));
     mockFetch.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ error: "Token inválido." }),
+      json: async () => ({ error: "Token inválido." })
     });
 
     await act(async () => {
@@ -117,7 +115,7 @@ describe("ConfirmEmailConmponent", () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams({ token: "valid-token" }));
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ message: "Success" }),
+      json: async () => ({ message: "Success" })
     });
 
     await act(async () => {

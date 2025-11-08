@@ -1,12 +1,12 @@
-"use client"
-import { Input } from "@/components/ui/input"
+"use client";
+import { Input } from "@/components/ui/input";
 import {
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import {
   Form,
   FormControl,
@@ -14,47 +14,50 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
-import { CreateGoalForm, UseCreateGoalForm } from "./use-create-goal"
+import { CreateGoalForm, UseCreateGoalForm } from "./use-create-goal";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useState } from "react";
 import { RadioGroup, RadioGroupIndicator, RadioGroupItem } from "@/components/ui/radio-group";
-import { createGoal } from "../_actions/create-goal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { useMobile } from "@/hooks/use-mobile";
+import { createGoal } from "@/app/actions/goals";
+import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler";
 
 interface CreateGoalProps {
   initialValues?: {
     title: string;
     desiredWeeklyFrequency: number;
-  }
+  };
 }
 
 export function CreateGoals({ initialValues }: CreateGoalProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isMobile = useMobile()
+  const isMobile = useMobile();
   const form = UseCreateGoalForm({ initialValues });
 
   async function onSubmit(formData: CreateGoalForm) {
     setIsLoading(true);
-    try {
-      const response = await createGoal({
-        title: formData.title,
-        desiredWeeklyFrequency: formData.desiredWeeklyFrequency
-      });
-      if (response.error) {
-        toast.error(response.error)
-      }
-      toast.success(response.data);
-      form.reset();
-    } catch (error) {
+    const response = await createGoal({
+      title: formData.title,
+      desiredWeeklyFrequency: formData.desiredWeeklyFrequency
+    });
+    if (isErrorResponse(response)) {
+      toast.error(response.error);
     }
-    finally {
-      setIsLoading(false);
+    if (isSuccessResponse(response)) {
+      toast.success(response.message);
     }
 
+    form.reset();
   }
 
   return (
@@ -96,7 +99,7 @@ export function CreateGoals({ initialValues }: CreateGoalProps) {
                 <FormItem>
                   <FormLabel>Quantas vezes na semana</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} >
+                    <Select onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="1x por semana" />
                       </SelectTrigger>
@@ -127,7 +130,9 @@ export function CreateGoals({ initialValues }: CreateGoalProps) {
                           <span className="text-lg leading-none">🤯</span>
                         </SelectItem>
                         <SelectItem value="7">
-                          <span className="text-sm font-medium leading-none">Todos os dias da semana</span>
+                          <span className="text-sm font-medium leading-none">
+                            Todos os dias da semana
+                          </span>
                           <span className="text-lg leading-none">🔥</span>
                         </SelectItem>
                       </SelectContent>
@@ -179,10 +184,11 @@ export function CreateGoals({ initialValues }: CreateGoalProps) {
                       </RadioGroupItem>
                       <RadioGroupItem value="7">
                         <RadioGroupIndicator />
-                        <span className="text-sm font-medium leading-none">Todos os dias da semana</span>
+                        <span className="text-sm font-medium leading-none">
+                          Todos os dias da semana
+                        </span>
                         <span className="text-lg leading-none">🔥</span>
                       </RadioGroupItem>
-
                     </RadioGroup>
                   </FormControl>
                   <FormDescription />
@@ -194,16 +200,20 @@ export function CreateGoals({ initialValues }: CreateGoalProps) {
 
           <div className="flex justify-between">
             <SheetTrigger asChild>
-              <Button variant={"secondary"} className="cursor-pointer w-2/5">Fechar</Button>
+              <Button variant={"secondary"} className="cursor-pointer w-2/5">
+                Fechar
+              </Button>
             </SheetTrigger>
             <Button type="submit" className="cursor-pointer w-2/5">
-              {isLoading ?
+              {isLoading ? (
                 <div className="w-5 h-5 border border-zinc-300 border-b-primary rounded-full animate-spin" />
-                : "Salvar"}
+              ) : (
+                "Salvar"
+              )}
             </Button>
           </div>
         </form>
       </Form>
     </SheetContent>
-  )
+  );
 }

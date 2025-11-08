@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense } from "react";
 import { ConfirmEmailConmponent } from "@/app/(public)/verify-email/_components/confirme-email";
 
 export default function VerifyEmailPage() {
@@ -8,5 +8,5 @@ export default function VerifyEmailPage() {
         <ConfirmEmailConmponent />
       </Suspense>
     </div>
-  )
+  );
 }

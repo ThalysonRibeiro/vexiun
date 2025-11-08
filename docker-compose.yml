@@ -1,22 +1,22 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
     image: postgres:17
-    container_name: dev_tasks
+    container_name: catalyst
     restart: always
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
     ports:
-            - "5434:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   db-test:
     image: postgres:17
-    container_name: dev_tasks_test
+    container_name: catalyst_test
     restart: always
     environment:
       POSTGRES_USER: myuser
@@ -26,7 +26,6 @@ services:
       - "5435:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
-
 
 volumes:
   postgres_data:

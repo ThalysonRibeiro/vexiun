@@ -48,3 +48,11 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# remover depopis
+IDEIAS.md
+PROJETO_CATALYST_PORTFOLIO.md
+PROXIMOS_PASSOS_DOCUMENTACAO.md
+MEMBERS_CHECKLIST.md
+
+.vercel

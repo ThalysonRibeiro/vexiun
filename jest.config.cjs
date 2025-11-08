@@ -1,55 +1,50 @@
-const nextJest = require('next/jest.js');
+const nextJest = require("next/jest.js");
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: './',
-})
+  dir: "./"
+});
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  coverageProvider: 'v8',
-  testEnvironment: 'jsdom',
+  coverageProvider: "v8",
+  testEnvironment: "jsdom",
   // Add more setup options before each test is run
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.tsx'],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.tsx"],
   collectCoverage: false,
   verbose: true,
-  moduleDirectories: ['node_modules', '<rootDir>/'],
+  moduleDirectories: ["node_modules", "<rootDir>/"],
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/index.ts',
-    '!src/**/page.tsx',
-    '!src/**/layout.tsx',
-    '!src/**/loading.tsx',
-    '!src/**/error.tsx',
-    '!src/**/not-found.tsx',
-    '!src/**/globals.css',
-    '!src/generated/**',
-    '!**/node_modules/**',
-    '!**/.next/**',
-    '!**/coverage/**',
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/index.ts",
+    "!src/**/page.tsx",
+    "!src/**/layout.tsx",
+    "!src/**/loading.tsx",
+    "!src/**/error.tsx",
+    "!src/**/not-found.tsx",
+    "!src/**/globals.css",
+    "!src/generated/**",
+    "!**/node_modules/**",
+    "!**/.next/**",
+    "!**/coverage/**"
   ],
   testMatch: [
-    '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
-    '<rootDir>/src/**/*.{test,spec}.{ts,tsx}',
+    "<rootDir>/src/**/__tests__/**/*.{ts,tsx}",
+    "<rootDir>/src/**/*.{test,spec}.{ts,tsx}"
   ],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    "^@/(.*)$": "<rootDir>/src/$1"
   },
   watchPathIgnorePatterns: [
-    '<rootDir>/.next/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/coverage/',
-    '<rootDir>/playwright-report/',
-    '<rootDir>/test-results/',
+    "<rootDir>/.next/",
+    "<rootDir>/node_modules/",
+    "<rootDir>/coverage/",
+    "<rootDir>/playwright-report/",
+    "<rootDir>/test-results/"
   ],
-  coverageReporters: [
-    'json',
-    'text',
-    'lcov',
-    'clover'
-  ],
-}
+  coverageReporters: ["json", "text", "lcov", "clover"]
+};
 
 module.exports = async () => {
   // Create Next.js jest configuration
@@ -57,8 +52,8 @@ module.exports = async () => {
 
   // Add the transformIgnorePatterns setting
   nextJestConfig.transformIgnorePatterns = [
-    '/node_modules/(?!next-auth|@auth/core|jose)/',
-    '^.+\.module\.(css|sass|scss)$',
+    "/node_modules/(?!next-auth|@auth/core|jose)/",
+    "^.+\.module\.(css|sass|scss)$"
   ];
 
   return nextJestConfig;

@@ -6,12 +6,12 @@ import { NextResponse, NextRequest } from "next/server";
 jest.mock("@/lib/prisma", () => ({
   user: {
     findUnique: jest.fn(),
-    update: jest.fn(),
-  },
+    update: jest.fn()
+  }
 }));
 
 jest.mock("@/services/email.service", () => ({
-  sendVerificationEmail: jest.fn(),
+  sendVerificationEmail: jest.fn()
 }));
 
 describe("API Route: /api/auth/send-verification", () => {
@@ -28,7 +28,7 @@ describe("API Route: /api/auth/send-verification", () => {
 
     const request = new NextRequest("http://localhost/api/auth/send-verification", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email })
     });
 
     const response = await POST(request);
@@ -38,16 +38,12 @@ describe("API Route: /api/auth/send-verification", () => {
       where: { email },
       data: {
         emailVerificationToken: expect.any(String),
-        verificationExpiresAt: expect.any(Date),
-      },
+        verificationExpiresAt: expect.any(Date)
+      }
     });
-    expect(sendVerificationEmail).toHaveBeenCalledWith(
-      email,
-      expect.any(String),
-      user.name
-    );
+    expect(sendVerificationEmail).toHaveBeenCalledWith(email, expect.any(String), user.name);
     expect(NextResponse.json).toHaveBeenCalledWith({
-      message: "E-mail send",
+      message: "E-mail send"
     });
     expect(response.status).toBe(200);
   });
@@ -55,15 +51,12 @@ describe("API Route: /api/auth/send-verification", () => {
   it("should return a 400 error if email is not provided", async () => {
     const request = new NextRequest("http://localhost/api/auth/send-verification", {
       method: "POST",
-      body: JSON.stringify({}),
+      body: JSON.stringify({})
     });
 
     const response = await POST(request);
 
-    expect(NextResponse.json).toHaveBeenCalledWith(
-      { error: "Email is required" },
-      { status: 400 }
-    );
+    expect(NextResponse.json).toHaveBeenCalledWith({ error: "Email is required" }, { status: 400 });
     expect(response.status).toBe(400);
   });
 
@@ -74,16 +67,13 @@ describe("API Route: /api/auth/send-verification", () => {
 
     const request = new NextRequest("http://localhost/api/auth/send-verification", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email })
     });
 
     const response = await POST(request);
 
     expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email } });
-    expect(NextResponse.json).toHaveBeenCalledWith(
-      { error: "User not found" },
-      { status: 404 }
-    );
+    expect(NextResponse.json).toHaveBeenCalledWith({ error: "User not found" }, { status: 404 });
     expect(response.status).toBe(404);
   });
 
@@ -92,13 +82,11 @@ describe("API Route: /api/auth/send-verification", () => {
     const user = { id: "1", email, name: "Test User" };
 
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(user);
-    (sendVerificationEmail as jest.Mock).mockRejectedValue(
-      new Error("Failed to send email")
-    );
+    (sendVerificationEmail as jest.Mock).mockRejectedValue(new Error("Failed to send email"));
 
     const request = new NextRequest("http://localhost/api/auth/send-verification", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email })
     });
 
     await expect(POST(request)).rejects.toThrow("Failed to send email");
@@ -107,13 +95,11 @@ describe("API Route: /api/auth/send-verification", () => {
   it("should handle errors from prisma.user.findUnique", async () => {
     const email = "test@example.com";
 
-    (prisma.user.findUnique as jest.Mock).mockRejectedValue(
-      new Error("Database error")
-    );
+    (prisma.user.findUnique as jest.Mock).mockRejectedValue(new Error("Database error"));
 
     const request = new NextRequest("http://localhost/api/auth/send-verification", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email })
     });
 
     await expect(POST(request)).rejects.toThrow("Database error");
@@ -124,13 +110,11 @@ describe("API Route: /api/auth/send-verification", () => {
     const user = { id: "1", email, name: "Test User" };
 
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(user);
-    (prisma.user.update as jest.Mock).mockRejectedValue(
-      new Error("Database error")
-    );
+    (prisma.user.update as jest.Mock).mockRejectedValue(new Error("Database error"));
 
     const request = new NextRequest("http://localhost/api/auth/send-verification", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email })
     });
 
     await expect(POST(request)).rejects.toThrow("Database error");

@@ -16,6 +16,7 @@
 ## 🔍 Checklist
 
 ### Antes de submeter
+
 - [ ] ✅ Código segue os padrões do projeto
 - [ ] ✅ Testes unitários passam (`npm run test:unit`)
 - [ ] ✅ Testes E2E passam (`npm run test:e2e`)
@@ -24,12 +25,14 @@
 - [ ] ✅ Build funciona (`npm run build`)
 
 ### Funcionalidades
+
 - [ ] ✅ Funcionalidade testada localmente
-- [ ] ✅ Responsividade testada (mobile/desktop)
+- [ ] ✅ Responsividade testada (mobile/Workspace)
 - [ ] ✅ Acessibilidade verificada
 - [ ] ✅ Performance não degradada
 
 ### Banco de Dados
+
 - [ ] ✅ Migrações criadas (se necessário)
 - [ ] ✅ Schema atualizado (se necessário)
 - [ ] ✅ Dados de teste atualizados (se necessário)
@@ -39,11 +42,13 @@
 <!-- Descreva os testes realizados -->
 
 ### Testes Unitários
+
 - [ ] Componentes testados
 - [ ] Utilitários testados
 - [ ] Hooks testados
 
 ### Testes E2E
+
 - [ ] Fluxos críticos testados
 - [ ] Autenticação testada
 - [ ] Dashboard testado
@@ -53,9 +58,11 @@
 <!-- Adicione screenshots se aplicável -->
 
 ### Antes
+
 <!-- Screenshot da versão anterior -->
 
 ### Depois
+
 <!-- Screenshot da nova versão -->
 
 ## 🔗 Links Relacionados
@@ -72,9 +79,11 @@
 ## 🚀 Deploy
 
 ### Vercel Preview
+
 <!-- Link será gerado automaticamente -->
 
 ### Ambiente de Teste
+
 - [ ] Testado em ambiente de staging
 - [ ] Variáveis de ambiente configuradas
 - [ ] Banco de dados de teste funcionando

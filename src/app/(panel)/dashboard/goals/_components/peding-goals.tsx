@@ -1,29 +1,26 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Plus, Trash } from "lucide-react"
-import { goalCompletion } from "../_actions/goal-completion"
-import { toast } from "react-toastify"
-import { deleteGoal } from "../_actions/delete-goal"
-import { PendingGoal } from "../_types"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { Plus, Trash } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { deleteGoal, goalCompletion } from "@/app/actions/goals";
+import { isErrorResponse, isSuccessResponse } from "@/lib/errors/error-handler";
+import { PendingGoal } from "@/app/data-access/goals";
 
 export function PedingGoals({ data }: { data: PendingGoal[] }) {
-
   async function handleCompleteGoal(goalId: string) {
     if (!goalId) {
       toast.error("Falha ao completar meta");
       return;
     }
-    try {
-      const response = await goalCompletion({ goalId });
-      if (response.error) {
-        toast.error(response.error);
-        return; // Importante: return aqui para não chamar success
-      }
-      toast.success(response.data);
-    } catch (error) {
-      toast.error("Falha ao completar meta");
+    const response = await goalCompletion({ goalId });
+    if (isErrorResponse(response)) {
+      toast.error(response.error);
+      return;
+    }
+    if (isSuccessResponse(response)) {
+      toast.success(response.message);
     }
   }
 
@@ -32,24 +29,28 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
       toast.error("Falha ao deletar meta");
       return;
     }
-    try {
-      const response = await deleteGoal({ goalId });
-      if (response.error) {
-        toast.error(response.error);
-        return; // Importante: return aqui para não chamar success
-      }
-      toast.success(response.data);
-    } catch (error) {
-      toast.error("Falha ao deletar meta");
+    const response = await deleteGoal({ goalId });
+    if (isErrorResponse(response)) {
+      toast.error(response.error);
+      return;
+    }
+    if (isSuccessResponse(response)) {
+      toast.success(response.message);
     }
   }
 
   return (
     <div className="flex flex-wrap gap-4">
-      {data.map(goal => (
-        <div key={goal.id} className={cn("flex items-center border rounded-lg hover:border-primary",
-          goal.completionCount >= goal.desiredWeeklyFrequency ? "hover:bg-accent/5" : "hover:bg-accent"
-        )}>
+      {data.map((goal) => (
+        <div
+          key={goal.id}
+          className={cn(
+            "flex items-center border rounded-lg hover:border-primary",
+            goal.completionCount >= goal.desiredWeeklyFrequency
+              ? "hover:bg-accent/5"
+              : "hover:bg-accent"
+          )}
+        >
           <Button
             disabled={goal.completionCount >= goal.desiredWeeklyFrequency}
             variant={"ghost"}
@@ -59,7 +60,8 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
           >
             <Plus />
             <p className="truncate text-ellipsis max-w-[calc(100dvw-9.5rem)]">
-              <span className="capitalize">{goal.title.slice(0, 1)}</span>{goal.title.slice(1)} ({goal.completionCount}/{goal.desiredWeeklyFrequency})
+              <span className="capitalize">{goal.title.slice(0, 1)}</span>
+              {goal.title.slice(1)} ({goal.completionCount}/{goal.desiredWeeklyFrequency})
             </p>
           </Button>
           <Button
@@ -75,5 +77,5 @@ export function PedingGoals({ data }: { data: PendingGoal[] }) {
         </div>
       ))}
     </div>
-  )
+  );
 }

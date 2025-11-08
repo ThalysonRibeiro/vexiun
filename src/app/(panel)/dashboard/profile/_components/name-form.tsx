@@ -1,35 +1,40 @@
-"use client"
+"use client";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { User } from "next-auth";
 import { useState } from "react";
-import { UseNameForm } from "./use-settings-form";
 import { Button } from "@/components/ui/button";
-import { updateName } from "../_actions/update-name";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+import { useNameForm, useUpdateName } from "@/hooks/use-user";
+import { isSuccessResponse } from "@/lib/errors/error-handler";
 
 export function NameForme({ user }: { user: User }) {
   const [isAdding, setIsAdding] = useState<boolean>(false);
-
-  const form = UseNameForm({ initialValues: { name: user?.name || "" } });
+  const form = useNameForm({ initialValues: { name: user?.name || "" } });
+  const updateName = useUpdateName();
 
   async function onSubmit(formData: { name: string }) {
     if (!user.id) return;
-    try {
-      const response = await updateName({
-        userId: user.id,
-        name: formData.name
-      });
-      if (response?.error) {
-        toast.error(response.error);
-        return;
-      }
-      toast.success("Nome alterado com sucesso!");
-      setIsAdding(false);
-    } catch (error) {
+
+    const response = await updateName.mutateAsync({
+      userId: user.id,
+      name: formData.name,
+      revalidatePaths: ["/dashboard/profile"]
+    });
+    if (!isSuccessResponse(response)) {
       toast.error("Erro ao atualizar nome");
+      return;
     }
+    toast.success("Nome alterado com sucesso!");
+    setIsAdding(false);
   }
 
   return (
@@ -50,10 +55,7 @@ export function NameForme({ user }: { user: User }) {
       </button>
       {isAdding && (
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-4 space-y-2 p-2"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-2 p-2">
             <FormField
               control={form.control}
               name="name"
@@ -61,27 +63,18 @@ export function NameForme({ user }: { user: User }) {
                 <FormItem>
                   <FormLabel>Editar nome</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Digite seu nome"
-                      {...field}
-                    />
+                    <Input placeholder="Digite seu nome" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              size={"sm"}
-              className=""
-            >
+            <Button type="submit" size={"sm"} className="">
               Salvar
             </Button>
           </form>
         </Form>
-      )
-      }
-
-    </div >
-  )
+      )}
+    </div>
+  );
 }

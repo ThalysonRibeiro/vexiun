@@ -1,26 +1,29 @@
-"use client"
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Session } from "next-auth";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown, User, LogOut, Loader2 } from "lucide-react";
+import { ChevronsUpDown, User, LogOut, Loader2, Bell, Users, Mail } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 interface MenuProps {
   userData: Session;
+  countPendingInvitations: number;
 }
 
-export function Menu({ userData }: MenuProps) {
+export function Menu(props: MenuProps) {
+  const { userData, countPendingInvitations } = props;
   const { update } = useSession();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -43,7 +46,7 @@ export function Menu({ userData }: MenuProps) {
     if (!name) return "U";
     return name
       .split(" ")
-      .map(word => word.charAt(0))
+      .map((word) => word.charAt(0))
       .slice(0, 2)
       .join("")
       .toUpperCase();
@@ -80,13 +83,30 @@ export function Menu({ userData }: MenuProps) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+        <DropdownMenuLabel>{userData.user?.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="cursor-pointer">
           <Link href="/dashboard/profile" className="flex items-center gap-2">
             <User className="mr-2 h-4 w-4" />
             Perfil
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/dashboard/workspace/invites" className="flex items-center w-full gap-2">
+            <Mail className="mr-2 h-4 w-4" />
+            Convites
+            {countPendingInvitations > 0 && (
+              <Badge className="ml-auto">{countPendingInvitations}</Badge>
+            )}
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/dashboard/notifications" className="flex items-center gap-2">
+            <Bell className="mr-2 h-4 w-4" />
+            Notificações
           </Link>
         </DropdownMenuItem>
 
