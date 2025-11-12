@@ -16,7 +16,7 @@ import { EntityStatus, Prisma, WorkspaceCategory, WorkspaceRole } from "@/genera
 import { changeWorkspaceStatus } from "@/app/actions/workspace/change-status";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { CACHE_TIMES } from "@/lib/constants";
+import { CACHE_TIMES } from "@/lib/constants/constants";
 import { useCallback, useState } from "react";
 import { WorkspaceWithDetails } from "@/app/(panel)/dashboard/workspace/_components/workspaces-page-client";
 import { toast } from "sonner";

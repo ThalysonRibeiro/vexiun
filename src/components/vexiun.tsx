@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { AiOutlineRobot } from "react-icons/ai";
 
 interface VexiunProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -21,7 +20,7 @@ export function Vexiun({ size = "md", showText = true, className, robot = true }
   return (
     <div className={cn("flex items-center", className)}>
       {robot && <Robot className={sizes[size].icon} />}
-      {showText && <span className={`font-bold -ml-2 uppercase ${sizes[size].text}`}>Vexiun</span>}
+      {showText && <span className={`font-bold uppercase ${sizes[size].text}`}>Vexiun</span>}
     </div>
   );
 }

@@ -51,7 +51,7 @@ export function KanbanGrid() {
     const priorityClass = `text-xs px-1 py-0.5 rounded-md ${colorPriority(item.priority)}`;
     dragPreview.className =
       "h-35 w-60 bg-background border-1 border-primary/50 rounded-lg p-3 shadow-lg opacity-90 space-y-1";
-    dragPreview.innerHTML = `
+    dragPreview.innerHTML = /*html*/ `
       <div class="font-medium truncate">${item.title}</div>
       <div class="text-sm">
         ${format(new Date(item.term), "dd/MM/yyyy")}
@@ -103,7 +103,7 @@ export function KanbanGrid() {
         status: status,
         priority: draggedItem.priority,
         complexity: draggedItem.complexity,
-        term: draggedItem.term,
+        // term: draggedItem.term,
         description: draggedItem.description,
         notes: draggedItem.notes,
         title: draggedItem.title

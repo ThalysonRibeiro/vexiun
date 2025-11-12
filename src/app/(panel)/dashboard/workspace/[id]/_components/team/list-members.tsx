@@ -23,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { memo } from "react";
 import { TeamResponse } from "@/hooks/use-team";
 import { ActionTeam } from "./action-team";
-import { roleDescriptions } from "@/lib/constants";
+import { roleDescriptions } from "@/lib/constants/constants";
 
 interface ListMembersProps {
   workspaceId: string;

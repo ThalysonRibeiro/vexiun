@@ -2,6 +2,7 @@
 
 import { updateAvatar } from "@/app/actions/user";
 import { useUpdateAvatar } from "@/hooks/use-user";
+import { env } from "@/lib/env";
 import { Loader2, Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -57,7 +58,7 @@ export default function Avatar({
       formData.append("file", image);
       formData.append("userId", userId);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/image/upload`, {
+      const response = await fetch(`${env.NEXT_PUBLIC_APP_URL}/api/image/upload`, {
         method: "POST",
         body: formData
       });

@@ -8,9 +8,32 @@ import { authenticateUser } from "@/app/data-access/auth/authenticateUser";
 import { ERROR_MESSAGES, ValidationError } from "./errors";
 import { signInSchema } from "@/app/actions/auth";
 import { Role } from "@/generated/prisma";
+import { env } from "./env";
+
+const adapter = PrismaAdapter(prisma);
+
+const extendedAdapter: typeof adapter = {
+  ...adapter,
+  async createUser(data) {
+    const user = await adapter.createUser!(data);
+
+    try {
+      await prisma.userSettings.create({
+        data: {
+          userId: user.id
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao criar UserSettings:", error);
+      throw new Error("Erro ao criar UserSettings");
+    }
+
+    return user;
+  }
+};
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: extendedAdapter,
   trustHost: true,
   session: {
     strategy: "jwt"
@@ -69,6 +92,51 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   events: {
     async signIn({ user, account, isNewUser }) {
       console.log(`[LOGIN] ${user.email} via ${account?.provider}${isNewUser ? " (novo)" : ""}`);
+      // 🔥 Envia alerta de login de forma assíncrona (não bloqueia o login)
+      setImmediate(async () => {
+        try {
+          // Busca as preferências do usuário
+          const userSettings = await prisma.userSettings.findUnique({
+            where: { userId: user.id },
+            select: { emailNotifications: true }
+          });
+
+          // Só envia se as notificações estiverem ativas
+          if (userSettings?.emailNotifications) {
+            const loginInfo = {
+              email: user.email!,
+              name: user.name || "Usuário",
+              provider: account?.provider || "credentials",
+              timestamp: new Date().toISOString(),
+              isNewUser
+            };
+
+            // Chama a API route de forma segura
+            const baseUrl = env.NEXT_PUBLIC_APP_URL;
+
+            const response = await fetch(`${baseUrl}/api/auth/login-alert`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                // 🔒 Token secreto para autenticar requisições internas
+                "x-internal-secret": env.INTERNAL_API_SECRET!
+              },
+              body: JSON.stringify(loginInfo)
+            });
+
+            if (response.ok) {
+              console.log(`✅ Alerta de login enviado para ${user.email}`);
+            } else {
+              console.error(`❌ Erro ao enviar alerta: ${response.status}`);
+            }
+          } else {
+            console.log(`ℹ️ Notificações desativadas para ${user.email}`);
+          }
+        } catch (error) {
+          console.error("❌ Erro ao enviar alerta de login:", error);
+          // Não falha o login por causa disso
+        }
+      });
     },
     async signOut(message) {
       console.log(`[LOGOUT]`, message);

@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { LoginAlert } from "@/components/login-alert";
 import { Priorities } from "./_components/priorities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -49,7 +48,7 @@ export default async function Dashboard() {
 
   return (
     <>
-      <LoginAlert emailNotifications={detailUser?.userSettings?.emailNotifications} />
+      {/* <LoginAlert emailNotifications={detailUser?.userSettings?.emailNotifications} /> */}
       <main className="container mx-auto px-6 pt-10">
         <section className="flex flex-col space-y-4">
           <div>

@@ -18,9 +18,9 @@ import { LoaderCircle, Tag } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
 import { isSuccessResponse } from "@/lib/errors";
 import { Textarea } from "@/components/ui/textarea";
-import { CATEGORIES_ARRAY } from "@/lib/constants";
 import { WorkspaceCategory } from "@/generated/prisma";
 import { WorkspaceFormData } from "@/app/actions/workspace/workspace-schema";
+import { CATEGORIES_ARRAY } from "@/lib/constants/categories-workspace";
 
 interface WorkspaceFormProps {
   workspaceId?: string;

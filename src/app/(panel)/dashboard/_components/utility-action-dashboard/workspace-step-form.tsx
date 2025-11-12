@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useWorkspaceForm } from "@/hooks/use-workspace";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { CATEGORIES_ARRAY } from "@/lib/constants";
+import { CATEGORIES_ARRAY } from "@/lib/constants/categories-workspace";
 
 export function WorkspaceStepForm({
   canProceed,

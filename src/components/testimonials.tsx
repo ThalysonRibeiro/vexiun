@@ -1,7 +1,7 @@
 "use client";
 import { Card, CardContent } from "./ui/card";
 import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from "./ui/kibo-ui/marquee";
-import { TESTIMONIALS } from "@/lib/constants";
+import { TESTIMONIALS } from "@/lib/constants/constants";
 
 export function TestimonialsSectionMultipleRows({ maxRows }: { maxRows: number }) {
   // Função para dividir em chunks

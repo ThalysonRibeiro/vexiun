@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:email": "email dev",
     "format": "prettier --write .",
     "dev:test": "dotenv -e .env.test -- next dev --turbopack",
     "build": "prisma generate && next build",
@@ -62,6 +63,7 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-email/components": "^0.5.7",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "@tailwindcss/postcss": "^4.1.12",
     "@tanstack/react-query": "^5.90.2",
     "@tiptap/core": "^3.6.5",
@@ -106,11 +108,12 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "tippy.js": "^6.3.7",
-    "zod": "^3.25.64"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.55.0",
+    "@react-email/preview-server": "^4.3.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",

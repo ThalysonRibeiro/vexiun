@@ -1,6 +1,7 @@
+import { env } from "@/lib/env";
 import argon2 from "argon2";
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = env.NODE_ENV === "production";
 
 export async function saltAndHashPassword(password: string): Promise<string> {
   return await argon2.hash(password, {

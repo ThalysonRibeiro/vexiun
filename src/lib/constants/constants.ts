@@ -1,50 +1,4 @@
-import { WorkspaceCategory, WorkspaceRole } from "@/generated/prisma";
-import {
-  User,
-  Briefcase,
-  GraduationCap,
-  Heart,
-  DollarSign,
-  Palette,
-  Cpu,
-  Megaphone,
-  TrendingUp,
-  Headphones,
-  MoreHorizontal
-} from "lucide-react";
-
-export const branding = {
-  // Nome oficial
-  name: "Vexiun",
-  domain: "vexiun.com",
-
-  email: "noreply@vexiun.com",
-  support: "support@vexiun.com",
-  contact: "contact@vexiun.com",
-  privacy: "privacy@vexiun.com",
-  terms: "terms@vexiun.com",
-
-  // Marketing
-  tagline1: "Project management, reimagined",
-  tagline2: "The smart project manager",
-  tagline3: "AI-powered project management",
-  description:
-    "Vexiun é uma plataforma moderna de gestão de projetos e times, projetada para transformar visão em execução com fluidez e inteligência.",
-  pitch: "Vexiun — Onde a visão encontra a execução.",
-
-  // Pronuncia:
-  pronunciation: "VEKS-ee-un",
-
-  story: {
-    origin: "Nome criado para representar velocidade + visão",
-    meaning: "Projetos que movem rápido com clareza",
-    tagline: "Move fast. Stay clear."
-  },
-  // Social
-  twitter: "@vexiun",
-  linkedin: "vexiun",
-  github: "vexiun"
-};
+import { WorkspaceRole } from "@/generated/prisma";
 
 export const CACHE_TIMES = {
   SHORT: 1 * 60 * 1000, // 1min - dados frequentes
@@ -52,34 +6,6 @@ export const CACHE_TIMES = {
   LONG: 15 * 60 * 1000, // 15min - dados estáveis
   PERMANENT: Infinity // Dados imutáveis
 } as const;
-
-export const CATEGORIES_ARRAY = [
-  { id: "PERSONAL", label: "Pessoal", icon: User },
-  { id: "WORK", label: "Trabalho", icon: Briefcase },
-  { id: "EDUCATION", label: "Educação", icon: GraduationCap },
-  { id: "HEALTH", label: "Saúde", icon: Heart },
-  { id: "FINANCE", label: "Finanças", icon: DollarSign },
-  { id: "CREATIVE", label: "Criativo", icon: Palette },
-  { id: "TECHNOLOGY", label: "Tecnologia", icon: Cpu },
-  { id: "MARKETING", label: "Marketing", icon: Megaphone },
-  { id: "SALES", label: "Vendas", icon: TrendingUp },
-  { id: "SUPPORT", label: "Suporte", icon: Headphones },
-  { id: "OTHER", label: "Outros", icon: MoreHorizontal }
-];
-
-export const CATEGORIES_MAP = {
-  PERSONAL: "Pessoal",
-  WORK: "Trabalho",
-  EDUCATION: "Educação",
-  HEALTH: "Saúde",
-  FINANCE: "Finanças",
-  CREATIVE: "Criativo",
-  TECHNOLOGY: "Tecnologia",
-  MARKETING: "Marketing",
-  SALES: "Vendas",
-  SUPPORT: "Suporte",
-  OTHER: "Outros"
-};
 
 export const UI_LABELS = {
   ASSIGN: "Atribuir",

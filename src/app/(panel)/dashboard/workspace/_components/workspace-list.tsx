@@ -33,11 +33,11 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useActionsWorkspaceList } from "@/hooks/use-workspace";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORIES_MAP } from "@/lib/constants";
 import { InviteMembersToWorkspaces } from "@/components/invite-members-to-workspaces";
 import { WorkspaceWithDetails } from "./workspaces-page-client";
 import { ActionsWorkspaceList } from "./actions-workspace-list";
 import { useDragScroll } from "@/hooks/use-drag-scroll";
+import { CATEGORIES_MAP } from "@/lib/constants/categories-workspace";
 
 interface WorkspaceListProps {
   workspaces: WorkspaceWithDetails[];

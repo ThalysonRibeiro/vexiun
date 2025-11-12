@@ -7,6 +7,7 @@ import {
   DuplicateError,
   RelationError
 } from "./custom-errors";
+import { env } from "../env";
 
 /**
  * Tipo de retorno de erro padronizado
@@ -107,7 +108,7 @@ export function handleError(
   defaultMessage: string = "Erro ao processar operação",
   context?: Record<string, unknown>
 ): ErrorResponse {
-  const isDev = process.env.NODE_ENV === "development";
+  const isDev = env.NODE_ENV === "development";
   const silentErrors = [PermissionError];
 
   const shouldLog = !silentErrors.some((ErrorClass) => error instanceof ErrorClass);
@@ -170,7 +171,7 @@ export function handleError(
   // Erros padrão do JavaScript
   if (error instanceof Error) {
     // Em produção, não expor detalhes internos
-    if (process.env.NODE_ENV === "production") {
+    if (env.NODE_ENV === "production") {
       return { error: defaultMessage, code: "GENERIC_ERROR" };
     }
     return { error: error.message, code: "ERROR" };

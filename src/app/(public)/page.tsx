@@ -63,7 +63,7 @@ export default async function Home() {
   return (
     <main className="relative overflow-x-hidden min-h-screen">
       <div className="absolute top-4 left-4">
-        <Vexiun size="md" />
+        <Vexiun size="md" robot={false} />
       </div>
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[44px_44px]" />
 
@@ -1034,8 +1034,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 mb-6">
-                <Vexiun size="sm" />
-                <span className="text-xl font-bold">Catalyst</span>
+                <Vexiun size="sm" robot={false} />
               </div>
               <p className="text-muted-foreground mb-6 max-w-md">
                 Plataforma completa para gerenciamento de projetos em equipe, permitindo colaboração
@@ -1201,7 +1200,7 @@ export default async function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <span className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} Catalyst. Todos os direitos reservados.
+                © {new Date().getFullYear()} Vexiun. Todos os direitos reservados.
               </span>
             </div>
             <div className="flex gap-6">
